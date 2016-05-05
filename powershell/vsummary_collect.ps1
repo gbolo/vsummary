@@ -24,7 +24,8 @@ TODO:
 function post_to_vsummary($json, $url)
 {
     # maybe add gzip and auth?
-    (Invoke-WebRequest -Uri $url -Body $json -ContentType "application/json" -Method Post).StatusCode
+    $http_status = (Invoke-WebRequest -Uri $url -Body $json -ContentType "application/json" -Method Post).StatusCode
+    return $http_status
 }
 
 
@@ -446,17 +447,26 @@ Function Get-vDiskSummary ( [string]$vc_uuid ){
 
 function vsummary_checks( [string]$vc_uuid, [string]$url ){
     # Run Checks
-    post_to_vsummary (Get-EsxiSummary $vc_uuid) $url
-    post_to_vsummary (Get-pNicSummary $vc_uuid) $url
-    post_to_vsummary (Get-datastoreSummary $vc_uuid) $url
-    post_to_vsummary (Get-vmSummary $vc_uuid) $url
-    post_to_vsummary (Get-svsSummary $vc_uuid) $url
-    post_to_vsummary (Get-dvsSummary $vc_uuid) $url
-    post_to_vsummary (Get-svsPgSummary $vc_uuid) $url
-    post_to_vsummary (Get-dvsPgSummary $vc_uuid) $url
-    post_to_vsummary (Get-vNicSummary $vc_uuid) $url
-    post_to_vsummary (Get-vDiskSummary $vc_uuid) $url
-
+    $status = post_to_vsummary (Get-EsxiSummary $vc_uuid) $url
+    Write-Host "esxi check http status code: $status"
+    $status = post_to_vsummary (Get-pNicSummary $vc_uuid) $url
+    Write-Host "pnic check http status code: $status"
+    $status = post_to_vsummary (Get-datastoreSummary $vc_uuid) $url
+    Write-Host "datastore check http status code: $status"
+    $status = post_to_vsummary (Get-vmSummary $vc_uuid) $url
+    Write-Host "vm check http status code: $status"
+    $status = post_to_vsummary (Get-svsSummary $vc_uuid) $url
+    Write-Host "vswitch check http status code: $status"
+    $status = post_to_vsummary (Get-dvsSummary $vc_uuid) $url
+    Write-Host "dvs check http status code: $status"
+    $status = post_to_vsummary (Get-svsPgSummary $vc_uuid) $url
+    Write-Host "vswitch_pg check http status code: $status"
+    $status = post_to_vsummary (Get-dvsPgSummary $vc_uuid) $url
+    Write-Host "dvs_pg check http status code: $status"
+    $status = post_to_vsummary (Get-vNicSummary $vc_uuid) $url
+    Write-Host "vnic check http status code: $status"
+    $status = post_to_vsummary (Get-vDiskSummary $vc_uuid) $url
+    Write-Host "vdisk check http status code: $status"
 }
 
 
