@@ -494,7 +494,22 @@ foreach($vc in $vcenters.Keys)
     if ($c){
         $vc_uuid = $c.InstanceUuid
         Write-Host "Connected to $vc_fqdn"
+
+        $vc_obj = New-Object -TypeName PSobject -Property @{
+            vc_shortname = $vc_shortname
+            vc_uuid = $vc_uuid
+            vc_fqdn = $vc_fqdn
+            objecttype = 'VCENTER'
+        }
+        $json = $vc_obj | ConvertTo-JSON
+
+        # SEND VCENTER INFO
+        $status = post_to_vsummary $json $vsummary_url
+        Write-Host "vcenter check http status code: $status"
+
+        # SEND ALL CHECKS
         vsummary_checks $vc_uuid $vsummary_url
+
     } Else {
         Write-Host "Could not connect to $vc_fqdn"
     }
