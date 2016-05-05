@@ -105,7 +105,8 @@ present TINYINT DEFAULT 1
 CREATE TABLE vcenter
 (
 id VARCHAR(36) PRIMARY KEY,
-name VARCHAR(128),
+fqdn VARCHAR(128),
+short_name VARCHAR(64),
 present TINYINT DEFAULT 1
 );
 
@@ -186,35 +187,24 @@ present TINYINT DEFAULT 1
 
 
 
+/*
 
+CREATE VIEWS TO SIMPLIFY QUEIRES IN APPLICATION
 
-
-
-
-
-
-
-
-
-
-
-
-SELECT  vm.name, esxi.name, coalesce(COUNT(vdisk.id),0) AS vdisks
-FROM    vm
-LEFT OUTER JOIN
-        vdisk
-ON      vm.id = vdisk.vm_id
-LEFT JOIN
-        esxi
-ON      vm.esxi_id = esxi.id
-WHERE   vm.present = 1 AND vdisk.present = 1 AND esxi.present = 1
-GROUP BY
-        vm.id;
-
+*/
 
 
 CREATE VIEW view_vm AS
-SELECT  vm.name, esxi.name AS esxi_name, coalesce(COUNT(vdisk.id),0) AS vdisks
+SELECT  
+  vm.*,
+  esxi.name AS esxi_name,
+  esxi.current_evc AS esxi_current_evc,
+  esxi.status AS esxi_status,
+  esxi.cpu_model AS esxi_cpu_model,
+  coalesce(COUNT(distinct vdisk.id),0) AS vdisks,
+  coalesce(COUNT(distinct vnic.id),0) AS vnics,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
 FROM    vm
 LEFT JOIN
         vdisk
@@ -222,21 +212,33 @@ ON      vm.id = vdisk.vm_id
     AND vm.present = 1
     AND vdisk.present = 1
 LEFT JOIN
+        vnic
+ON      vm.id = vnic.vm_id
+    AND vm.present = 1
+    AND vnic.present = 1
+LEFT JOIN
         esxi
 ON      vm.esxi_id = esxi.id
+LEFT JOIN
+        vcenter
+ON      vm.vcenter_id = vcenter.id
 GROUP BY
         vm.id;
 
 
+
 CREATE VIEW view_vnic AS
-SELECT  vnic.name, vnic.mac, vnic.connected, vnic.status, vnic.vcenter_id,
+SELECT  
+  vnic.*,
   vm.name AS vm_name, 
   esxi.name AS esxi_name, 
   coalesce(portgroup.name,"ORPHANED") AS portgroup_name,
   portgroup.vlan,
   coalesce(vswitch.name,"ORPHANED") AS vswitch_name, 
   vswitch.type AS vswitch_type,
-  vswitch.max_mtu
+  vswitch.max_mtu AS vswitch_max_mtu,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
 FROM    vnic
 LEFT JOIN
         portgroup
@@ -246,11 +248,16 @@ ON      vnic.portgroup_id = portgroup.id
 LEFT JOIN
         vm
 ON      vnic.vm_id = vm.id
+    AND vm.present = 1
 LEFT JOIN
         esxi
 ON      vm.esxi_id = esxi.id
+    AND esxi.present = 1
 LEFT JOIN
         vswitch
 ON      portgroup.vswitch_id = vswitch.id
+LEFT JOIN
+        vcenter
+ON      vm.vcenter_id = vcenter.id
 GROUP BY
         vnic.id;
