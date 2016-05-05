@@ -16,6 +16,7 @@ TODO:
     - Create a view into VM Snapshots
     - Create a view into Datacenter/Clusters/Resource Pools
     - Create a view into Folders
+    - Fix `#requires -PsSnapin VMware.VimAutomation.Core -Version 5` to work with 6
     - Alot more stuff I can't think of right now!
 
 #>
@@ -57,8 +58,6 @@ function Get-VMHostSerialNumber {
 Function Get-vmSummary ( [string]$vc_uuid ){
 
     $objecttype = "VM"
-
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
 
     &{Get-View -ViewType VirtualMachine -Property Name,
         Config.Files.VmPathName,
@@ -133,8 +132,6 @@ Function Get-vNicSummary ( [string]$vc_uuid ){
 
     $objecttype = "VNIC"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
-
     $dvs = @(Get-View -ViewType DistributedVirtualSwitch -Property Name,Uuid)
 
     $dvs | %{$_.UpdateViewData("Portgroup.Key","Portgroup.Name")}
@@ -202,8 +199,6 @@ Function Get-EsxiSummary ( [string]$vc_uuid ){
 
     $objecttype = "ESXI"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
-
     &{Get-View -ViewType HostSystem -Property Name,
         Summary.MaxEVCModeKey,
         Summary.CurrentEVCModeKey,
@@ -262,8 +257,6 @@ Function Get-pNicSummary ( [string]$vc_uuid ){
 
     $objecttype = "PNIC"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
-
     &{Get-View -ViewType HostSystem -Property Name,
         Config.Network.Pnic | %{
             $esxi = $_
@@ -289,8 +282,6 @@ Function Get-svsSummary ( [string]$vc_uuid ){
 
     $objecttype = "SVS"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
-
     &{Get-View -ViewType HostSystem -Property Name,
         Config.Network.Vswitch | %{
             $esxi = $_
@@ -313,8 +304,6 @@ Function Get-dvsSummary ( [string]$vc_uuid ){
 
     $objecttype = "DVS"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
-
     &{Get-View -ViewType DistributedVirtualSwitch -Property Name,
         Summary.ProductInfo.Version,
         Config | %{
@@ -336,7 +325,6 @@ Function Get-dvsPgSummary ( [string]$vc_uuid ){
 
     $objecttype = "DVSPG"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
     &{Get-View -ViewType DistributedVirtualPortgroup -Property Name,
         Config.DefaultPortConfig,
         Config.DistributedVirtualSwitch | %{
@@ -380,7 +368,6 @@ Function Get-svsPgSummary ( [string]$vc_uuid ){
 
     $objecttype = "SVSPG"
 
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
     &{Get-View -ViewType HostSystem -Property Name,
         Config.Network.Portgroup | %{
             $esxi = $_
@@ -403,8 +390,6 @@ Function Get-svsPgSummary ( [string]$vc_uuid ){
 Function Get-datastoreSummary ( [string]$vc_uuid ){
 
     $objecttype = "DS"
-
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
 
     &{Get-View -ViewType Datastore -Property Name,
             OverallStatus,
@@ -433,8 +418,6 @@ Function Get-datastoreSummary ( [string]$vc_uuid ){
 Function Get-vDiskSummary ( [string]$vc_uuid ){
 
     $objecttype = "VDISK"
-
-    #requires -PsSnapin VMware.VimAutomation.Core -Version 6
 
     &{Get-View -ViewType VirtualMachine -Property Name,
         Config.Hardware.Device,
@@ -492,13 +475,22 @@ foreach($vc in $vcenters.Keys)
     $vc_user = $vcenters.Item($vc).readonly_user
     $vc_pass = $vcenters.Item($vc).password
     
-    $d = Disconnect-VIServer -Server * -Force -Confirm:$false
-    $c = Connect-VIServer $vc_fqdn -user $vc_user -password $vc_pass
+    if ($global:DefaultVIServers.Count -gt 0) {
+        Disconnect-VIServer -Server * -Force -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
+    }
 
-    $vc_uuid = $c.InstanceUuid
+    $c = Connect-VIServer $vc_fqdn -user $vc_user -password $vc_pass 
 
-    vsummary_checks $vc_uuid $vsummary_url
-
+    if ($c){
+        $vc_uuid = $c.InstanceUuid
+        Write-Host "Connected to $vc_fqdn"
+        vsummary_checks $vc_uuid $vsummary_url
+    } Else {
+        Write-Host "Could not connect to $vc_fqdn"
+    }
+    
 }
 
-$d = Disconnect-VIServer -Server * -Force -Confirm:$false
+if ($global:DefaultVIServers.Count -gt 0) {
+    Disconnect-VIServer -Server * -Force -Confirm:$false
+}
