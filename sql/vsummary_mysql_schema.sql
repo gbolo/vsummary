@@ -1,8 +1,18 @@
 /*
-=============
+
 vSummary
 MYSQL SCHEMA
-=============
+
+Any database schema changes made for this project will be reflected in this file.
+
+TODO:
+ - create more views
+ - further normalization of the data
+ - add foreign keys/constraints
+ - add a logging table
+ - maybe a last_modified date column?
+ - verify correct types are being used for each column
+
 */
 
 CREATE TABLE vm
