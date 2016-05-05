@@ -405,6 +405,22 @@ function InsertvNIC($data){
 
 }
 
+
+function update_vcenter($data){
+
+    $id = $data['vc_uuid'];
+    $fqdn = $data['vc_fqdn'];
+    $short_name = $data['vc_shortname'];
+
+    $query = "INSERT INTO vcenter (id, fqdn, short_name) 
+        VALUES ('$id', '$fqdn', '$short_name') 
+        ON DUPLICATE KEY
+        UPDATE fqdn='$fqdn', short_name='$short_name', present=1";
+    mysql_query($query) or die(mysql_error());
+
+}
+
+
 $data = json_decode(file_get_contents('php://input'), true);
 
 $sql_user = 'vsummary';
@@ -450,7 +466,9 @@ elseif ( strcasecmp($data[0]['objecttype'],"DVSPG")==0 ){
 elseif ( strcasecmp($data[0]['objecttype'],"SVSPG")==0 ){
     InsertSVSPortgroup($data);
 }
-
+elseif ( strcasecmp($data['objecttype'],"VCENTER")==0 ){
+    update_vcenter($data);
+}
 
 mysql_close($dbhandle);
 
