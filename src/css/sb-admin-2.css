@@ -354,7 +354,23 @@ table.dataTable thead .sorting:after {
 }
 
 
-/* vSummary Additions */
+/* vSummary Additions/Overrides */
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Source Sans Pro', sans-serif;
+  color: #337ab7;
+  font-weight: 600;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+.page-header {
+    padding-bottom: 9px;
+    margin: 20px 0 20px;
+    border-bottom: 1px solid #eee;
+}
 
 .navbar-brand {
   padding: 0px;
