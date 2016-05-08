@@ -26,25 +26,49 @@ $primaryKey = 'id';
 // parameter represents the DataTables column identifier. In this case simple
 // indexes
 $columns = array(
-    array( 'db' => 'id', 'dt' => 0 ),
-    array( 'db' => 'name', 'dt' => 1 ),
-    array( 'db' => 'mac', 'dt' => 2 ),
-    array( 'db' => 'type', 'dt' => 3 ),
-    array( 'db' => 'connected', 'dt' => 4 ),
-    array( 'db' => 'status', 'dt' => 5 ),
-    array( 'db' => 'vm_id', 'dt' => 6 ),
-    array( 'db' => 'portgroup_id', 'dt' => 7 ),
-    array( 'db' => 'vcenter_id', 'dt' => 8 ),
-    array( 'db' => 'present', 'dt' => 9 ),
-    array( 'db' => 'vm_name', 'dt' => 10 ),
-    array( 'db' => 'esxi_name', 'dt' => 11 ),
-    array( 'db' => 'portgroup_name', 'dt' => 12 ),
-    array( 'db' => 'vlan', 'dt' => 13 ),
-    array( 'db' => 'vswitch_name', 'dt' => 14 ),
-    array( 'db' => 'vswitch_type', 'dt' => 15 ),
-    array( 'db' => 'vswitch_max_mtu', 'dt' => 16 ),
-    array( 'db' => 'vcenter_fqdn', 'dt' => 17 ),
-    array( 'db' => 'vcenter_short_name', 'dt' => 18 )
+    array( 
+        'db' => 'name', 
+        'dt' => 0,
+        'formatter' => function( $d, $row ) {
+            return str_replace("Network adapter", "vNIC #", $d);
+        }
+    ),
+    array( 'db' => 'mac', 'dt' => 1 ),
+    array( 'db' => 'type', 'dt' => 2 ),
+    array( 'db' => 'connected', 'dt' => 3 ),
+    array( 'db' => 'status', 'dt' => 4 ),
+    array( 'db' => 'vm_name', 'dt' => 5 ),
+    array( 'db' => 'esxi_name', 'dt' => 6 ),
+    array( 
+        'db' => 'portgroup_name', 
+        'dt' => 7,
+        'formatter' => function( $d, $row ) {
+            if ($d === 'ORPHANED'){
+                return "NULL";
+            }else{
+                return $d;
+            }
+        }
+    ),
+    array( 
+        'db' => 'vlan', 
+        'dt' => 8,
+        'formatter' => function( $d, $row ) {
+            if ($d === '4095'){
+                return "ALL";
+            }elseif ($d === '0'){
+                return "None";
+            }else {
+                return $d;
+            }
+        }
+    ),
+    array( 'db' => 'vswitch_name', 'dt' => 9 ),
+    array( 'db' => 'vswitch_type', 'dt' => 10 ),
+    array( 'db' => 'vswitch_max_mtu', 'dt' => 11 ),
+    array( 'db' => 'vcenter_fqdn', 'dt' => 12 ),
+    array( 'db' => 'vcenter_short_name', 'dt' => 13 )
+
 );
  
 // Load MYSQL connection details
