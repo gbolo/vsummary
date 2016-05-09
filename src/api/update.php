@@ -5,9 +5,12 @@
  POST json data sent from the PowerCLI script and modify/insert it
  into the various mysql tables.
 
+ - each POST will affect a single table and executed in a single transaction
+ - failed transactions or bad POST data will result in 500 response code
+
  **Disclaimer**
- This script currently does no error checking or validation. It expects to recieve 
- very specific post data.
+ This script currently does not do much error checking or validation. 
+ It expects to recieve very specific post data.
  STILL UNDER HEAVY DEVELOPMENT
 
 */
@@ -16,24 +19,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-function vlan_trunk_to_string($vlan_start, $vlan_end){
-
-    $v_start = explode( " ", $vlan_start );
-    $v_end = explode( " ", $vlan_end );
-
-    $vlan = "";
-
-    for ($i = 0; $i < count($v_start); $i++) {
-        if ( $v_start[$i] == $v_end[$i] ){
-            $vlan .=  "{$v_start[$i]}, ";
-        } else {
-            $vlan .=  "{$v_start[$i]} - {$v_end[$i]}, ";
-        }
-    }
-
-    $vlan = rtrim($vlan, ", ");
-    return $vlan;
-}
+// functions required
 
 function update_vcenter($data){
 
@@ -455,6 +441,220 @@ function update_pnic($data){
     }
 }
 
+function update_dvs($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+    $type = 'DVS';
+
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE vswitch SET present = 0 WHERE present = 1 AND type = "'.$type.'" AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,version,max_mtu,ports,vcenter_id) ' . 
+                'VALUES(:id,:name,:type,:version,:max_mtu,:ports,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),version=VALUES(version),max_mtu=VALUES(max_mtu),ports=VALUES(ports),present=1');
+
+        foreach ($data as $dvs) {
+
+            $id = md5( $dvs['vcenter_id'] . $dvs['moref'] );
+            $name = $dvs['name'];
+            $version = $dvs['version'];
+            $max_mtu = $dvs['max_mtu'];
+            $ports = $dvs['ports'];
+            $vcenter_id = $dvs['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->bindParam(':version', $version, PDO::PARAM_STR);
+            $stmt->bindParam(':max_mtu', $max_mtu, PDO::PARAM_INT);
+            $stmt->bindParam(':ports', $ports, PDO::PARAM_INT);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $conn->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
+function update_svs($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+    $type = 'vSwitch';
+
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE vswitch SET present = 0 WHERE present = 1 AND type = "'.$type.'" AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,esxi_id,max_mtu,ports,vcenter_id) ' . 
+                'VALUES(:id,:name,:type,:esxi_id,:max_mtu,:ports,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE max_mtu=VALUES(max_mtu),ports=VALUES(ports),present=1');
+
+        foreach ($data as $svs) {
+
+            $id = md5( $svs['vcenter_id'] . $svs['esxi_moref'] . $svs['name'] );
+            $name = $svs['name'];
+            $max_mtu = $svs['max_mtu'];
+            $ports = $svs['ports'];
+            $esxi_id = md5( $svs['vcenter_id'] . $svs['esxi_moref'] );
+            $vcenter_id = $svs['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->bindParam(':esxi_id', $esxi_id, PDO::PARAM_STR);
+            $stmt->bindParam(':max_mtu', $max_mtu, PDO::PARAM_STR);
+            $stmt->bindParam(':ports', $ports, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $conn->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
+function update_dvspg($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+    $type = 'DVS';
+   
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE portgroup SET present = 0 WHERE present = 1 AND type = "'.$type.'" AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' . 
+                'VALUES(:id,:name,:type,:vlan,:vlan_type,:vswitch_id,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),vlan=VALUES(vlan),vlan_type=VALUES(vlan_type),vswitch_id=VALUES(vswitch_id),vcenter_id=VALUES(vcenter_id),present=1');
+
+        foreach ($data as $pg) {
+
+            $id = md5( $pg['vcenter_id'] . $pg['moref'] );
+            $vswitch_id = md5( $pg['vcenter_id'] . $pg['dvs_moref'] );
+            $name = $pg['name'];
+            $vcenter_id = $pg['vcenter_id'];
+
+            if ( $pg['vlan_type'] == "VmwareDistributedVirtualSwitchTrunkVlanSpec" ) {
+                $vlan = vlan_trunk_to_string( $pg['vlan_start'], $pg['vlan_end'] );
+                $vlan_type = "trunk";
+            } else {
+                $vlan = $pg['vlan'];
+                $vlan_type = "single";
+            }
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->bindParam(':vlan', $vlan, PDO::PARAM_STR);
+            $stmt->bindParam(':vlan_type', $vlan_type, PDO::PARAM_STR);
+            $stmt->bindParam(':vswitch_id', $vswitch_id, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $conn->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
+function update_svspg($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+    $type = 'vSwitch';
+   
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE portgroup SET present = 0 WHERE present = 1 AND type = "'.$type.'" AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' . 
+                'VALUES(:id,:name,:type,:vlan,:vlan_type,:vswitch_id,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),vlan=VALUES(vlan),vlan_type=VALUES(vlan_type),vswitch_id=VALUES(vswitch_id),vcenter_id=VALUES(vcenter_id),present=1');
+
+        foreach ($data as $pg) {
+
+            $esxi_id = md5( $pg['vcenter_id'] . $pg['esxi_moref'] );
+            $id = md5( $pg['vcenter_id'] . $pg['esxi_moref'] . $pg['name'] );
+            $vswitch_id = md5( $pg['vcenter_id'] . $pg['esxi_moref'] . $pg['vswitch_name'] );
+            $vlan = $pg['vlan'];
+            $vlan_type = 'single';
+            $name = $pg['name'];
+            $vcenter_id = $pg['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->bindParam(':vlan', $vlan, PDO::PARAM_STR);
+            $stmt->bindParam(':vlan_type', $vlan_type, PDO::PARAM_STR);
+            $stmt->bindParam(':vswitch_id', $vswitch_id, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $conn->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
+function vlan_trunk_to_string($vlan_start, $vlan_end){
+
+    $v_start = explode( " ", $vlan_start );
+    $v_end = explode( " ", $vlan_end );
+
+    $vlan = "";
+
+    for ($i = 0; $i < count($v_start); $i++) {
+        if ( $v_start[$i] == $v_end[$i] ){
+            $vlan .=  "{$v_start[$i]}, ";
+        } else {
+            $vlan .=  "{$v_start[$i]} - {$v_end[$i]}, ";
+        }
+    }
+
+    $vlan = rtrim($vlan, ", ");
+    return $vlan;
+}
+
 
 // Load MYSQL connection details
 require_once( 'lib/mysql_config.php' );
@@ -499,6 +699,18 @@ elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"VDI
 }
 elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"PNIC")==0 ){
     update_pnic($data);
+}
+elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"DVS")==0 ){
+    update_dvs($data);
+}
+elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"SVS")==0 ){
+    update_svs($data);
+}
+elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"DVSPG")==0 ){
+    update_dvspg($data);
+}
+elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"SVSPG")==0 ){
+    update_svspg($data);
 }
 else{
     echo "Invalid data";
