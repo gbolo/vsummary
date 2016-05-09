@@ -226,7 +226,6 @@ GROUP BY
         vm.id;
 
 
-
 CREATE VIEW view_vnic AS
 SELECT  
   vnic.*,
@@ -261,3 +260,58 @@ LEFT JOIN
 ON      vm.vcenter_id = vcenter.id
 GROUP BY
         vnic.id;
+
+
+CREATE VIEW view_esxi AS
+SELECT 
+  esxi.*, 
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name,
+  ( SELECT coalesce(sum(vm.vcpu),0)
+    FROM vm
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vcpus_powered_on,
+  ( SELECT coalesce(sum(vm.memory_mb),0)
+    FROM vm
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vmemory_mb_powered_on,
+  ( SELECT coalesce(count(vm.id),0)
+    FROM vm 
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vms_powered_on,
+  ( SELECT coalesce(count(pnic.id),0)
+    FROM pnic 
+    WHERE pnic.esxi_id = esxi.id AND pnic.present = 1) pnics
+FROM esxi 
+LEFT JOIN
+    vcenter
+ON  esxi.vcenter_id = vcenter.id;
+
+
+
+/* 
+TESTING
+*/
+
+CREATE VIEW view_esxi AS
+SELECT  
+  esxi.*,
+  coalesce(COUNT(distinct vm.id),0) AS vms_powered_on,
+  coalesce(SUM(vm.vcpu),0) AS vcpus_powered_on, 
+  coalesce(SUM(vm.memory_mb),0) AS vmemory_mb_powered_on,
+  coalesce(COUNT(distinct pnic.id),0) AS pnics,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    esxi
+LEFT JOIN
+        vm
+ON      esxi.id = vm.esxi_id
+    AND esxi.present = 1
+    AND vm.present = 1
+    AND vm.power_state = 1
+LEFT JOIN
+        pnic
+ON      esxi.id = pnic.esxi_id
+    AND pnic.present = 1
+LEFT JOIN
+        vcenter
+ON      vm.vcenter_id = vcenter.id
+GROUP BY
+        esxi.id;
