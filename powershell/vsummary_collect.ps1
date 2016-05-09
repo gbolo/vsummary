@@ -23,9 +23,20 @@ TODO:
 
 function post_to_vsummary($json, $url)
 {
-    # maybe add gzip and auth?
-    $http_status = (Invoke-WebRequest -Uri $url -Body $json -ContentType "application/json" -Method Post).StatusCode
-    return $http_status
+    # maybe add gzip and auth or api key?
+    try {
+        $request = Invoke-WebRequest -Uri $url -Body $json -ContentType "application/json" -Method Post -ErrorAction SilentlyContinue
+    } 
+    catch [System.Net.WebException] {
+        $request = $_.Exception.Response
+        return 500
+    }
+    catch {
+        Write-Error $_.Exception
+        return 500
+    }
+    return $request.StatusCode
+
 }
 
 
