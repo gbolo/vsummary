@@ -2,10 +2,11 @@
 
 // SQL server connection information
 $sql_details = array(
-    'user' => 'vsummary',
-    'pass' => 'changeme',
-    'db'   => 'vsummary',
-    'host' => 'localhost'
+    'user'    => 'vsummary',
+    'pass'    => 'changeme',
+    'db'      => 'vsummary',
+    'host'    => 'localhost',
+    'charset' => 'utf8'
 );
 
 

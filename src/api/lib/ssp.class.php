@@ -16,13 +16,6 @@
  */
 
 
-// REMOVE THIS BLOCK - used for DataTables test environment only!
-$file = $_SERVER['DOCUMENT_ROOT'].'/datatables/mysql.php';
-if ( is_file( $file ) ) {
-	include( $file );
-}
-
-
 class SSP {
 	/**
 	 * Create the data output array for the DataTables rows
@@ -372,17 +365,18 @@ class SSP {
 	 *
 	 * @param  array $sql_details SQL server connection details array, with the
 	 *   properties:
-	 *     * host - host name
-	 *     * db   - database name
-	 *     * user - user name
-	 *     * pass - user password
+	 *     * host    - host name
+	 *     * db      - database name
+	 *     * user    - user name
+	 *     * pass    - user password
+	 *     * charset - charset
 	 * @return resource Database connection handle
 	 */
 	static function sql_connect ( $sql_details )
 	{
 		try {
 			$db = @new PDO(
-				"mysql:host={$sql_details['host']};dbname={$sql_details['db']}",
+				"mysql:host={$sql_details['host']};dbname={$sql_details['db']};charset={$sql_details['charset']}",
 				$sql_details['user'],
 				$sql_details['pass'],
 				array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION )
