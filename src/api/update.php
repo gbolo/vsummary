@@ -319,9 +319,9 @@ function update_datastore($data){
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
             $stmt->bindParam(':status', $status, PDO::PARAM_INT);
-            $stmt->bindParam(':capacity_bytes', $capacity_bytes, PDO::PARAM_INT);
-            $stmt->bindParam(':free_bytes', $free_bytes, PDO::PARAM_INT);
-            $stmt->bindParam(':uncommitted_bytes', $uncommitted_bytes, PDO::PARAM_INT);
+            $stmt->bindParam(':capacity_bytes', $capacity_bytes);
+            $stmt->bindParam(':free_bytes', $free_bytes);
+            $stmt->bindParam(':uncommitted_bytes', $uncommitted_bytes);
             $stmt->bindParam(':type', $type, PDO::PARAM_STR);
             $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
 
@@ -370,7 +370,7 @@ function update_vdisk($data){
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-            $stmt->bindParam(':capacity_bytes', $capacity_bytes, PDO::PARAM_INT);
+            $stmt->bindParam(':capacity_bytes', $capacity_bytes);
             $stmt->bindParam(':path', $path, PDO::PARAM_STR);
             $stmt->bindParam(':thin_provisioned', $thin_provisioned, PDO::PARAM_STR);
             $stmt->bindParam(':datastore_id', $datastore_id, PDO::PARAM_STR);
