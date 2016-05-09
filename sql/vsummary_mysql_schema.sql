@@ -299,6 +299,57 @@ GROUP BY
         datastore.id;
 
 
+CREATE VIEW view_vdisk AS
+SELECT  
+  vdisk.*,
+  vm.name AS vm_name,
+  vm.power_state AS vm_power_state,
+  datastore.name AS datastore_name,
+  datastore.type AS datastore_type,
+  esxi.name AS esxi_name,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    vdisk
+LEFT JOIN
+        vm
+ON      vdisk.vm_id = vm.id
+    AND vdisk.present = 1
+LEFT JOIN
+        datastore
+ON      vdisk.datastore_id = datastore.id
+    AND vdisk.present = 1
+LEFT JOIN
+        esxi
+ON      vdisk.esxi_id = esxi.id
+    AND vdisk.present = 1
+LEFT JOIN
+        vcenter
+ON      vdisk.vcenter_id = vcenter.id
+    AND vdisk.present = 1
+GROUP BY
+        vdisk.id;
+
+
+CREATE VIEW view_portgroup AS
+SELECT  
+  portgroup.*,
+  vswitch.name AS vswitch_name,
+  vswitch.type AS vswitch_type,
+  vswitch.max_mtu AS vswitch_max_mtu,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    portgroup
+LEFT JOIN
+        vswitch
+ON      portgroup.vswitch_id = vswitch.id
+    AND portgroup.present = 1
+LEFT JOIN
+        vcenter
+ON      portgroup.vcenter_id = vcenter.id
+    AND portgroup.present = 1
+GROUP BY
+        portgroup.id;
+
 /* 
 TESTING
 */
