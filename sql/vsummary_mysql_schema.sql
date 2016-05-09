@@ -285,6 +285,19 @@ LEFT JOIN
 ON  esxi.vcenter_id = vcenter.id;
 
 
+CREATE VIEW view_datastore AS
+SELECT  
+  datastore.*,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    datastore
+LEFT JOIN
+        vcenter
+ON      datastore.vcenter_id = vcenter.id
+    AND datastore.present = 1
+GROUP BY
+        datastore.id;
+
 
 /* 
 TESTING
