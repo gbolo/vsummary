@@ -356,6 +356,7 @@ function update_vdisk($data){
 
         foreach ($data as $vdisk) {
 
+            // older vm versions will not have disk_object_id. add path to the hash
             $id = md5( $vdisk['vcenter_id'] . $vdisk['disk_object_id'] . $vdisk['path'] );
             $name = $vdisk['name'];
             if ( is_null($vdisk['capacity_bytes']) ){
