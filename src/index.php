@@ -200,6 +200,12 @@
                 responsive: true,
                 scrollX: true,
                 stateSave: true,
+                stateSaveParams: function (settings, data) {
+                    // Loop through all columns and delete the search
+                    for (var i = 0;i < data.columns.length; i++){
+                        delete data.columns[i].search;
+                    }
+                },
                 paging: true,
                 pageLength: 15,
                 lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]],
