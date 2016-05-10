@@ -683,44 +683,62 @@ catch (PDOException $e) {
 // Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Pass the POST data to the correct function
-if ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER")==0 ){
+// quick data validation and manipulation to support single arrays 
+if ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER") == 0 ){
     update_vcenter($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"VNIC")==0 ){
-    update_vnic($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"ESXI")==0 ){
-    update_esxi($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"VM")==0 ){
-    update_vm($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"DS")==0 ){
-    update_datastore($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"VDISK")==0 ){
-    update_vdisk($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"PNIC")==0 ){
-    update_pnic($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"DVS")==0 ){
-    update_dvs($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"SVS")==0 ){
-    update_svs($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"DVSPG")==0 ){
-    update_dvspg($data);
-}
-elseif ( isset($data[0]['objecttype']) && strcasecmp($data[0]['objecttype'],"SVSPG")==0 ){
-    update_svspg($data);
-}
-else{
+    exit();
+} elseif ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER") != 0 ){
+    $post_data[0] = $data;
+    $object_type = $data['objecttype'];
+} elseif ( isset($data[0]['objecttype']) ){
+    $post_data = $data;
+    $object_type = $data[0]['objecttype'];
+} else {
     echo "Invalid data";
     http_response_code(500);
+    exit();
 }
+
+// pass post_data to correct function based on object_type
+switch ($object_type) {
+    case "ESXI":
+        update_esxi($post_data);
+        break;
+    case "VM":
+        update_vm($post_data);
+        break;
+    case "VNIC":
+        update_vnic($post_data);
+        break;
+    case "DS":
+        update_datastore($post_data);
+        break;
+    case "VDISK":
+        update_vdisk($post_data);
+        break;
+    case "PNIC":
+        update_pnic($post_data);
+        break;
+    case "DVS":
+        update_dvs($post_data);
+        break;
+    case "SVS":
+        update_svs($post_data);
+        break;
+    case "DVSPG":
+        update_dvspg($post_data);
+        break;
+    case "SVSPG":
+        update_svspg($post_data);
+        break;
+    default:
+        echo "Invalid data";
+        http_response_code(500);
+}
+
+
+
+
 
 
 
