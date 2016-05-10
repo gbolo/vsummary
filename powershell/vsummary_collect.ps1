@@ -486,11 +486,14 @@ function vsummary_checks( [string]$vc_uuid, [string]$url ){
 
 
 # ADD YOUR vSUMMARY PHP ENDPOINT HERE:
-$vsummary_url = 'http://vsummary.midgar.dev/api/update.php'
+$vsummary_url = 'http://vsummary.linuxctl.com/api/update.php'
 
 # ADD YOUR VCENTER SERVERS LIKE THIS:
 $vcenters = @{
-    PROD = @{ fqdn = '10.0.77.6'; readonly_user = 'readonly@vsphere.local'; password = '^Blue_300'; }; 
+    LAB = @{ fqdn = 'vcsa1.lab.linuxctl.com'; readonly_user = 'readonly@vsphere.local'; password = 'changeme'; };
+    VDI = @{ fqdn = 'vcsa1.vdi.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
+    PROD = @{ fqdn = 'vcsa1.prod.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
+    DR = @{ fqdn = 'vcsa1.dr.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
 }
 
 foreach($vc in $vcenters.Keys)
