@@ -113,10 +113,13 @@
                                         <a href="#">Log Insight</a>
                                     </li>
                                     <li>
-                                        <a href="http://pubs.vmware.com/vsphere-60/topic/com.vmware.powercli.cmdletref.doc/Overview.html">PowerCLI Reference</a>
+                                        <a target="_blank" href="http://pubs.vmware.com/vsphere-60/topic/com.vmware.powercli.cmdletref.doc/Overview.html">PowerCLI Reference</a>
                                     </li>
                                 </ul>
                                 <!-- /.nav-second-level -->
+                            </li>
+                            <li>
+                                <a target="_blank" href="https://github.com/gbolo/vSummary"><i class="fa fa-git fa-fw"></i> Contribute @ github</a>
                             </li>
                         </ul>
                     </div>
