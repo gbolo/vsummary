@@ -143,7 +143,7 @@ function update_esxi($data){
             $current_evc = var_export( $esxi['current_evc'], true );
             $status = $esxi['status'];
             $power_state = $esxi['power_state'];
-            $in_maintenance_mode = $esxi['in_maintenance_mode'];
+            $in_maintenance_mode = var_export( $esxi['in_maintenance_mode'], true );
             $vendor = $esxi['vendor'];
             $model = $esxi['model'];
             $uuid = $esxi['uuid'];
