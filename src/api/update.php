@@ -356,11 +356,15 @@ function update_vdisk($data){
 
         foreach ($data as $vdisk) {
 
-            $id = md5( $vdisk['vcenter_id'] . $vdisk['disk_object_id'] );
+            $id = md5( $vdisk['vcenter_id'] . $vdisk['disk_object_id'] . $vdisk['path'] );
             $name = $vdisk['name'];
-            $capacity_bytes = $vdisk['capacity_bytes'];
+            if ( is_null($vdisk['capacity_bytes']) ){
+                $capacity_bytes = 1024 * $vdisk['capacity_kb'];
+            } else {
+                $capacity_bytes = $vdisk['capacity_bytes'];
+            }
             $path = $vdisk['path'];
-            $thin_provisioned = $vdisk['thin_provisioned'];
+            $thin_provisioned = var_export( $vdisk['thin_provisioned'], true );
             $datastore_id = md5( $vdisk['vcenter_id'] . $vdisk['datastore_moref'] );
             $uuid = $vdisk['uuid'];
             $disk_object_id = $vdisk['disk_object_id'];
