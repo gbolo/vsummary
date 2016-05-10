@@ -438,9 +438,13 @@ Function Get-vDiskSummary ( [string]$vc_uuid ){
             $vm = $_
             $vm.Config.Hardware.Device | ?{$_ -is [VMware.Vim.VirtualDisk]} | %{
                 $vdisk = $_
+
+                ## Collect both capacity_bytes and capacityInKB since vm version vmx-07 and lower will not have capacity_bytes
+                ## https://www.vmware.com/support/developer/converter-sdk/conv55_apireference/vim.vm.device.VirtualDisk.html
                 New-Object -TypeName PSobject -Property @{
                     name = $vdisk.DeviceInfo.Label
                     capacity_bytes = $vdisk.CapacityInBytes
+                    capacity_kb = $vdisk.capacityInKB
                     path = $vdisk.Backing.Filename
                     thin_provisioned = $vdisk.Backing.ThinProvisioned
                     datastore_moref = $vdisk.Backing.Datastore.Value
