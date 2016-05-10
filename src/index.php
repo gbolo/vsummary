@@ -1,7 +1,7 @@
+<?php require_once('include/functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 
-<?php require_once('include/functions.php'); ?>
 <head>
 
     <meta charset="utf-8">
@@ -138,7 +138,9 @@
                 <div class="col-lg-12">
                     <!-- /.dataTable_wrapper -->
                     <div class="dataTable_wrapper">
-						<?php datatables_html($view); ?>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dt-vsummary-<?php echo $view; ?>">
+						  <?php datatables_html($view); ?>
+                        </table>
                     </div>
                 </div>
                 <!-- /.col-lg-12 -->
@@ -185,13 +187,13 @@
         $(document).ready(function() {
 
             // Setup - add a text input to each footer cell
-            $('#dt-vsummary tfoot th').each( function () {
+            $('#dt-vsummary-<?php echo $view; ?> tfoot th').each( function () {
                 var title = $(this).text();
                 $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
             });
             
             // Load Datatables
-            var table = $('#dt-vsummary').DataTable({
+            var table = $('#dt-vsummary-<?php echo $view; ?>').DataTable({
                 //dom: 'Blrtip',
                 dom: "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
                 scrollY: '60vh',
@@ -240,7 +242,7 @@
                 $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
 
                 // Redraw the datatables vsummary table
-                $('#dt-vsummary').DataTable().draw();
+                $('#dt-vsummary-<?php echo $view; ?>').DataTable().draw();
 
             });
         });
