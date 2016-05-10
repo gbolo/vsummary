@@ -52,7 +52,7 @@ function update_vcenter($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         http_response_code(500);
     }
@@ -113,7 +113,7 @@ function update_vnic($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         http_response_code(500);
     }
@@ -195,7 +195,7 @@ function update_esxi($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -281,7 +281,7 @@ function update_vm($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -332,7 +332,7 @@ function update_datastore($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -387,7 +387,7 @@ function update_vdisk($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -434,7 +434,7 @@ function update_pnic($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -481,7 +481,7 @@ function update_dvs($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -528,7 +528,7 @@ function update_svs($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -581,7 +581,7 @@ function update_dvspg($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
@@ -629,7 +629,7 @@ function update_svspg($data){
 
     } catch (PDOException $e) {
         // rollback transaction on error
-        $conn->rollback();
+        $pdo->rollback();
         // return 500
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
