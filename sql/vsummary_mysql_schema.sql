@@ -329,7 +329,36 @@ ON      vdisk.vcenter_id = vcenter.id
 GROUP BY
         vdisk.id;
 
+/* group standard vswitch portgroups only if actually the same */
+CREATE VIEW view_portgroup AS
+SELECT DISTINCT  
+  portgroup.name,
+  portgroup.type,
+  portgroup.vlan,
+  portgroup.vlan_type,
+  vswitch.name AS vswitch_name,
+  vswitch.type AS vswitch_type,
+  vswitch.max_mtu AS vswitch_max_mtu,
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    portgroup
+LEFT JOIN
+        vswitch
+ON      portgroup.vswitch_id = vswitch.id
+    AND portgroup.present = 1
+LEFT JOIN
+        vcenter
+ON      portgroup.vcenter_id = vcenter.id
+    AND portgroup.present = 1
+GROUP BY
+        portgroup.id;
 
+
+/* 
+TESTING
+*/
+
+/* portgroup non distinct */
 CREATE VIEW view_portgroup AS
 SELECT  
   portgroup.*,
@@ -350,9 +379,6 @@ ON      portgroup.vcenter_id = vcenter.id
 GROUP BY
         portgroup.id;
 
-/* 
-TESTING
-*/
 
 CREATE VIEW view_esxi AS
 SELECT  
@@ -374,6 +400,25 @@ LEFT JOIN
         pnic
 ON      esxi.id = pnic.esxi_id
     AND pnic.present = 1
+LEFT JOIN
+        vcenter
+ON      vm.vcenter_id = vcenter.id
+GROUP BY
+        esxi.id;
+
+
+SELECT  
+  esxi.id,
+  SUM(vm.vcpu) AS vm_vcpu, 
+  vcenter.fqdn AS vcenter_fqdn,
+  vcenter.short_name AS vcenter_short_name
+FROM    esxi
+LEFT JOIN
+        vm
+ON      esxi.id = vm.esxi_id
+    AND esxi.present = 1
+    AND vm.present = 1
+    AND vm.power_state = 1
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id
