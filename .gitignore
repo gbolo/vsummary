@@ -1,2 +1,2 @@
 ### mysql config details ###
-api/lib/mysql_config.php
+src/api/lib/mysql_config.php
