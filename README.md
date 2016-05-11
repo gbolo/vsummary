@@ -1,4 +1,4 @@
-![Alt text](/img/vsummary_logo.png?raw=true "vSummary Logo")
+![Alt text](/src/img/vsummary_logo.png?raw=true "vSummary Logo")
 
 vSummary is an open source  tool for collecting and displaying a summary of your vSphere Environment(s).
 
