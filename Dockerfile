@@ -26,12 +26,9 @@ RUN apk add --no-cache bash supervisor mariadb mariadb-client \
 # -----------------------------------------------------------------------------
 RUN mkdir -p /data/mysql/data && \
     mkdir -p /data/mysql/conf && \
-    mkdir -p /data/mysql/logs && \
     mkdir -p /data/nginx/www && \
     mkdir -p /data/nginx/conf && \
-    mkdir -p /data/nginx/logs && \
-    mkdir -p /data/php-fpm/conf && \
-    mkdir -p /data/php-fpm/logs
+    mkdir -p /data/php-fpm/conf
 
 COPY ./docker/my.cnf /data/mysql/conf/my.cnf
 COPY ./docker/nginx.conf /data/nginx/conf/nginx.conf
