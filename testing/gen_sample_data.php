@@ -87,7 +87,7 @@ function vsummary_api_call($data){
                                                                   
 	$data_string = json_encode($data);                                                                                   
 	                                                                                                                     
-	$ch = curl_init('http://vsummary.midgar.dev/api/update.php');                                                                      
+	$ch = curl_init('http://127.0.0.1/api/update.php');                                                                      
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);                                                                  
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
