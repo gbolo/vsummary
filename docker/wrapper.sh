@@ -13,9 +13,9 @@ DATA_DIR="/data/mysql/data"
 PID_FILE=/var/run/mysqld/mysqld.pid
 
 if [ ! -d "$DATA_DIR/mysql" ]; then
-  if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
+  if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
     echo >&2 'error: database is uninitialized and password option is not specified '
-    echo >&2 'You need to specify one of MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD'
+    echo >&2 'You need to specify MYSQL_ROOT_PASSWORD'
     exit 1
   fi
 
@@ -57,14 +57,15 @@ if [ ! -d "$DATA_DIR/mysql" ]; then
     FLUSH PRIVILEGES ;
 EOSQL
 
-
   mysql_options="$mysql_options -p${MYSQL_ROOT_PASSWORD}"
-
+  
+  # create vsummary database and user
   mysql $mysql_options -e "CREATE DATABASE IF NOT EXISTS vsummary ;"
   mysql $mysql_options -e "CREATE USER 'vsummary'@'%' IDENTIFIED BY 'changeme' ;"
   mysql $mysql_options -e "GRANT ALL ON vsummary.* TO 'vsummary'@'%' ;"
   mysql $mysql_options -e 'FLUSH PRIVILEGES ;'
 
+  # create mysql schema
   mysql $mysql_options vsummary < /data/mysql/conf/vsummary_mysql_schema.sql
 
   pid="`cat $PID_FILE`"
@@ -75,6 +76,12 @@ EOSQL
 
   # make sure mysql completely ended
   sleep 2
+
+  # Insert some sample data if required
+  if [ "$INSERT_SAMPLE_DATA" = true ] ; then
+    echo >$2 'INSERTING SAMPLE DATA FOR vsummary'
+    /usr/bin/php /data/nginx/gen_sample_data.php
+  fi
 
   echo
   echo 'MySQL init process done. Ready for start up.'
@@ -89,17 +96,10 @@ chown -R nginx: /data/nginx
 rm -rf /etc/nginx/nginx.conf
 ln -s /data/nginx/conf/nginx.conf /etc/nginx/nginx.conf
 
-
 mkdir -p /data/php-fpm/logs
 chown -R nginx: /data/php-fpm
 rm -rf /etc/php5/php-fpm.conf
 ln -s /data/php-fpm/conf/php-fpm.conf /etc/php5/php-fpm.conf
-
-########################################
-#  vsummary -- INSERT SAMPLE DATA      #
-########################################
-/usr/bin/php /data/nginx/gen_sample_data.php
-
 
 ########################################
 #  vsummary -- START SUPERVISORD       #
