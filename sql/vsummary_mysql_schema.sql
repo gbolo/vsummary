@@ -359,6 +359,7 @@ TESTING
 */
 
 /* portgroup non distinct */
+/*
 CREATE VIEW view_portgroup AS
 SELECT  
   portgroup.*,
@@ -424,3 +425,5 @@ LEFT JOIN
 ON      vm.vcenter_id = vcenter.id
 GROUP BY
         esxi.id;
+
+*/
