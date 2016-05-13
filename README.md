@@ -9,6 +9,11 @@ For a **LIVE DEMO**, please follow this link:
 ### Screenshots
 ![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_1.png "Screenshot 1")
 
+### Architecture
+vSummary is essentially a web application with both a frontend and backend. The baceknd accepts HTTP POST data in json format which it then normalizes and inserts/updates into mysql tables. The frontend is where it disaplys this data for users to see. Here is a basic architectural diagram to visualize this:
+
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/vsummary_arch.png "Architecture")
+
 ### Requirements
 
 The following requirements for vSummary have been identified so far:
@@ -31,6 +36,7 @@ The following requirements for vSummary have been identified so far:
 8. Allow execution of powershell files that are not signed: `Set-ExecutionPolicy -Scope "CurrentUser" -ExecutionPolicy "unrestricted"`
 9. Download the powershell script [vsummary_collect.ps1](https://github.com/gbolo/vSummary/blob/master/powershell/vsummary_collect.ps1) and modify the vcenter server list and api endpoint located near the end of the script.
 10. Execute the powershell script, then once complete visit your webserver address to see the results.
+11. Create an automated job to run this script X amount of times per day.
 
 ### Docker
 
