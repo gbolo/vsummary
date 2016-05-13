@@ -2,7 +2,8 @@
 
 vSummary is an open source  tool for collecting and displaying a summary of your vSphere Environment(s).
 
-For a **LIVE DEMO**, please follow this link: [![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/demo_link.png)](http://vsummary.linuxctl.com/index.php?view=vm)
+For a **LIVE DEMO**, please follow this link: 
+[![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/demo_link.png)](http://vsummary.linuxctl.com/index.php?view=vm){:target="_blank"}
 
 ### Screenshots
 ![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_1.png "Screenshot 1")
