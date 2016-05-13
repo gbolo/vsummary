@@ -1,18 +1,12 @@
 <?php
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
-/*
-{
-    "vc_uuid":  "73994d03-a089-43ed-bf12-45dae20d14e1",
-    "objecttype":  "VCENTER",
-    "vc_shortname":  "LAB",
-    "vc_fqdn":  "vcsa-1.lab.linuxctl.com"
-}
-*/
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$api_endpoint = 'http://localhost/api/update.php';
 $vc_id = 'TEST'.md5(mt_rand());
 $vc_type = 'dr';
-$vc_fqdn = 'vcsa.'.$vc_type.'.linuxctl.com';
+$vc_fqdn = 'vcenter.'.$vc_type.'.sample.tld';
 
 $vm_pre_name = array(
 	"nginx", 
@@ -84,10 +78,11 @@ $guest_os = array(
 );
 
 function vsummary_api_call($data){
-                                                                  
+                              
+    global $api_endpoint;                                  
 	$data_string = json_encode($data);                                                                                   
 	                                                                                                                     
-	$ch = curl_init('http://127.0.0.1/api/update.php');                                                                      
+	$ch = curl_init($api_endpoint);                                                                      
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);                                                                  
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
@@ -96,8 +91,18 @@ function vsummary_api_call($data){
 	    'Content-Length: ' . strlen($data_string))                                                                       
 	);                                                                                                                   
 	                                                                                                                     
-	$result = curl_exec($ch);
-	return $result;
+	curl_exec($ch);
+
+	// Check if any error occurred
+	if (!curl_errno($ch)) {
+	  	$info = curl_getinfo($ch);
+	  	$status = ($info['http_code'] == 200 ? 'SUCCESS' : 'FAILED');
+	  	$result = $status . '! RESPONSE: ' . $info['http_code'] . ' TIME: ' . $info['total_time'] . "s\n";
+	  	return $result;
+	} else {
+		return "API REQUEST FAILED\n";
+	}
+	
 }
 
 function gen_mac(){
@@ -277,10 +282,10 @@ function gen_vnic($vm){
 	        "name":  "Network adapter '.$i.'",
 	        "type":  "VirtualVmxnet3",
 	        "vswitch_type":  "VmwareDistributedVirtualSwitch",
-	        "status":  "untried",
+	        "status":  "ok",
 	        "vcenter_id":  "'.$vc_id.'",
 	        "portgroup_moref":  "'.$pg['moref'].'",
-	        "connected":  false,
+	        "connected":  true,
 	        "vswitch_name":  "SAMPLE"
 	    }';
 		$arr[] = json_decode($json, true);
@@ -371,12 +376,14 @@ $vcenter_arr = array(
     "vc_shortname" => strtoupper($vc_type),
     "vc_fqdn" =>  $vc_fqdn
 );
-vsummary_api_call($vcenter_arr);
-vsummary_api_call($esxi_total);
-vsummary_api_call($dvs_total);
-vsummary_api_call($ds_total);
-vsummary_api_call($vm_total);
-vsummary_api_call($pg_total);
-vsummary_api_call($pnic_total);
-vsummary_api_call($vnic_total);
-vsummary_api_call($vdisk_total);
+
+echo "POSTING RANDOM SAMPLE DATA FOR VSUMMARY API: $api_endpoint\n---\n";
+echo '[vcenter] ' . vsummary_api_call($vcenter_arr);
+echo '[esxi] ' . vsummary_api_call($esxi_total);
+echo '[dvs] ' . vsummary_api_call($dvs_total);
+echo '[datastore] ' . vsummary_api_call($ds_total);
+echo '[vm] ' . vsummary_api_call($vm_total);
+echo '[portgroup] ' . vsummary_api_call($pg_total);
+echo '[pnic] ' . vsummary_api_call($pnic_total);
+echo '[vnic] ' . vsummary_api_call($vnic_total);
+echo '[vdisk] ' . vsummary_api_call($vdisk_total);

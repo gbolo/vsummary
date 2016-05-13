@@ -77,12 +77,6 @@ EOSQL
   # make sure mysql completely ended
   sleep 2
 
-  # Insert some sample data if required
-  if [ "$INSERT_SAMPLE_DATA" = true ] ; then
-    echo >$2 'INSERTING SAMPLE DATA FOR vsummary'
-    /usr/bin/php /data/nginx/gen_sample_data.php
-  fi
-
   echo
   echo 'MySQL init process done. Ready for start up.'
   echo
@@ -104,4 +98,4 @@ ln -s /data/php-fpm/conf/php-fpm.conf /etc/php5/php-fpm.conf
 ########################################
 #  vsummary -- START SUPERVISORD       #
 ########################################
-/usr/bin/supervisord
+/usr/bin/supervisord -c /etc/supervisord.conf
