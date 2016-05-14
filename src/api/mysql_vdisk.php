@@ -21,6 +21,18 @@ $table = 'view_vdisk';
 // Table's primary key
 $primaryKey = 'id';
  
+
+$units = explode(' ', 'B KB MB GB TB PB');
+function format_size($size) {
+    global $units;
+    $mod = 1024;
+    for ($i = 0; $size > $mod; $i++) {
+        $size /= $mod;
+    }
+    $endIndex = strpos($size, ".")+3;
+    return substr( $size, 0, $endIndex).' '.$units[$i];
+}
+
 // Array of database columns which should be read and sent back to DataTables.
 // The `db` parameter represents the column name in the database, while the `dt`
 // parameter represents the DataTables column identifier. In this case simple
@@ -28,6 +40,13 @@ $primaryKey = 'id';
 $columns = array(
     array( 'db' => 'name', 'dt' => 0 ),
     array( 'db' => 'capacity_bytes', 'dt' => 1 ),
+    array( 
+        'db' => 'capacity_bytes', 
+        'dt' => 1,
+        'formatter' => function( $d, $row ) {
+            return format_size($d);
+        }
+    ),
     array( 'db' => 'path', 'dt' => 2 ),
     array( 'db' => 'thin_provisioned', 'dt' => 3 ),
     array( 'db' => 'vm_name', 'dt' => 4 ),
