@@ -21,6 +21,17 @@ $table = 'view_datastore';
 // Table's primary key
 $primaryKey = 'id';
  
+$units = explode(' ', 'B KB MB GB TB PB');
+function format_size($size) {
+    global $units;
+    $mod = 1024;
+    for ($i = 0; $size > $mod; $i++) {
+        $size /= $mod;
+    }
+    $endIndex = strpos($size, ".")+3;
+    return substr( $size, 0, $endIndex).' '.$units[$i];
+}
+
 // Array of database columns which should be read and sent back to DataTables.
 // The `db` parameter represents the column name in the database, while the `dt`
 // parameter represents the DataTables column identifier. In this case simple
@@ -28,9 +39,27 @@ $primaryKey = 'id';
 $columns = array(
     array( 'db' => 'name', 'dt' => 0 ),
     array( 'db' => 'status', 'dt' => 1 ),
-    array( 'db' => 'capacity_bytes', 'dt' => 2 ),
-    array( 'db' => 'free_bytes', 'dt' => 3 ),
-    array( 'db' => 'uncommitted_bytes', 'dt' => 4 ),
+    array( 
+        'db' => 'capacity_bytes', 
+        'dt' => 2,
+        'formatter' => function( $d, $row ) {
+            return format_size($d);
+        }
+    ),
+    array( 
+        'db' => 'free_bytes', 
+        'dt' => 3,
+        'formatter' => function( $d, $row ) {
+            return format_size($d);
+        }
+    ),
+    array( 
+        'db' => 'uncommitted_bytes', 
+        'dt' => 4,
+        'formatter' => function( $d, $row ) {
+            return format_size($d);
+        }
+    ),
     array( 'db' => 'type', 'dt' => 5 ),
     array( 'db' => 'vcenter_fqdn', 'dt' => 6 ),
     array( 'db' => 'vcenter_short_name', 'dt' => 7 ),
