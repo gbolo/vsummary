@@ -720,6 +720,106 @@ function update_svspg($data){
     }
 }
 
+function update_datacenter($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+   
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE datacenter SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO datacenter (id,vm_folder_id,esxi_folder_id,name,vcenter_id) ' . 
+                'VALUES(:id,:vm_folder_id,:esxi_folder_id,:name,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE vm_folder_id=VALUES(vm_folder_id),esxi_folder_id=VALUES(esxi_folder_id),name=VALUES(name),present=1');
+
+        foreach ($data as $dc) {
+
+            $id = md5( $dc['vcenter_id'] . $dc['moref'] );
+            $vm_folder_id = $dc['vm_folder_moref'];
+            $esxi_folder_id = $dc['esxi_folder_moref'];
+            $name = $dc['name'];
+            $vcenter_id = $dc['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':vm_folder_id', $vm_folder_id, PDO::PARAM_STR);
+            $stmt->bindParam(':esxi_folder_id', $esxi_folder_id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $pdo->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
+
+function update_folder($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+   
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE folder SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO folder (id,name,type,parent,parent_datacenter_id,vcenter_id) ' . 
+                'VALUES(:id,:name,:type,:parent,:parent_datacenter_id,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),parent=VALUES(parent),parent_datacenter_id=VALUES(parent_datacenter_id),present=1');
+
+        foreach ($data as $folder) {
+
+            $id = md5( $folder['vcenter_id'] . $folder['moref'] );
+            if ( strpos($folder['type'], 'VirtualMachine') === false ) {
+                # dont handle non-vm folders for now
+                $type = 'not_vm';
+            }else {
+                $type = 'VirtualMachine';
+            }
+            if ( strpos($folder['parent_moref'], 'datacenter-') === false ) {
+                $parent = md5( $folder['vcenter_id'] . $folder['parent_moref'] );
+                $parent_datacenter_id = 'n/a';
+            }else {
+                # This is a root folder DC
+                $parent = 'datacenter';
+                $parent_datacenter_id = md5( $folder['vcenter_id'] . $folder['parent_moref'] );
+            }
+            $name = $folder['name'];
+            $vcenter_id = $folder['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->bindParam(':parent', $parent, PDO::PARAM_STR);
+            $stmt->bindParam(':parent_datacenter_id', $parent_datacenter_id, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $pdo->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
+
 function vlan_trunk_to_string($vlan_start, $vlan_end){
 
     $v_start = explode( " ", $vlan_start );
@@ -812,6 +912,12 @@ switch ($object_type) {
         break;
     case "RES":
         update_resourcepool($post_data);
+        break;
+    case "DC":
+        update_datacenter($post_data);
+        break;
+    case "FOLDER":
+        update_folder($post_data);
         break;
     default:
         echo "Invalid data";

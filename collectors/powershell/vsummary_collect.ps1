@@ -360,6 +360,48 @@ Function Get-dvsSummary ( [string]$vc_uuid ){
     } | convertto-JSON
 }
 
+Function Get-dcSummary ( [string]$vc_uuid ){
+
+    $objecttype = "DC"
+
+    &{Get-View -ViewType Datacenter -Property Name,
+        HostFolder,
+        VmFolder | %{
+            $dc = $_
+            New-Object -TypeName PSobject -Property @{
+                name = $dc.Name
+                moref = $dc.MoRef.Value
+                vm_folder_moref = $dc.VmFolder.Value
+                esxi_folder_moref = $dc.HostFolder.Value
+                vcenter_id = $vc_uuid
+                objecttype = $objecttype
+            } ## end new-object
+        } ## end foreach-object
+    } | convertto-JSON
+}
+
+
+Function Get-folderSummary ( [string]$vc_uuid ){
+
+    $objecttype = "FOLDER"
+
+    &{Get-View -ViewType Folder -Property Name,
+        Parent,
+        ChildType | %{
+            $folder = $_
+            New-Object -TypeName PSobject -Property @{
+                name = $folder.Name
+                moref = $folder.MoRef.Value
+                type = [string]$folder.ChildType
+                parent_moref = $folder.Parent.Value
+                vcenter_id = $vc_uuid
+                objecttype = $objecttype
+            } ## end new-object
+        } ## end foreach-object
+    } | convertto-JSON
+}
+
+
 Function Get-dvsPgSummary ( [string]$vc_uuid ){
 
     $objecttype = "DVSPG"
@@ -511,6 +553,10 @@ function vsummary_checks( [string]$vc_uuid, [string]$url ){
     Write-Host "vdisk check http status code: $status"
     $status = post_to_vsummary (Get-resourcePoolSummary $vc_uuid) $url
     Write-Host "resourcepool check http status code: $status"
+    $status = post_to_vsummary (Get-dcSummary $vc_uuid) $url
+    Write-Host "datacenter check http status code: $status"
+    $status = post_to_vsummary (Get-folderSummary $vc_uuid) $url
+    Write-Host "folder check http status code: $status"
 }
 
 
