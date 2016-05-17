@@ -123,6 +123,50 @@ Function Get-vmSummary ( [string]$vc_uuid ){
     } | convertto-JSON
 }
 
+Function Get-resourcePoolSummary ( [string]$vc_uuid ){
+
+    $objecttype = "RES"
+
+    &{Get-View -ViewType ResourcePool -Property Name,
+        Owner,
+        OverallStatus,
+        Parent,
+        Summary | %{
+            $res = $_
+            Switch ($res.GetType().Name) {
+                # ResourcePool
+                "ResourcePool" {
+                    $type = "ResourcePool"
+                    $vapp_state = "n/a"
+
+                }
+                # vApp
+                "VirtualApp" {
+                    $type = "VirtualApp"
+                    $vapp_state = $res.Summary.VAppState
+                }
+            }
+
+            New-Object -TypeName PSobject -Property @{
+                name = $res.Name  
+                moref = $res.MoRef.Value
+                type = $type
+                status = $res.OverallStatus
+                vapp_state = $vapp_state
+                parent_moref = $res.Parent.Value
+                cluster_moref = $res.Owner.Value
+                configured_memory_mb = $res.Summary.ConfiguredMemoryMB
+                cpu_reservation =  $res.summary.Config.CpuAllocation.Reservation
+                cpu_limit = $res.summary.Config.CpuAllocation.Limit
+                mem_reservation =  $res.summary.Config.MemoryAllocation.Reservation
+                mem_limit = $res.summary.Config.MemoryAllocation.Limit
+                vcenter_id = $vc_uuid
+                objecttype = $objecttype
+            } ## end new-object
+        } ## end foreach-object
+    } | convertto-JSON
+}
+
 Function Get-vNicSummary ( [string]$vc_uuid ){
 
     $objecttype = "VNIC"
@@ -465,6 +509,8 @@ function vsummary_checks( [string]$vc_uuid, [string]$url ){
     Write-Host "vnic check http status code: $status"
     $status = post_to_vsummary (Get-vDiskSummary $vc_uuid) $url
     Write-Host "vdisk check http status code: $status"
+    $status = post_to_vsummary (Get-resourcePoolSummary $vc_uuid) $url
+    Write-Host "resourcepool check http status code: $status"
 }
 
 
