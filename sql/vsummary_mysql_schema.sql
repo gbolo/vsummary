@@ -38,6 +38,7 @@ stat_guest_memory_usage INT UNSIGNED,
 stat_uptime_sec INT UNSIGNED,
 power_state TINYINT UNSIGNED,
 vapp_id VARCHAR(32),
+resourcepool_id VARCHAR(32),
 esxi_id VARCHAR(32),
 vcenter_id VARCHAR(36),
 present TINYINT DEFAULT 1
