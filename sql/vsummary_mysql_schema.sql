@@ -62,6 +62,27 @@ vcenter_id VARCHAR(36),
 present TINYINT DEFAULT 1
 );
 
+CREATE TABLE datacenter
+(
+id VARCHAR(32) PRIMARY KEY,
+vm_folder_id VARCHAR(32),
+esxi_folder_id VARCHAR(32),
+name VARCHAR(128),
+vcenter_id VARCHAR(36),
+present TINYINT DEFAULT 1
+);
+
+CREATE TABLE folder
+(
+id VARCHAR(32) PRIMARY KEY,
+name VARCHAR(128),
+type VARCHAR(64),
+parent VARCHAR(32),
+parent_datacenter_id VARCHAR(32),
+vcenter_id VARCHAR(36),
+present TINYINT DEFAULT 1
+);
+
 CREATE TABLE esxi
 (
 id VARCHAR(32) PRIMARY KEY,	
