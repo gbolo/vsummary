@@ -85,6 +85,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
         Guest.Hostname,
         Guest.IpAddress,
         ParentVApp,
+        ResourcePool,
         Summary.Quickstats.OverallCpuUsage,
         Summary.Quickstats.HostMemoryUsage,
         Summary.Quickstats.GuestMemoryUsage,
@@ -114,6 +115,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
                 power_state = $vm.Runtime.PowerState
                 esxi_moref = $vm.Runtime.Host.Value
                 vapp_moref = $vm.ParentVApp.Value
+                resourcepool_moref = $vm.ResourcePool.Value
                 vcenter_id = $vc_uuid
                 objecttype = $objecttype
             } ## end new-object

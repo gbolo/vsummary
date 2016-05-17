@@ -213,9 +213,9 @@ function update_vm($data){
         $pdo->beginTransaction();
         $pdo->query( 'UPDATE vm SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
 
-        $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,vapp_id,esxi_id,vcenter_id) ' . 
-                'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:vapp_id,:esxi_id,:vcenter_id) ' .
-                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),vapp_id=VALUES(vapp_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
+        $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,vapp_id,resourcepool_id,esxi_id,vcenter_id) ' . 
+                'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:vapp_id,:resourcepool_id,:esxi_id,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),vapp_id=VALUES(vapp_id),resourcepool_id=VALUES(resourcepool_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
 
         foreach ($data as $vm) {
 
@@ -224,6 +224,11 @@ function update_vm($data){
                 $vapp_id = 'none';
             } else {
                 $vapp_id = md5( $vm['vcenter_id'] . $vm['vapp_moref'] );
+            }
+            if ( is_null($vm['resourcepool_moref']) ){
+                $resourcepool_id = 'none';
+            } else {
+                $resourcepool_id = md5( $vm['vcenter_id'] . $vm['resourcepool_moref'] );
             }
             $name = $vm['name'];
             $moref = $vm['moref'];
@@ -258,6 +263,7 @@ function update_vm($data){
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
             $stmt->bindParam(':vapp_id', $vapp_id, PDO::PARAM_STR);
+            $stmt->bindParam(':resourcepool_id', $resourcepool_id, PDO::PARAM_STR);
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
             $stmt->bindParam(':vmx_path', $vmx_path, PDO::PARAM_STR);
