@@ -44,6 +44,24 @@ vcenter_id VARCHAR(36),
 present TINYINT DEFAULT 1
 );
 
+CREATE TABLE resourcepool
+(
+id VARCHAR(32) PRIMARY KEY,
+name VARCHAR(128),
+type VARCHAR(64),
+status VARCHAR(64),
+vapp_state VARCHAR(64),
+configured_memory_mb BIGINT UNSIGNED,
+cpu_reservation BIGINT UNSIGNED,
+cpu_limit BIGINT,
+mem_reservation BIGINT UNSIGNED,
+mem_limit BIGINT,
+parent VARCHAR(32),
+cluster_id VARCHAR(32),
+vcenter_id VARCHAR(36),
+present TINYINT DEFAULT 1
+);
+
 CREATE TABLE esxi
 (
 id VARCHAR(32) PRIMARY KEY,	
