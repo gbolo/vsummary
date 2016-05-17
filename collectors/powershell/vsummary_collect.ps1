@@ -84,6 +84,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
         Guest.ToolsRunningStatus,
         Guest.Hostname,
         Guest.IpAddress,
+        ParentVApp,
         Summary.Quickstats.OverallCpuUsage,
         Summary.Quickstats.HostMemoryUsage,
         Summary.Quickstats.GuestMemoryUsage,
@@ -112,32 +113,12 @@ Function Get-vmSummary ( [string]$vc_uuid ){
                 stat_uptime_sec = $vm.Summary.Quickstats.UptimeSeconds
                 power_state = $vm.Runtime.PowerState
                 esxi_moref = $vm.Runtime.Host.Value
+                vapp_moref = $vm.ParentVApp.Value
                 vcenter_id = $vc_uuid
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | Select name,
-    moref,
-    vmx_path,
-    vcpu,
-    memory_mb,
-    config_guest_os,
-    config_version,
-    smbios_uuid,
-    instance_uuid,
-    config_change_version,
-    guest_tools_version,
-    guest_tools_running,
-    guest_hostname,
-    guest_ip,
-    stat_cpu_usage,
-    stat_host_memory_usage,
-    stat_guest_memory_usage,
-    stat_uptime_sec,
-    power_state,
-    esxi_moref,
-    vcenter_id,
-    objecttype | convertto-JSON
+    } | convertto-JSON
 }
 
 Function Get-vNicSummary ( [string]$vc_uuid ){
