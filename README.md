@@ -46,7 +46,8 @@ For a quicker deployment, a docker image is available (which does steps 1 to 6) 
 docker run --name vsummary -p 80:80 -d gbolo/vsummary
 ```
 **(optional) Load sample data into the database for testing**
-if you would like to load sample data into vsummary for testing, you may execute a php script inside the conatiner to do so:
+~~if you would like to load sample data into vsummary for testing, you may execute a php script inside the conatiner to do so:~~
+**sample data generator script is broken for now until it's updated to support the newer data schema that has changed recently**
 ```
 docker exec -it vsummary php /data/gen_sample_data.php
 
