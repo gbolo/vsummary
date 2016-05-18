@@ -213,17 +213,19 @@ function update_vm($data){
         $pdo->beginTransaction();
         $pdo->query( 'UPDATE vm SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
 
-        $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,vapp_id,resourcepool_id,esxi_id,vcenter_id) ' . 
-                'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:vapp_id,:resourcepool_id,:esxi_id,:vcenter_id) ' .
-                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),vapp_id=VALUES(vapp_id),resourcepool_id=VALUES(resourcepool_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
+        $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,folder_id,vapp_id,resourcepool_id,esxi_id,vcenter_id) ' . 
+                'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:folder_id,:vapp_id,:resourcepool_id,:esxi_id,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),folder_id=VALUES(folder_id),vapp_id=VALUES(vapp_id),resourcepool_id=VALUES(resourcepool_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
 
         foreach ($data as $vm) {
 
             $id = md5( $vm['vcenter_id'] . $vm['moref'] );
             if ( is_null($vm['vapp_moref']) ){
                 $vapp_id = 'none';
+                $folder_id = md5( $vm['vcenter_id'] . $vm['folder_moref'] );
             } else {
                 $vapp_id = md5( $vm['vcenter_id'] . $vm['vapp_moref'] );
+                $folder_id = 'vapp';
             }
             if ( is_null($vm['resourcepool_moref']) ){
                 $resourcepool_id = 'none';
@@ -263,6 +265,7 @@ function update_vm($data){
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
             $stmt->bindParam(':vapp_id', $vapp_id, PDO::PARAM_STR);
+            $stmt->bindParam(':folder_id', $folder_id, PDO::PARAM_STR);
             $stmt->bindParam(':resourcepool_id', $resourcepool_id, PDO::PARAM_STR);
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
@@ -818,7 +821,103 @@ function update_folder($data){
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
     }
+
+    // update folder full path
+    update_folder_full_path($vcenter_id);
 }
+
+function update_folder_full_path($vcenter_id){
+
+    // import array_column function to support php versions older than 5.5
+    require_once('lib/array_column.php');
+
+    global $pdo;
+
+    // make arrays to save sql queries and make function faster
+    $dcs = array();
+    $folders = array();
+    $full_path_results = array();
+
+    // populate folders
+    $query = "select id,name,parent FROM folder WHERE vcenter_id = '$vcenter_id' AND parent != 'datacenter' AND type = 'VirtualMachine' AND present=1";
+    foreach($pdo->query($query) as $folder){
+        $folders[] = $folder;
+    }
+
+    // populate dcs
+    $query = "select folder.id, folder.name, folder.parent, datacenter.name from folder LEFT JOIN datacenter ON folder.parent_datacenter_id = datacenter.id WHERE folder.vcenter_id = '$vcenter_id' AND folder.parent='datacenter' AND folder.type='VirtualMachine' AND folder.present=1 AND datacenter.present=1";
+    foreach($pdo->query($query) as $dc){
+        $dcs[ $dc['id'] ] = $dc['name'];
+    }
+
+
+    // Loop through folders and determine full path
+    foreach ( $folders as $id => $info ){
+        $continue = true;
+        $search_id = $info['parent'];
+
+        while ( $continue ) {
+            $key = array_search( $search_id, array_column($folders,'id') );
+            if ( $key === false || ( array_search($search_id, $dcs) != false ) ){
+                # this parent folder is a dc
+                $folders[ $id ]['dc_id'] = $search_id;
+                $folders[ $id ]['dc_name'] = $dcs[ $search_id ];
+                $continue = false;
+            } else {
+                $folders[ $id ]['path'][] = $folders[ $key ]['name'];
+                $folders[ $id ]['path_id'][] = $search_id;
+                if ( isset( $folders[ $key ]['parent'] ) && ( array_search($folders[ $key ]['parent'], $dcs) == false ) ){
+                    $search_id = $folders[ $key ]['parent'];
+                    $continue = true;
+                } else {
+                    $continue = false;
+                }
+            }
+            
+        }
+    }
+
+    foreach ( $folders as $folder ){
+        $full_path = $folder['dc_name'];
+        if ( isset($folder['path']) ){
+            $ordered_path = array_reverse($folder['path']);
+            foreach ( $ordered_path as $path ){
+                $full_path .= "/$path";
+            }
+        }
+
+        $full_path .= "/".$folder['name'];
+        
+
+        try {
+
+            // start transaction
+            $pdo->beginTransaction();
+
+            // prepare statement to avoid sql injections
+            $stmt = $pdo->prepare('UPDATE folder ' . 
+                    'SET full_path=:full_path ' .
+                    'WHERE id=' . $pdo->quote($folder['id']) );
+
+            $stmt->bindParam(':full_path', $full_path, PDO::PARAM_STR);
+
+            // execute prepared statement
+            $stmt->execute();
+
+            // commit transaction
+            $pdo->commit();
+
+        } catch (PDOException $e) {
+            // rollback transaction on error
+            $pdo->rollback();
+            // return 500
+            http_response_code(500);
+        }
+
+    }
+
+}
+
 
 function vlan_trunk_to_string($vlan_start, $vlan_end){
 
