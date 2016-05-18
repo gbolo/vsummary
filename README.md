@@ -69,9 +69,15 @@ POSTING RANDOM SAMPLE DATA FOR VSUMMARY API: http://localhost/api/update.php
 
 This tool is under much development. **ANY CONTRIBUTIONS WILL BE GREATLY APPRECIATED**
 
+### Special Thanks
 
-License
-----
+The development of this tool was made possible by leveraging these other really cool opensource software:
+* [DataTables](https://datatables.net/)
+* [Bootstrap](http://getbootstrap.com/)
+* [jQuery](https://jquery.com/)
+* [SB Admin 2](https://github.com/BlackrockDigital/startbootstrap-sb-admin-2)
+
+### License
 
 MIT
 
