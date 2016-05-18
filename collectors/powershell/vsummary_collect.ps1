@@ -80,6 +80,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
         Config.Uuid,
         Config.instanceUuid,
         Config.changeVersion,
+        Config.Template,
         Guest.ToolsVersion,
         Guest.ToolsRunningStatus,
         Guest.Hostname,
@@ -116,6 +117,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
                 power_state = $vm.Runtime.PowerState
                 esxi_moref = $vm.Runtime.Host.Value
                 folder_moref = $vm.Parent.Value
+                template = $vm.Config.Template
                 vapp_moref = $vm.ParentVApp.Value
                 resourcepool_moref = $vm.ResourcePool.Value
                 vcenter_id = $vc_uuid
