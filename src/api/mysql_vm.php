@@ -27,29 +27,40 @@ $primaryKey = 'id';
 // indexes
 $columns = array(
     array( 'db' => 'name', 'dt' => 0 ),
-    array( 'db' => 'vmx_path', 'dt' => 1 ),
-    array( 'db' => 'vcpu', 'dt' => 2 ),
-    array( 'db' => 'memory_mb', 'dt' => 3 ),
-    array( 'db' => 'config_guest_os', 'dt' => 4 ),
-    array( 'db' => 'config_version', 'dt' => 5 ),
-    array( 'db' => 'config_change_version', 'dt' => 6 ),
-    array( 'db' => 'guest_tools_version', 'dt' => 7 ),
-    array( 'db' => 'guest_tools_running', 'dt' => 8 ),
-    array( 'db' => 'guest_hostname', 'dt' => 9 ),
-    array( 'db' => 'guest_ip', 'dt' => 10 ),
-    array( 'db' => 'stat_cpu_usage', 'dt' => 11 ),
-    array( 'db' => 'stat_host_memory_usage', 'dt' => 12 ),
-    array( 'db' => 'stat_guest_memory_usage', 'dt' => 13 ),
-    array( 'db' => 'stat_uptime_sec', 'dt' => 14 ),
-    array( 'db' => 'power_state', 'dt' => 15 ),
-    array( 'db' => 'esxi_name', 'dt' => 16 ),
-    array( 'db' => 'esxi_current_evc', 'dt' => 17 ),
-    array( 'db' => 'esxi_status', 'dt' => 18 ),
-    array( 'db' => 'esxi_cpu_model', 'dt' => 19 ),
-    array( 'db' => 'vdisks', 'dt' => 20 ),
-    array( 'db' => 'vnics', 'dt' => 21 ),
-    array( 'db' => 'vcenter_fqdn', 'dt' => 22 ),
-    array( 'db' => 'vcenter_short_name', 'dt' => 23 )
+    array( 
+        'db' => 'folder', 
+        'dt' => 1,
+        'formatter' => function( $d, $row ) {
+            if ( is_null($d) ){
+                return 'vApp not supported yet';
+            } else {
+                return $d;
+            }
+        }
+    ),
+    array( 'db' => 'vmx_path', 'dt' => 2 ),
+    array( 'db' => 'vcpu', 'dt' => 3 ),
+    array( 'db' => 'memory_mb', 'dt' => 4 ),
+    array( 'db' => 'config_guest_os', 'dt' => 5 ),
+    array( 'db' => 'config_version', 'dt' => 6 ),
+    array( 'db' => 'config_change_version', 'dt' => 7 ),
+    array( 'db' => 'guest_tools_version', 'dt' => 8 ),
+    array( 'db' => 'guest_tools_running', 'dt' => 9 ),
+    array( 'db' => 'guest_hostname', 'dt' => 10 ),
+    array( 'db' => 'guest_ip', 'dt' => 11 ),
+    array( 'db' => 'stat_cpu_usage', 'dt' => 12 ),
+    array( 'db' => 'stat_host_memory_usage', 'dt' => 13 ),
+    array( 'db' => 'stat_guest_memory_usage', 'dt' => 14 ),
+    array( 'db' => 'stat_uptime_sec', 'dt' => 15 ),
+    array( 'db' => 'power_state', 'dt' => 16 ),
+    array( 'db' => 'esxi_name', 'dt' => 17 ),
+    array( 'db' => 'esxi_current_evc', 'dt' => 18 ),
+    array( 'db' => 'esxi_status', 'dt' => 19 ),
+    array( 'db' => 'esxi_cpu_model', 'dt' => 20 ),
+    array( 'db' => 'vdisks', 'dt' => 21 ),
+    array( 'db' => 'vnics', 'dt' => 22 ),
+    array( 'db' => 'vcenter_fqdn', 'dt' => 23 ),
+    array( 'db' => 'vcenter_short_name', 'dt' => 24 )
 );
  
 // Load MYSQL connection details

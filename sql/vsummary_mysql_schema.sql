@@ -240,6 +240,7 @@ CREATE VIEWS TO SIMPLIFY QUEIRES IN APPLICATION
 CREATE VIEW view_vm AS
 SELECT  
   vm.*,
+  folder.full_path AS folder,
   esxi.name AS esxi_name,
   esxi.current_evc AS esxi_current_evc,
   esxi.status AS esxi_status,
@@ -249,6 +250,10 @@ SELECT
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name
 FROM    vm
+LEFT JOIN
+        folder
+ON      vm.folder_id = folder.id
+    AND vm.present = 1
 LEFT JOIN
         vdisk
 ON      vm.id = vdisk.vm_id
