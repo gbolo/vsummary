@@ -109,8 +109,9 @@ present TINYINT DEFAULT 1
 
 CREATE TABLE esxi
 (
-id VARCHAR(32) PRIMARY KEY,	
+id VARCHAR(32) PRIMARY KEY,
 name VARCHAR(128),
+cluster_id VARCHAR(32),
 moref VARCHAR(16),
 max_evc VARCHAR(64),
 current_evc VARCHAR(64),

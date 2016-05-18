@@ -130,13 +130,14 @@ function update_esxi($data){
         $pdo->beginTransaction();
         $pdo->query( 'UPDATE esxi SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
 
-        $stmt = $pdo->prepare('INSERT INTO esxi (id,name,moref,max_evc,current_evc,status,power_state,in_maintenance_mode,vendor,model,uuid,memory_bytes,cpu_model,cpu_mhz,cpu_sockets,cpu_cores,cpu_threads,nics,hbas,version,build,stat_cpu_usage,stat_memory_usage,stat_uptime_sec,vcenter_id) ' . 
-                'VALUES(:id,:name,:moref,:max_evc,:current_evc,:status,:power_state,:in_maintenance_mode,:vendor,:model,:uuid,:memory_bytes,:cpu_model,:cpu_mhz,:cpu_sockets,:cpu_cores,:cpu_threads,:nics,:hbas,:version,:build,:stat_cpu_usage,:stat_memory_usage,:stat_uptime_sec,:vcenter_id) ' .
-                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),max_evc=VALUES(max_evc),current_evc=VALUES(current_evc),status=VALUES(status),power_state=VALUES(power_state),in_maintenance_mode=VALUES(in_maintenance_mode),vendor=VALUES(vendor),model=VALUES(model),uuid=VALUES(uuid),memory_bytes=VALUES(memory_bytes),cpu_model=VALUES(cpu_model),cpu_mhz=VALUES(cpu_mhz),cpu_sockets=VALUES(cpu_sockets),cpu_cores=VALUES(cpu_cores),cpu_threads=VALUES(cpu_threads),nics=VALUES(nics),hbas=VALUES(hbas),version=VALUES(version),build=VALUES(build),stat_cpu_usage=VALUES(stat_cpu_usage),stat_memory_usage=VALUES(stat_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),vcenter_id=VALUES(vcenter_id),present=1');
+        $stmt = $pdo->prepare('INSERT INTO esxi (id,name,cluster_id,moref,max_evc,current_evc,status,power_state,in_maintenance_mode,vendor,model,uuid,memory_bytes,cpu_model,cpu_mhz,cpu_sockets,cpu_cores,cpu_threads,nics,hbas,version,build,stat_cpu_usage,stat_memory_usage,stat_uptime_sec,vcenter_id) ' . 
+                'VALUES(:id,:name,:cluster_id,:moref,:max_evc,:current_evc,:status,:power_state,:in_maintenance_mode,:vendor,:model,:uuid,:memory_bytes,:cpu_model,:cpu_mhz,:cpu_sockets,:cpu_cores,:cpu_threads,:nics,:hbas,:version,:build,:stat_cpu_usage,:stat_memory_usage,:stat_uptime_sec,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),cluster_id=VALUES(cluster_id),moref=VALUES(moref),max_evc=VALUES(max_evc),current_evc=VALUES(current_evc),status=VALUES(status),power_state=VALUES(power_state),in_maintenance_mode=VALUES(in_maintenance_mode),vendor=VALUES(vendor),model=VALUES(model),uuid=VALUES(uuid),memory_bytes=VALUES(memory_bytes),cpu_model=VALUES(cpu_model),cpu_mhz=VALUES(cpu_mhz),cpu_sockets=VALUES(cpu_sockets),cpu_cores=VALUES(cpu_cores),cpu_threads=VALUES(cpu_threads),nics=VALUES(nics),hbas=VALUES(hbas),version=VALUES(version),build=VALUES(build),stat_cpu_usage=VALUES(stat_cpu_usage),stat_memory_usage=VALUES(stat_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),vcenter_id=VALUES(vcenter_id),present=1');
 
         foreach ($data as $esxi) {
 
             $id = md5( $esxi['vcenter_id'] . $esxi['moref'] );
+            $cluster_id = md5( $esxi['vcenter_id'] . $esxi['cluster_moref'] );
             $name = $esxi['name'];
             $moref = $esxi['moref'];
             $max_evc = $esxi['max_evc'];
@@ -163,6 +164,7 @@ function update_esxi($data){
             $vcenter_id = $esxi['vcenter_id'];
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':cluster_id', $cluster_id, PDO::PARAM_STR);
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
             $stmt->bindParam(':max_evc', $max_evc, PDO::PARAM_STR);

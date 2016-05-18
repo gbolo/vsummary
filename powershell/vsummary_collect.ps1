@@ -243,6 +243,7 @@ Function Get-EsxiSummary ( [string]$vc_uuid ){
     $objecttype = "ESXI"
 
     &{Get-View -ViewType HostSystem -Property Name,
+        Parent,
         Summary.MaxEVCModeKey,
         Summary.CurrentEVCModeKey,
         Summary.OverallStatus,
@@ -289,6 +290,7 @@ Function Get-EsxiSummary ( [string]$vc_uuid ){
                 stat_cpu_usage = $esxi.Summary.Quickstats.OverallCpuUsage
                 stat_memory_usage = $esxi.Summary.Quickstats.OverallMemoryUsage
                 stat_uptime_sec = $esxi.Summary.Quickstats.Uptime
+                cluster_moref = $esxi.Parent.Value
                 vcenter_id = $vc_uuid
                 objecttype = $objecttype
             } ## end new-object
