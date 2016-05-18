@@ -322,7 +322,6 @@ Function Get-pNicSummary ( [string]$vc_uuid ){
 
 Function Get-svsSummary ( [string]$vc_uuid ){
 
-
     $objecttype = "SVS"
 
     &{Get-View -ViewType HostSystem -Property Name,
@@ -339,6 +338,39 @@ Function Get-svsSummary ( [string]$vc_uuid ){
                     objecttype = $objecttype
                 } ## end new-object
             } ## end foreach-object
+        } ## end foreach-object
+    } | convertto-JSON
+}
+
+Function Get-clusterSummary ( [string]$vc_uuid ){
+
+    $objecttype = "CLUSTER"
+
+    &{Get-View -ViewType ClusterComputeResource -Property Name,
+        OverallStatus,
+        Parent,
+        Configuration.DasConfig,
+        Configuration.DrsConfig,
+        Summary | %{
+            $cluster = $_
+            New-Object -TypeName PSobject -Property @{
+                name = $cluster.Name
+                moref = $cluster.MoRef.Value
+                datacenter_moref = $cluster.Parent.Value
+                total_cpu_threads = $cluster.Summary.NumCpuThreads
+                total_cpu_mhz = $cluster.Summary.TotalCpu
+                total_memory_bytes = $cluster.Summary.TotalMemory
+                total_vmotions = $cluster.Summary.NumVmotions
+                num_hosts = $cluster.Summary.NumHosts
+                current_balance = $cluster.Summary.CurrentBalance
+                target_balance = $cluster.Summary.TargetBalance
+                drs_enabled = [string]$cluster.Configuration.DrsConfig.Enabled
+                drs_behaviour = $cluster.Configuration.DrsConfig.DefaultVmBehavior
+                ha_enabled = [string]$cluster.Configuration.DasConfig.Enabled
+                status = [string]$cluster.OverallStatus
+                vcenter_id = $vc_uuid
+                objecttype = $objecttype
+            } ## end new-object
         } ## end foreach-object
     } | convertto-JSON
 }
@@ -562,6 +594,8 @@ function vsummary_checks( [string]$vc_uuid, [string]$url ){
     # Folder check needs to be done after datacenter check
     $status = post_to_vsummary (Get-folderSummary $vc_uuid) $url
     Write-Host "folder check http status code: $status"
+    $status = post_to_vsummary (Get-clusterSummary $vc_uuid) $url
+    Write-Host "Cluster check http status code: $status"
 }
 
 

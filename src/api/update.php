@@ -768,6 +768,68 @@ function update_datacenter($data){
     }
 }
 
+function update_cluster($data){
+    
+    $vcenter_id = $data[0]['vcenter_id'];
+   
+    try {
+
+        global $pdo;
+
+        $pdo->beginTransaction();
+        $pdo->query( 'UPDATE cluster SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
+
+        $stmt = $pdo->prepare('INSERT INTO cluster (id,name,datacenter_id,current_balance,target_balance,total_cpu_threads,total_cpu_mhz,total_memory_bytes,total_vmotions,num_hosts,drs_enabled,drs_behaviour,ha_enabled,status,vcenter_id) ' . 
+                'VALUES(:id,:name,:datacenter_id,:current_balance,:target_balance,:total_cpu_threads,:total_cpu_mhz,:total_memory_bytes,:total_vmotions,:num_hosts,:drs_enabled,:drs_behaviour,:ha_enabled,:status,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),current_balance=VALUES(current_balance),target_balance=VALUES(target_balance),datacenter_id=VALUES(datacenter_id),total_cpu_threads=VALUES(total_cpu_threads),total_cpu_mhz=VALUES(total_cpu_mhz),total_memory_bytes=VALUES(total_memory_bytes),total_vmotions=VALUES(total_vmotions),num_hosts=VALUES(num_hosts),drs_enabled=VALUES(drs_enabled),drs_behaviour=VALUES(drs_behaviour),ha_enabled=VALUES(ha_enabled),status=VALUES(status),present=1');
+
+        foreach ($data as $cl) {
+
+            $id = md5( $cl['vcenter_id'] . $cl['moref'] );
+            $datacenter_id = $cl['datacenter_moref'];
+            $current_balance = $cl['current_balance'];
+            $target_balance = $cl['target_balance'];
+            $total_cpu_threads = $cl['total_cpu_threads'];
+            $total_cpu_mhz = $cl['total_cpu_mhz'];
+            $total_memory_bytes = $cl['total_memory_bytes'];
+            $total_vmotions = $cl['total_vmotions'];
+            $num_hosts = $cl['num_hosts'];
+            $drs_enabled = $cl['drs_enabled'];
+            $drs_behaviour = $cl['drs_behaviour'];
+            $ha_enabled = $cl['ha_enabled'];
+            $status = $cl['status'];
+            $name = $cl['name'];
+            $vcenter_id = $cl['vcenter_id'];
+
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':datacenter_id', $datacenter_id, PDO::PARAM_STR);
+            $stmt->bindParam(':current_balance', $current_balance, PDO::PARAM_INT);
+            $stmt->bindParam(':target_balance', $target_balance, PDO::PARAM_INT);
+            $stmt->bindParam(':total_cpu_threads', $total_cpu_threads, PDO::PARAM_INT);
+            $stmt->bindParam(':total_cpu_mhz', $total_cpu_mhz);
+            $stmt->bindParam(':total_memory_bytes', $total_memory_bytes);
+            $stmt->bindParam(':total_vmotions', $total_vmotions, PDO::PARAM_INT);
+            $stmt->bindParam(':num_hosts', $num_hosts, PDO::PARAM_INT);
+            $stmt->bindParam(':drs_enabled', $drs_enabled, PDO::PARAM_STR);
+            $stmt->bindParam(':drs_behaviour', $drs_behaviour, PDO::PARAM_STR);
+            $stmt->bindParam(':ha_enabled', $ha_enabled, PDO::PARAM_STR);
+            $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':vcenter_id', $vcenter_id, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+        }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $pdo->rollback();
+        // return 500
+        echo "Error in transaction: ".$e->getMessage();
+        http_response_code(500);
+    }
+}
 
 function update_folder($data){
     
@@ -1019,6 +1081,9 @@ switch ($object_type) {
         break;
     case "FOLDER":
         update_folder($post_data);
+        break;
+    case "CLUSTER":
+        update_cluster($post_data);
         break;
     default:
         echo "Invalid data";
