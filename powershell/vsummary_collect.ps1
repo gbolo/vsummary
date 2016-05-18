@@ -84,6 +84,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
         Guest.ToolsRunningStatus,
         Guest.Hostname,
         Guest.IpAddress,
+        Parent,
         ParentVApp,
         ResourcePool,
         Summary.Quickstats.OverallCpuUsage,
@@ -114,6 +115,7 @@ Function Get-vmSummary ( [string]$vc_uuid ){
                 stat_uptime_sec = $vm.Summary.Quickstats.UptimeSeconds
                 power_state = $vm.Runtime.PowerState
                 esxi_moref = $vm.Runtime.Host.Value
+                folder_moref = $vm.Parent.Value
                 vapp_moref = $vm.ParentVApp.Value
                 resourcepool_moref = $vm.ResourcePool.Value
                 vcenter_id = $vc_uuid
@@ -555,6 +557,7 @@ function vsummary_checks( [string]$vc_uuid, [string]$url ){
     Write-Host "resourcepool check http status code: $status"
     $status = post_to_vsummary (Get-dcSummary $vc_uuid) $url
     Write-Host "datacenter check http status code: $status"
+    # Folder check needs to be done after datacenter check
     $status = post_to_vsummary (Get-folderSummary $vc_uuid) $url
     Write-Host "folder check http status code: $status"
 }
