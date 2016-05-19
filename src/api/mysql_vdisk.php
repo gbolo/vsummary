@@ -38,18 +38,17 @@ function format_size($size) {
 // parameter represents the DataTables column identifier. In this case simple
 // indexes
 $columns = array(
-    array( 'db' => 'name', 'dt' => 0 ),
-    array( 'db' => 'capacity_bytes', 'dt' => 1 ),
+    array( 'db' => 'vm_name', 'dt' => 0 ),
+    array( 'db' => 'name', 'dt' => 1 ),
     array( 
         'db' => 'capacity_bytes', 
-        'dt' => 1,
+        'dt' => 2,
         'formatter' => function( $d, $row ) {
             return format_size($d);
         }
     ),
-    array( 'db' => 'path', 'dt' => 2 ),
-    array( 'db' => 'thin_provisioned', 'dt' => 3 ),
-    array( 'db' => 'vm_name', 'dt' => 4 ),
+    array( 'db' => 'path', 'dt' => 3 ),
+    array( 'db' => 'thin_provisioned', 'dt' => 4 ),
     array( 'db' => 'vm_power_state', 'dt' => 5 ),
     array( 'db' => 'datastore_name', 'dt' => 6 ),
     array( 'db' => 'datastore_type', 'dt' => 7 ),
