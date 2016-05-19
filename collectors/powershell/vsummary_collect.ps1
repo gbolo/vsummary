@@ -2,20 +2,18 @@
 
 <#
 
-This powershell script is under active development and currently contains test cases.
-Also, this script is undergoing much efficiency tweaking and code styling changes.
-* THIS SCRIPT IS NOT READY FOR USE *
+This powershell script is under active development and is designed to be used in conjunction with:
+vSummary - https://github.com/gbolo/vSummary
+
 
 DESCRIPTION:
     The Function of this script is to retrieve data from vcenter; 
-    then send that data via http POST to a local/remote php server.
+    then send that data via http POST to a local/remote php server in JSON format.
 
 TODO:
-    - Create a mega function which updates all data in correct order and uses existing views
+    - Merge get-view of same viewtype
     - Create a view into vmkernel interfaces
     - Create a view into VM Snapshots
-    - Create a view into Datacenter/Clusters/Resource Pools
-    - Create a view into Folders
     - Fix `#requires -PsSnapin VMware.VimAutomation.Core -Version 5` to work with 6
     - Alot more stuff I can't think of right now!
 
