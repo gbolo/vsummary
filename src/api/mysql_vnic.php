@@ -26,18 +26,18 @@ $primaryKey = 'id';
 // parameter represents the DataTables column identifier. In this case simple
 // indexes
 $columns = array(
+    array( 'db' => 'vm_name', 'dt' => 0 ),
     array( 
         'db' => 'name', 
-        'dt' => 0,
+        'dt' => 1,
         'formatter' => function( $d, $row ) {
             return str_replace("Network adapter", "vNIC #", $d);
         }
     ),
-    array( 'db' => 'mac', 'dt' => 1 ),
-    array( 'db' => 'type', 'dt' => 2 ),
-    array( 'db' => 'connected', 'dt' => 3 ),
-    array( 'db' => 'status', 'dt' => 4 ),
-    array( 'db' => 'vm_name', 'dt' => 5 ),
+    array( 'db' => 'mac', 'dt' => 2 ),
+    array( 'db' => 'type', 'dt' => 3 ),
+    array( 'db' => 'connected', 'dt' => 4 ),
+    array( 'db' => 'status', 'dt' => 5 ),
     array( 'db' => 'esxi_name', 'dt' => 6 ),
     array( 
         'db' => 'portgroup_name', 

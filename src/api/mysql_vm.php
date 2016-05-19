@@ -38,9 +38,9 @@ $columns = array(
             }
         }
     ),
-    array( 'db' => 'vmx_path', 'dt' => 2 ),
-    array( 'db' => 'vcpu', 'dt' => 3 ),
-    array( 'db' => 'memory_mb', 'dt' => 4 ),
+    array( 'db' => 'vcpu', 'dt' => 2 ),
+    array( 'db' => 'memory_mb', 'dt' => 3 ),
+    array( 'db' => 'power_state', 'dt' => 4 ),
     array( 'db' => 'config_guest_os', 'dt' => 5 ),
     array( 'db' => 'config_version', 'dt' => 6 ),
     array( 'db' => 'config_change_version', 'dt' => 7 ),
@@ -52,13 +52,13 @@ $columns = array(
     array( 'db' => 'stat_host_memory_usage', 'dt' => 13 ),
     array( 'db' => 'stat_guest_memory_usage', 'dt' => 14 ),
     array( 'db' => 'stat_uptime_sec', 'dt' => 15 ),
-    array( 'db' => 'power_state', 'dt' => 16 ),
-    array( 'db' => 'esxi_name', 'dt' => 17 ),
-    array( 'db' => 'esxi_current_evc', 'dt' => 18 ),
-    array( 'db' => 'esxi_status', 'dt' => 19 ),
-    array( 'db' => 'esxi_cpu_model', 'dt' => 20 ),
-    array( 'db' => 'vdisks', 'dt' => 21 ),
-    array( 'db' => 'vnics', 'dt' => 22 ),
+    array( 'db' => 'esxi_name', 'dt' => 16 ),
+    array( 'db' => 'esxi_current_evc', 'dt' => 17 ),
+    array( 'db' => 'esxi_status', 'dt' => 18 ),
+    array( 'db' => 'esxi_cpu_model', 'dt' => 19 ),
+    array( 'db' => 'vdisks', 'dt' => 20 ),
+    array( 'db' => 'vnics', 'dt' => 21 ),
+    array( 'db' => 'vmx_path', 'dt' => 22 ),
     array( 'db' => 'vcenter_fqdn', 'dt' => 23 ),
     array( 'db' => 'vcenter_short_name', 'dt' => 24 )
 );

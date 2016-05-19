@@ -190,11 +190,11 @@
         $(document).ready(function() {
 
             // Setup - add a text input to each footer cell
-            $('#dt-vsummary-<?php echo $view; ?> tfoot th').each( function () {
-                var title = $(this).text();
-                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-            });
-            
+            $('#dt-vsummary-<?php echo $view; ?> tfoot th').each( function (i) {
+                var title = $('#dt-vsummary-<?php echo $view; ?> thead th').eq( $(this).index() ).text();
+                $(this).html( '<input type="text" placeholder="Search '+title+'" data-index="'+i+'" />' );
+            } );
+
             // Load Datatables
             var table = $('#dt-vsummary-<?php echo $view; ?>').DataTable({
                 //dom: 'Blrtip',
@@ -205,9 +205,12 @@
                     details: false
                 },
                 */
+                /*
                 fixedColumns: {
                     leftColumns: 1
                 },
+                */
+                fixedColumns: true,
                 scrollX: true,
                 stateSave: true,
                 stateSaveParams: function (settings, data) {
@@ -248,16 +251,12 @@
             });
             
             // Apply the footer search
-            table.columns().every( function () {
-                var that = this;
-                $( 'input', this.footer() ).on( 'keyup change', function () {
-                    if ( that.search() !== this.value ) {
-                        that
-                            .search( this.value )
-                            .draw();
-                    }
-                });
-            });
+            $( table.table().container() ).on( 'keyup', 'tfoot input', function () {
+                table
+                    .column( $(this).data('index') )
+                    .search( this.value )
+                    .draw();
+            } ); 
 
         });
 
