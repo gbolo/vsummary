@@ -141,7 +141,7 @@
                 <div class="col-lg-12">
                     <!-- /.dataTable_wrapper -->
                     <div class="dataTable_wrapper">
-                        <table width="100%" class="table table-striped table-bordered table-hover" id="dt-vsummary-<?php echo $view; ?>">
+                        <table width="100%" class="table table-striped table-bordered table-hover nowrap" id="dt-vsummary-<?php echo $view; ?>">
 						  <?php datatables_html($view); ?>
                         </table>
                     </div>
@@ -200,7 +200,14 @@
                 //dom: 'Blrtip',
                 dom: "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
                 scrollY: '60vh',
-                responsive: true,
+                /*
+                responsive: {
+                    details: false
+                },
+                */
+                fixedColumns: {
+                    leftColumns: 1
+                },
                 scrollX: true,
                 stateSave: true,
                 stateSaveParams: function (settings, data) {
@@ -220,7 +227,23 @@
                 buttons: [
                   'copy', 
                   'csv',
-                  { extend: 'colvis', className: 'colvis', text: 'Columns' }
+                  /*
+                  {
+                    extend: 'colvisGroup',
+                    text: 'View1',
+                    show: [ 1, 2 ],
+                    hide: [ 3, 4, 5 ]
+                  },
+                  {
+                    extend: 'colvisGroup',
+                    text: 'View All',
+                    show: ':hidden'
+                  },
+                  */
+                  { extend: 'colvis', 
+                    className: 'colvis', 
+                    text: 'Custom View' 
+                  }
                 ]
             });
             
