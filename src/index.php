@@ -92,6 +92,9 @@
                                 <a href="index.php?view=vm"><i class="fa fa-desktop fa-fw"></i> Virtual Machines</a>
                             </li>
                             <li>
+                                <a href="index.php?view=vcenter"><i class="fa fa-cubes fa-fw"></i> vCenter Servers</a>
+                            </li>
+                            <li>
                                 <a href="index.php?view=esxi"><i class="fa fa-server fa-fw"></i> ESXi Hosts</a>
                             </li>
                             <li>
@@ -101,7 +104,7 @@
                                 <a href="index.php?view=vdisk"><i class="fa fa-hdd-o fa-fw"></i> Virtual Disks</a>
                             </li>
                             <li>
-                                <a href="index.php?view=datastore"><i class="fa fa-hdd-o fa-fw"></i> Datastores</a>
+                                <a href="index.php?view=datastore"><i class="fa fa-database fa-fw"></i> Datastores</a>
                             </li>
                             <li>
                                 <a href="index.php?view=vnic"><i class="fa fa-plug fa-fw"></i> Virtual NICs</a>

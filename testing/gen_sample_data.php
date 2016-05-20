@@ -110,6 +110,22 @@ function gen_mac(){
 	return $mac;
 }
 
+function gen_datacenter($num){
+	return false;
+}
+
+function gen_folder($num, $dc){
+	return false;
+}
+
+function gen_cluster($num, $dc){
+	return false;
+}
+
+function gen_resourcepool($num, $cluster){
+	return false;
+}
+
 function gen_esxi($num){
 	global $vc_type;
 	global $vc_id;
@@ -339,6 +355,10 @@ function gen_pnic($esxi){
 	return $arr;
 }
 
+
+//========================//
+// START GENERATION LOGIC //
+//========================//
 
 $dvs_total = gen_dvs(2);
 $esxi_total = gen_esxi(rand(2, 6));
