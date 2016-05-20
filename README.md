@@ -41,14 +41,13 @@ The following requirements for vSummary have been identified so far:
 
 For a quicker deployment, a docker image is available (which does steps 1 to 6) with preinstalled nginx, php-fpm, mariadb, and vsummary source code. To run it please execute these commands:
 
-**Start container and bind it to port 80 on local machine**
+#### Start container and bind it to port 80 on local machine
 ```
 docker run --name vsummary -p 80:80 -d gbolo/vsummary
 ```
-~~**(optional) Load sample data into the database for testing**~~
-~~if you would like to load sample data into vsummary for testing, you may execute a php script inside the conatiner to do so:~~
+#### (optional) Load sample data into the database for testing
 
-**sample data generator script is broken for now until it's updated to support the newer data schema that has changed recently**
+if you would like to load sample data into vsummary for testing, you may execute a php script inside the conatiner to do so:
 ```
 docker exec -it vsummary php /data/gen_sample_data.php
 
