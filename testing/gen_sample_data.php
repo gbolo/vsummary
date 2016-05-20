@@ -26,7 +26,7 @@ $dc_pre_name = array(
 	"Johannesburg"
 );
 
-$api_endpoint = 'http://vsummary.midgar.dev/api/update.php';
+$api_endpoint = 'http://localhost/api/update.php';
 $vc_id = 'TEST'.md5(mt_rand());
 $vc_type = strtolower( $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)] );
 $vc_fqdn = 'vca.'.$vc_type.'.sample.tld';
@@ -561,7 +561,7 @@ foreach ($dc_total as $dc){
 $esxi_total = [];
 $rp_total = [];
 foreach ($cl_total as $cl){
-	$n = rand(2, 12);
+	$n = rand(2, 10);
 	$esxi = gen_esxi($n,$cl);
 	$esxi_total = array_merge($esxi_total, $esxi);
 
@@ -583,7 +583,7 @@ foreach ($dvs_total as $dvs){
 $vm_total = [];
 $pnic_total = [];
 foreach ($esxi_total as $esxi){
-	$n = rand(5, 20);
+	$n = rand(5, 16);
 	$vm = gen_vm($n, $esxi);
 	$vm_total = array_merge($vm_total, $vm);
 	$pnic = gen_pnic($esxi);
