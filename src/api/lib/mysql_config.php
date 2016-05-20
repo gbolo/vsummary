@@ -10,4 +10,14 @@ $sql_details = array(
 );
 
 
+// Format for new library
+$config = array(
+	'host'     => $sql_details['host'],
+	'port'     => '3306',
+	'username' => $sql_details['user'],
+	'password' => $sql_details['pass'],
+	'database' => $sql_details['db']
+);
+
+
 ?>
