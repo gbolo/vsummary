@@ -3,10 +3,33 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$api_endpoint = 'http://localhost/api/update.php';
+$dc_pre_name = array(
+	"Toronto",
+	"Vancouver",
+	"NewYork",
+	"Florida",
+	"Chicago",
+	"LosAngeles",
+	"Dublin",
+	"Amsterdam",
+	"London",
+	"Paris",
+	"Berlin",
+	"SaoPaulo",
+	"HongKong",
+	"Shanghai",
+	"Montevideo",
+	"Sydney",
+	"Budapest",
+	"Dubai",
+	"Sousse",
+	"Johannesburg"
+);
+
+$api_endpoint = 'http://vsummary.midgar.dev/api/update.php';
 $vc_id = 'TEST'.md5(mt_rand());
-$vc_type = 'dr';
-$vc_fqdn = 'vcenter.'.$vc_type.'.sample.tld';
+$vc_type = strtolower( $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)] );
+$vc_fqdn = 'vca.'.$vc_type.'.sample.tld';
 
 $vm_pre_name = array(
 	"nginx", 
@@ -77,6 +100,31 @@ $guest_os = array(
 	"opensuse64Guest"
 );
 
+$rp_name = array(
+	"High",
+	"Medium",
+	"Low",
+	"Verylow"
+);
+
+$folder_L1 = array(
+	"DEVOPS",
+	"NETWORKING",
+	"DATABASE",
+	"SECURITY",
+	"WEB",
+	"MAIL",
+	"OTHER",
+	"SHARED"
+);
+
+$folder_L2 = array(
+	"testing",
+	"production",
+	"staging",
+	"misc"
+);
+
 function vsummary_api_call($data){
                               
     global $api_endpoint;                                  
@@ -111,22 +159,149 @@ function gen_mac(){
 }
 
 function gen_datacenter($num){
-	return false;
+
+	global $vc_id;
+	global $dc_pre_name;
+	$arr;
+
+	for ($i = 1; $i <= $num; $i++) {
+
+		$name = $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)].'-DC'.rand(1, 9);
+
+		$json = '
+	    {
+	        "vcenter_id":  "'.$vc_id.'",
+	        "name":  "'.$name.'",
+	        "esxi_folder_moref":  "group-h'.$i.'",
+	        "objecttype":  "DC",
+	        "vm_folder_moref":  "group-v'.$i.'",
+	        "moref":  "datacenter-'.$i.'"
+	    }';
+		$arr[] = json_decode($json, true);
+	}
+	return $arr;
 }
 
-function gen_folder($num, $dc){
-	return false;
+function gen_folder($dc){
+
+	global $vc_id;
+	global $folder_L1;
+	global $folder_L2;
+
+	$folders = [];
+
+	// dc root folder must be present
+	$json = '
+    {
+        "vcenter_id":  "'.$vc_id.'",
+        "name":  "vm",
+        "objecttype":  "FOLDER",
+        "parent_moref":  "'.$dc['moref'].'",
+        "type":  "Folder VirtualMachine VirtualApp",
+        "moref":  "'.$dc['vm_folder_moref'].'"
+    }';
+    $root_folder[] = json_decode($json, true);
+
+	$i = 100;
+	foreach ($folder_L1 as $name){
+		$json = '
+	    {
+	        "vcenter_id":  "'.$vc_id.'",
+	        "name":  "'.$name.'",
+	        "objecttype":  "FOLDER",
+	        "parent_moref":  "'.$dc['vm_folder_moref'].'",
+	        "type":  "Folder VirtualMachine VirtualApp",
+	        "moref":  "group-v'.$i.'"
+	    }';
+	    $arrL1[] = json_decode($json, true);
+	    $i++;
+	}
+	
+	foreach ($arrL1 as $folder){
+
+		$name = $folder_L2[mt_rand(0, count($folder_L2) - 1)];
+		$json = '
+	    {
+	        "vcenter_id":  "'.$vc_id.'",
+	        "name":  "'.$name.'",
+	        "objecttype":  "FOLDER",
+	        "parent_moref":  "'.$folder['moref'].'",
+	        "type":  "Folder VirtualMachine VirtualApp",
+	        "moref":  "group-v'.$i.'"
+	    }';
+	    $arrL2[] = json_decode($json, true);
+	    $i++;
+	}
+
+	$folders = array_merge($root_folder, $arrL1, $arrL2);
+	return $folders;
 }
 
 function gen_cluster($num, $dc){
-	return false;
+
+	global $vc_id;
+
+	for ($i = 1; $i <= $num; $i++) {
+
+		$json = '
+	    {
+	        "ha_enabled":  "True",
+	        "target_balance":  200,
+	        "total_cpu_mhz":  10784,
+	        "moref":  "domain-c'.$i.'",
+	        "drs_enabled":  "True",
+	        "name":  "CLUSTER-'.$i.'",
+	        "total_vmotions":  '.rand(50, 5000).',
+	        "total_memory_bytes":  17178796032,
+	        "status":  "green",
+	        "num_hosts":  2,
+	        "datacenter_moref":  "'.$dc['esxi_folder_moref'].'",
+	        "current_balance":  '.rand(10, 180).',
+	        "drs_behaviour":  2,
+	        "total_cpu_threads":  4,
+	        "objecttype":  "CLUSTER",
+	        "vcenter_id":  "'.$vc_id.'"
+	    }';
+		$arr[] = json_decode($json, true);
+	}
+
+	return $arr;
 }
 
-function gen_resourcepool($num, $cluster){
-	return false;
+function gen_resourcepool($num, $cl){
+
+	global $vc_id;
+	global $rp_name;
+
+	for ($i = 1; $i <= $num; $i++) {
+
+		$name = $rp_name[mt_rand(0, count($rp_name) - 1)].'-'.$i;
+
+		$json = '
+	    {
+	        "mem_reservation":  0,
+	        "vapp_state":  "n/a",
+	        "objecttype":  "RES",
+	        "cpu_limit":  -1,
+	        "mem_limit":  -1,
+	        "moref":  "resgroup-'.$i.'",
+	        "parent_moref":  "resgroup-1",
+	        "name":  "'.$name.'",
+	        "type":  "ResourcePool",
+	        "status":  1,
+	        "cluster_moref":  "'.$cl['moref'].'",
+	        "vcenter_id":  "'.$i.'",
+	        "configured_memory_mb":  2048,
+	        "cpu_reservation":  0
+	    }';
+
+		$arr[] = json_decode($json, true);
+	}
+	return $arr;
+
 }
 
-function gen_esxi($num){
+function gen_esxi($num, $cl){
 	global $vc_type;
 	global $vc_id;
 	$arr;
@@ -156,6 +331,7 @@ function gen_esxi($num){
 		    "cpu_cores":  6,
 		    "status":  2,
 		    "stat_cpu_usage":  '.rand(500, 5000).',
+		    "cluster_moref":  "'.$cl['moref'].'",
 		    "moref":  "host-'.rand(1, 1000).'",
 		    "memory_bytes":  103043387392,
 		    "uuid":  "'.md5(uniqid()).'"
@@ -237,6 +413,7 @@ function gen_vm($num, $esxi){
 	global $vc_type;
 	global $vm_pre_name;
 	global $guest_os;
+	global $fd_total;
 	$arr;
 	for ($i = 0; $i < $num; $i++) {
 		$name = $vm_pre_name[mt_rand(0, count($vm_pre_name) - 1)].'-'.rand(1, 9);
@@ -244,7 +421,10 @@ function gen_vm($num, $esxi){
 		$power_state = rand(0, 1);
 		$guest = $guest_os[array_rand($guest_os)];
 	 	$date = new DateTime(date('Y-m-d', strtotime('-'.rand(1, 365).' days')));
-	 	//$date = date('Y-m-d', strtotime('-7 days'));
+	 	$folder = $fd_total[mt_rand(0, count($fd_total) - 1)];
+	 	while ( $folder['name'] === 'vm' ){
+	 		$folder = $fd_total[mt_rand(0, count($fd_total) - 1)];
+	 	}
 		$config_date = date_format($date, 'Y-m-d\TH:i:s.').rand(100000, 400000).'Z';
 		if ($power_state == 1){
 			$vmtools = 'guestToolsRunning';
@@ -260,6 +440,10 @@ function gen_vm($num, $esxi){
 		        "memory_mb":  '.$ram.',
 		        "config_guest_os":  "'.$guest.'",
 		        "config_version":  "vmx-0'.rand(7, 9).'",
+		        "resourcepool_moref": "resgroup-1",
+		        "folder_moref":  "'.$folder['moref'].'",
+		        "vapp_moref":  null,
+		        "template":  false,
 		        "smbios_uuid":  "'.md5(uniqid()).'",
 		        "instance_uuid":  "'.md5(uniqid()).'",
 		        "config_change_version":  "'.$config_date.'",
@@ -360,8 +544,33 @@ function gen_pnic($esxi){
 // START GENERATION LOGIC //
 //========================//
 
+// !!support only 1 dc per vcenter for random generation!!
+$dc_total = gen_datacenter(1);
+
+$cl_total = [];
+$fd_total = [];
+foreach ($dc_total as $dc){
+	$n = rand(1, 3);
+	$cl = gen_cluster($n,$dc);
+	$cl_total = array_merge($cl_total, $cl);
+
+	$fd = gen_folder($dc);
+	$fd_total = array_merge($fd_total, $fd);
+}
+
+$esxi_total = [];
+$rp_total = [];
+foreach ($cl_total as $cl){
+	$n = rand(2, 12);
+	$esxi = gen_esxi($n,$cl);
+	$esxi_total = array_merge($esxi_total, $esxi);
+
+	$n = rand(1, 3);
+	$rp = gen_resourcepool($n, $cl);
+	$rp_total = array_merge($rp_total, $rp);
+}
+
 $dvs_total = gen_dvs(2);
-$esxi_total = gen_esxi(rand(2, 6));
 $ds_total = gen_ds(rand(4, 12));
 
 $pg_total = [];
@@ -397,8 +606,12 @@ $vcenter_arr = array(
     "vc_fqdn" =>  $vc_fqdn
 );
 
+
 echo "POSTING RANDOM SAMPLE DATA FOR VSUMMARY API: $api_endpoint\n---\n";
 echo '[vcenter] ' . vsummary_api_call($vcenter_arr);
+echo '[datacenter] ' . vsummary_api_call($dc_total);
+echo '[cluster] ' . vsummary_api_call($cl_total);
+echo '[resourcepool] ' . vsummary_api_call($rp_total);
 echo '[esxi] ' . vsummary_api_call($esxi_total);
 echo '[dvs] ' . vsummary_api_call($dvs_total);
 echo '[datastore] ' . vsummary_api_call($ds_total);
@@ -407,3 +620,5 @@ echo '[portgroup] ' . vsummary_api_call($pg_total);
 echo '[pnic] ' . vsummary_api_call($pnic_total);
 echo '[vnic] ' . vsummary_api_call($vnic_total);
 echo '[vdisk] ' . vsummary_api_call($vdisk_total);
+echo '[folder] ' . vsummary_api_call($fd_total);
+
