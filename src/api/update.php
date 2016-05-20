@@ -141,10 +141,18 @@ function update_esxi($data){
             $name = $esxi['name'];
             $moref = $esxi['moref'];
             $max_evc = $esxi['max_evc'];
-            $current_evc = var_export( $esxi['current_evc'], true );
+            if ( is_null($esxi['current_evc']) ){
+                $current_evc = var_export( $esxi['current_evc'], true );
+            } else {
+                $current_evc = $esxi['current_evc'];
+            }
             $status = $esxi['status'];
             $power_state = $esxi['power_state'];
-            $in_maintenance_mode = var_export( $esxi['in_maintenance_mode'], true );
+            if ( is_null($esxi['in_maintenance_mode']) ){
+                $in_maintenance_mode = var_export( $esxi['in_maintenance_mode'], true );
+            } else {
+                $in_maintenance_mode = $esxi['in_maintenance_mode'];
+            }
             $vendor = $esxi['vendor'];
             $model = $esxi['model'];
             $uuid = $esxi['uuid'];

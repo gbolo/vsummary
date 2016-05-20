@@ -40,6 +40,13 @@ $columns = array(
     ),
     array( 'db' => 'vcpu', 'dt' => 2 ),
     array( 'db' => 'memory_mb', 'dt' => 3 ),
+    array( 
+        'db' => 'memory_mb', 
+        'dt' => 3,
+        'formatter' => function( $d, $row ) {
+            return $d . " MB";
+        }
+    ),
     array( 'db' => 'power_state', 'dt' => 4 ),
     array( 'db' => 'config_guest_os', 'dt' => 5 ),
     array( 'db' => 'config_version', 'dt' => 6 ),
