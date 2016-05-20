@@ -27,6 +27,10 @@ if (isset($_GET['view'])){
 			$view = $_GET['view'];
 			$view_title = 'Virtual Switch Portgroup';
 			break;
+		case 'vcenter':
+			$view = $_GET['view'];
+			$view_title = 'vCenter Environment';
+			break;
 		default;
 			$view = 'vm';
 			$view_title = 'Virtual Machine';

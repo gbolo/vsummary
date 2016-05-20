@@ -425,6 +425,58 @@ GROUP BY
         portgroup.id;
 
 
+CREATE VIEW view_vcenter AS
+SELECT 
+  vcenter.*, 
+  ( SELECT coalesce(sum(vm.vcpu),0)
+    FROM vm
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_vcpu_on,
+  ( SELECT coalesce(sum(vm.memory_mb),0)
+    FROM vm
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_memory_on,
+  ( SELECT coalesce(count(vm.id),0)
+    FROM vm 
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_on,
+  ( SELECT coalesce(count(vm.id),0)
+    FROM vm 
+    WHERE vm.vcenter_id = vcenter.id AND vm.present = 1) vms,
+  ( SELECT coalesce(count(datacenter.id),0)
+    FROM datacenter 
+    WHERE datacenter.vcenter_id = vcenter.id AND datacenter.present = 1) datacenters,
+  ( SELECT coalesce(count(cluster.id),0)
+    FROM cluster
+    WHERE cluster.vcenter_id = vcenter.id AND cluster.present = 1) clusters,
+  ( SELECT coalesce(count(esxi.id),0)
+    FROM esxi 
+    WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_hosts,
+  ( SELECT coalesce(sum(esxi.cpu_threads),0)
+    FROM esxi 
+    WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_cpu,
+  ( SELECT coalesce(sum(esxi.memory_bytes),0)
+    FROM esxi 
+    WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_memory,
+  ( SELECT coalesce(count(vnic.id),0)
+    FROM vnic 
+    WHERE vnic.vcenter_id = vcenter.id AND vnic.present = 1) vnics,
+  ( SELECT coalesce(count(vdisk.id),0)
+    FROM vdisk 
+    WHERE vdisk.vcenter_id = vcenter.id AND vdisk.present = 1) vdisks,
+  ( SELECT coalesce(count(datastore.id),0)
+    FROM datastore 
+    WHERE datastore.vcenter_id = vcenter.id AND datastore.present = 1) datastores,
+  ( SELECT coalesce(count(portgroup.id),0)
+    FROM portgroup 
+    WHERE portgroup.vcenter_id = vcenter.id AND portgroup.present = 1) portgroups,
+  ( SELECT coalesce(count(vswitch.id),0)
+    FROM vswitch
+    WHERE vswitch.vcenter_id = vcenter.id AND vswitch.present = 1) vswitches,
+  ( SELECT coalesce(count(resourcepool.id),0)
+    FROM resourcepool 
+    WHERE resourcepool.vcenter_id = vcenter.id AND resourcepool.present = 1) resourcepools
+FROM vcenter;
+
+
+
 /* 
 TESTING
 */
