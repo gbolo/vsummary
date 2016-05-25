@@ -77,6 +77,7 @@ present TINYINT DEFAULT 1
 CREATE TABLE folder
 (
 id VARCHAR(32) PRIMARY KEY,
+moref VARCHAR(32),
 name VARCHAR(128),
 type VARCHAR(64),
 full_path VARCHAR(512),

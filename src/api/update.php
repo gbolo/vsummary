@@ -852,13 +852,14 @@ function update_folder($data){
         $pdo->beginTransaction();
         $pdo->query( 'UPDATE folder SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
 
-        $stmt = $pdo->prepare('INSERT INTO folder (id,name,type,parent,parent_datacenter_id,vcenter_id) ' . 
-                'VALUES(:id,:name,:type,:parent,:parent_datacenter_id,:vcenter_id) ' .
+        $stmt = $pdo->prepare('INSERT INTO folder (id,moref,name,type,parent,parent_datacenter_id,vcenter_id) ' . 
+                'VALUES(:id,:moref,:name,:type,:parent,:parent_datacenter_id,:vcenter_id) ' .
                 'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),parent=VALUES(parent),parent_datacenter_id=VALUES(parent_datacenter_id),present=1');
 
         foreach ($data as $folder) {
 
             $id = md5( $folder['vcenter_id'] . $folder['moref'] );
+            $moref = $folder['moref'];
             if ( strpos($folder['type'], 'VirtualMachine') === false ) {
                 # dont handle non-vm folders for now
                 $type = 'not_vm';
@@ -877,6 +878,7 @@ function update_folder($data){
             $vcenter_id = $folder['vcenter_id'];
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
             $stmt->bindParam(':type', $type, PDO::PARAM_STR);
             $stmt->bindParam(':parent', $parent, PDO::PARAM_STR);
             $stmt->bindParam(':parent_datacenter_id', $parent_datacenter_id, PDO::PARAM_STR);
