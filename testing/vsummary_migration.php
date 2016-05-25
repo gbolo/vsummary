@@ -4,14 +4,26 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// MIGRATION VARIABLES
+$source_vcenter_id = '0184679d-369a-4590-993a-5fbdf326a75a';
+$source_datacenter_name = 'DC1';
+
+// VSWITCH GENERATE
+$esxi_hostname = '';
+$vswitch_name = 'vSwitch1';
+
+// DVS PORTGROUP EXPORT
+$gen_dvs_portgroup = true;
+$source_dvs_id = '5fb6de4be73d4154d746ca485eec9dae';
+$destination_dvs_name = 'DVS2';
+
+// FOLDER STRUCTURE EXPORT
+$gen_folder_structure = true;
+
+
+
 // SQL server connection information
-$sql_details = array(
-    'user'    => 'vsummary',
-    'pass'    => 'changeme',
-    'db'      => 'vsummary',
-    'host'    => '10.0.77.21',
-    'charset' => 'utf8'
-);
+require_once('src/api/lib/mysql_config.php');
 
 // set up PDO
 try {
@@ -45,8 +57,8 @@ function gen_vswitch_pg($src_dvs_id, $dst_svs_name){
 
 		$query = "SELECT * FROM portgroup WHERE vswitch_id='{$dvs['id']}' AND present = 1";
 
-		$esxi_pg .= "### CREATING NEW PORTGROUPS ON STANDARD VSWITCH FOR {$esxi['name']} ###\n";
-		$esxi_vm .= "### CHANGING PORTGROUPS FOR EACH VM ON {$esxi['name']} ###\n";
+		$esxi_pg .= "\n\n### CREATING NEW PORTGROUPS ON STANDARD VSWITCH FOR {$esxi['name']} ###\n";
+		$esxi_vm .= "\n\n### CHANGING PORTGROUPS FOR EACH VM ON {$esxi['name']} ###\n";
 		foreach($pdo->query($query) as $pg){
 			if ( $pg['vlan_type'] === 'single' ){
 
@@ -79,7 +91,7 @@ function gen_vswitch_pg($src_dvs_id, $dst_svs_name){
 function gen_dvs_pg($dvs_id, $dvs_dst_name){
 	global $pdo;
 	$query = "SELECT * FROM portgroup WHERE vswitch_id='{$dvs_id}' AND present = 1";
-	echo "### CREATING NEW PORTGROUPS ON DESTINATION DISTRIBUTED SWITCH ###\n";
+	echo "\n\n### CREATING NEW PORTGROUPS ON DESTINATION DISTRIBUTED SWITCH ###\n";
 	foreach($pdo->query($query) as $pg){
 		if ( $pg['vlan_type'] === 'single' ){
 
@@ -114,9 +126,7 @@ function export_vm_folders($vcenter_id, $dc_name){
 	});
 
 	// generate powercli commands
-	echo "##################################\n";
-	echo "# IMPORT VIRTUAL MACHINE FOLDERS #\n";
-	echo "##################################\n";
+	echo "\n\n### VIRTUAL MACHINE FOLDER IMPORT ###\n";
 	echo '$folderArray = @()'."\n";
 	foreach ($folders as $folder){
 
@@ -150,19 +160,6 @@ function export_vm_folders($vcenter_id, $dc_name){
 
 	// echo powercli logic
 	echo '
-Add-PSSnapin VMware.VimAutomation.Core
-If ($globale:DefaultVIServers) {
-	Disconnect-VIServer -Server $global:DefaultVIServers -Force
-}
-
-
-$destVI = Read-Host "DESTINATION vCenter"
-$datacenter = Read-Host "DESTINATION DataCenter Name"
-$creds = get-credential
-connect-viserver -server $destVI -Credential $creds
-
-
-##IMPORT FOLDERS
 $folderArray | % {
  $startFolder = Get-Datacenter -Name $datacenter | Get-Folder -Name \'vm\' -NoRecursion
     $path = $_
@@ -183,20 +180,49 @@ $folderArray | % {
     echo "======="
 }
 
+';
+
+
+}
+
+// PREPERATION ON DESTINATION VCENTER
+echo "###################################################\n";
+echo "#    PREPARATION ON DESTINATION VCENTER SERVER    #\n";
+echo "###################################################\n";
+echo '
+Add-PSSnapin VMware.VimAutomation.Core
+If ($globale:DefaultVIServers) {
+	Disconnect-VIServer -Server $global:DefaultVIServers -Force
+}
+
+
+$destVI = Read-Host "DESTINATION vCenter"
+$datacenter = Read-Host "DESTINATION DataCenter Name"
+$creds = get-credential
+connect-viserver -server $destVI -Credential $creds
+';
+
+if ($gen_folder_structure){
+	export_vm_folders($source_vcenter_id, $source_datacenter_name);
+}
+
+if ($gen_dvs_portgroup){
+	gen_dvs_pg($source_dvs_id, $destination_dvs_name);
+}
+
+echo '
+### DISCONNECT FROM DESTINATION VCENTER
 Disconnect-VIServer "*" -confirm:$false
 
 
 ';
 
 
-}
+echo "###################################################\n";
+echo "#        CHANGES ON SOURCE VCENTER SERVER         #\n";
+echo "###################################################\n";
+gen_vswitch_pg($source_dvs_id, $vswitch_name);
 
-
-
-$folders = export_vm_folders('0184679d-369a-4590-993a-5fbdf326a75a', 'DC1');
-
-gen_vswitch_pg('5fb6de4be73d4154d746ca485eec9dae', 'vSwitch1');
-gen_dvs_pg('5fb6de4be73d4154d746ca485eec9dae', 'DVS2');
 
 
 
