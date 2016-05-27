@@ -953,6 +953,15 @@ function update_folder_full_path($vcenter_id){
         }
     }
 
+
+    // add full path to root folders
+    // populate folders
+    $query = "select null AS name, folder.id AS id,datacenter.name AS dc_name FROM folder LEFT JOIN datacenter on folder.parent_datacenter_id=datacenter.id WHERE folder.parent = 'datacenter' AND folder.vcenter_id = '$vcenter_id' AND folder.type = 'VirtualMachine' AND folder.present=1";
+    foreach($pdo->query($query) as $folder){
+        $folders[] = $folder;
+    }
+
+
     foreach ( $folders as $folder ){
         $full_path = $folder['dc_name'];
         if ( isset($folder['path']) ){
