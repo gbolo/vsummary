@@ -754,7 +754,7 @@ function update_datacenter($data){
 
             $id = md5( $dc['vcenter_id'] . $dc['moref'] );
             $vm_folder_id = $dc['vm_folder_moref'];
-            $esxi_folder_id = $dc['esxi_folder_moref'];
+            $esxi_folder_id = md5( $dc['vcenter_id'] . $dc['esxi_folder_moref'] );
             $name = $dc['name'];
             $vcenter_id = $dc['vcenter_id'];
 
@@ -796,7 +796,7 @@ function update_cluster($data){
         foreach ($data as $cl) {
 
             $id = md5( $cl['vcenter_id'] . $cl['moref'] );
-            $datacenter_id = $cl['datacenter_moref'];
+            $datacenter_id = md5( $cl['vcenter_id'] . $cl['datacenter_moref'] );
             $current_balance = $cl['current_balance'];
             $target_balance = $cl['target_balance'];
             $total_cpu_threads = $cl['total_cpu_threads'];
