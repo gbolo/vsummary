@@ -4,6 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// OUTPUT FOLDER
+$outut_dir = 'output/phase1/';
+
 // MIGRATION VARIABLES
 $source_vcenter_id = '0184679d-369a-4590-993a-5fbdf326a75a';
 $source_datacenter_name = 'DC1';
@@ -23,7 +26,7 @@ $gen_folder_structure = true;
 
 
 // SQL server connection information
-require_once('src/api/lib/mysql_config.php');
+require_once('../src/api/lib/mysql_config.php');
 
 // set up PDO
 try {
@@ -90,15 +93,23 @@ function gen_vswitch_pg($src_dvs_id, $dst_svs_name){
 
 function gen_dvs_pg($dvs_id, $dvs_dst_name){
 	global $pdo;
+	global $outut_dir;
 	$query = "SELECT * FROM portgroup WHERE vswitch_id='{$dvs_id}' AND present = 1";
-	echo "\n\n### CREATING NEW PORTGROUPS ON DESTINATION DISTRIBUTED SWITCH ###\n";
+
+	$file = $outut_dir . 'import_DVS.ps1';
+	
+
+	$file_content = "### CREATING NEW PORTGROUPS ON DESTINATION DISTRIBUTED SWITCH ###\n";
 	foreach($pdo->query($query) as $pg){
 		if ( $pg['vlan_type'] === 'single' ){
 
-			echo "Get-VDSwitch -Name '{$dvs_dst_name}' | New-VDPortgroup -Name '{$pg['name']}' -NumPorts 128 -VLanId {$pg['vlan']}\n";
+			$file_content .= "Get-VDSwitch -Name '{$dvs_dst_name}' | New-VDPortgroup -Name '{$pg['name']}' -NumPorts 128 -VLanId {$pg['vlan']}\n";
 
 		}
 	}
+
+	file_put_contents($file, $file_content);
+
 
 }
 
@@ -106,6 +117,7 @@ function gen_dvs_pg($dvs_id, $dvs_dst_name){
 function export_vm_folders($vcenter_id, $dc_name){
 	
 	global $pdo;
+	global $outut_dir;
 
 	$query = "select DISTINCT full_path, name from folder 
 	WHERE full_path LIKE '{$dc_name}/%'
@@ -126,8 +138,23 @@ function export_vm_folders($vcenter_id, $dc_name){
 	});
 
 	// generate powercli commands
-	echo "\n\n### VIRTUAL MACHINE FOLDER IMPORT ###\n";
-	echo '$folderArray = @()'."\n";
+	$file = $outut_dir . 'export_vm-folders.ps1';
+	$file_content = '
+### DISCONNECT FROM DESTINATION VCENTER
+Disconnect-VIServer "*" -confirm:$false
+
+Add-PSSnapin VMware.VimAutomation.Core
+If ($globale:DefaultVIServers) {
+	Disconnect-VIServer -Server $global:DefaultVIServers -Force
+}
+
+
+$destVI = Read-Host "DESTINATION vCenter"
+$datacenter = Read-Host "DESTINATION DataCenter Name"
+$creds = get-credential
+connect-viserver -server $destVI -Credential $creds';
+	$file_content .= "### VIRTUAL MACHINE FOLDER IMPORT ###\n";
+	$file_content .= '$folderArray = @()'."\n";
 	foreach ($folders as $folder){
 
 		$path = $folder['path'];
@@ -152,14 +179,14 @@ function export_vm_folders($vcenter_id, $dc_name){
 			*/
 
 			// array of strings
-			echo "\$folderArray += '{$folder['path']}'\n";
+			$file_content .= "\$folderArray += '{$folder['path']}'\n";
 
 		}
 
 	}
 
 	// echo powercli logic
-	echo '
+	$file_content .= '
 $folderArray | % {
  $startFolder = Get-Datacenter -Name $datacenter | Get-Folder -Name \'vm\' -NoRecursion
     $path = $_
@@ -180,27 +207,75 @@ $folderArray | % {
     echo "======="
 }
 
+### DISCONNECT FROM DESTINATION VCENTER
+Disconnect-VIServer "*" -confirm:$false
 ';
 
 
-}
+	file_put_contents($file, $file_content);
 
-// PREPERATION ON DESTINATION VCENTER
-echo "###################################################\n";
-echo "#    PREPARATION ON DESTINATION VCENTER SERVER    #\n";
-echo "###################################################\n";
-echo '
-Add-PSSnapin VMware.VimAutomation.Core
-If ($globale:DefaultVIServers) {
-	Disconnect-VIServer -Server $global:DefaultVIServers -Force
 }
 
 
-$destVI = Read-Host "DESTINATION vCenter"
-$datacenter = Read-Host "DESTINATION DataCenter Name"
-$creds = get-credential
-connect-viserver -server $destVI -Credential $creds
-';
+function export_vm_folder_csv($vcenter_id, $esxi){
+
+
+	global $pdo;
+	$query = "SELECT name, esxi_name, folder FROM view_vm WHERE vcenter_id='{$vcenter_id}' AND present=1 AND vapp_id='none'";
+
+	$vms = array();
+
+	foreach($pdo->query($query) as $vm){
+
+		$vms[$vm['esxi_name']][] = array($vm['name'],$vm['folder']);
+	}
+	
+	foreach($vms as $esxi => $vmlist){
+
+		$fp = fopen("output/phase1/{$esxi}_vm-by-path.csv", 'w');
+		foreach($vmlist as $vm){
+			fputcsv($fp, $vm);
+		}
+
+		fclose($fp);
+	}
+	//$fp = fopen('file.csv', 'w');
+	//fputcsv($fp, $fields);
+
+	//fclose($fp);
+	//print_r($vms);
+}
+
+
+function export_templates_csv($vcenter_id, $esxi){
+
+
+	global $pdo;
+	$query = "SELECT name, esxi_name FROM view_vm WHERE vcenter_id='{$vcenter_id}' AND present=1 AND template='true'";
+
+	$vms = array();
+
+	foreach($pdo->query($query) as $vm){
+
+		$vms[$vm['esxi_name']][] = array($vm['name'],"template");
+	}
+	
+	foreach($vms as $esxi => $vmlist){
+
+		$fp = fopen("output/phase1/{$esxi}_vm-templates.csv", 'w');
+		foreach($vmlist as $vm){
+			fputcsv($fp, $vm);
+		}
+
+		fclose($fp);
+	}
+	//$fp = fopen('file.csv', 'w');
+	//fputcsv($fp, $fields);
+
+	//fclose($fp);
+	//print_r($vms);
+}
+
 
 if ($gen_folder_structure){
 	export_vm_folders($source_vcenter_id, $source_datacenter_name);
@@ -210,13 +285,6 @@ if ($gen_dvs_portgroup){
 	gen_dvs_pg($source_dvs_id, $destination_dvs_name);
 }
 
-echo '
-### DISCONNECT FROM DESTINATION VCENTER
-Disconnect-VIServer "*" -confirm:$false
-
-
-';
-
 
 echo "###################################################\n";
 echo "#        CHANGES ON SOURCE VCENTER SERVER         #\n";
@@ -225,4 +293,5 @@ gen_vswitch_pg($source_dvs_id, $vswitch_name);
 
 
 
-
+export_vm_folder_csv($source_vcenter_id, 'test');
+export_templates_csv($source_vcenter_id,'test');
