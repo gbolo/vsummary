@@ -625,7 +625,9 @@ foreach($vc in $vcenters.Keys)
 
     if ($c){
         $vc_uuid = $c.InstanceUuid
+        Write-Host "============================"
         Write-Host "Connected to $vc_fqdn"
+        Write-Host "============================"
 
         $vc_obj = New-Object -TypeName PSobject -Property @{
             vc_shortname = $vc_shortname

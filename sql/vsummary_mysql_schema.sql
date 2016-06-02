@@ -49,6 +49,8 @@ present TINYINT DEFAULT 1
 CREATE TABLE resourcepool
 (
 id VARCHAR(32) PRIMARY KEY,
+moref VARCHAR(16),
+full_path VARCHAR(512),
 name VARCHAR(128),
 type VARCHAR(64),
 status VARCHAR(64),
@@ -59,6 +61,7 @@ cpu_limit BIGINT,
 mem_reservation BIGINT UNSIGNED,
 mem_limit BIGINT,
 parent VARCHAR(32),
+parent_moref VARCHAR(16),
 cluster_id VARCHAR(32),
 vcenter_id VARCHAR(36),
 present TINYINT DEFAULT 1
