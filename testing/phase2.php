@@ -4,7 +4,7 @@
 	DEFINE VARIABLES
 ======================================= */
 
-$outut_dir = 'output/phase1/';
+$outut_dir = 'output/phase2/';
 
 // MIGRATION VARIABLES
 $source_vcenter_id = '0184679d-369a-4590-993a-5fbdf326a75a';
@@ -33,7 +33,11 @@ $VM_ARRAY = gen_vm_array($source_vcenter_id, $source_datacenter_name, $source_cl
 $filename = $outut_dir . 'csv/VM_AND_TEMPLATES_FULL.csv';
 csv_vm_list($VM_ARRAY, $filename);
 
-// STEP 2: CREATE PORTGROUPS ON STANDARD VSWITCH ON EACH ESXI HOST
+// STEP 2 & 3: CREATE PORTGROUPS ON STANDARD VSWITCH ON EACH ESXI HOST & MOVE ALL VM VNICS TO NEW STANDARTD VSWITCH PGS
+$ESXI_ARRAY = gen_esxi_array($source_vcenter_id, $source_datacenter_name, $source_cluster_id);
+$DVS_ARRAY = gen_dvs_pg_array($source_dvs_id);
 
-// STEP 3: MOVE ALL VM VNICS TO NEW STANDARTD VSWITCH PGS
+powercli_move_vm_vnics($DVS_ARRAY, $ESXI_ARRAY, $vswitch_name, $outut_dir);
+
+
 
