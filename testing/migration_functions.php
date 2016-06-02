@@ -258,13 +258,12 @@ function powercli_move_vm_vnics($dvs_array, $esxi_array, $dst_svs_name, $outut_d
 
 	global $pdo;
 
+	$vnics_changed = array();
 	foreach($esxi_array as $esxi){
 
 		$file1 = $outut_dir . 'create_vswitch_pg_' . $esxi['name'] . '.ps1';
 		$file2 = $outut_dir . 'change_vm_pg_' . $esxi['name'] . '.ps1';
 		$file3 = $outut_dir . 'csv/VNICS_CHANGED.csv';
-
-		$vnics_changed = array();
 
 		$file1_content = "### CREATING NEW PORTGROUPS ON STANDARD VSWITCH FOR {$esxi['name']} ###\n";
 		$file1_content .= '$vc_fqdn = Read-Host "SOURCE vCenter"'."\n";
@@ -276,18 +275,19 @@ function powercli_move_vm_vnics($dvs_array, $esxi_array, $dst_svs_name, $outut_d
 		foreach($dvs_array as $pg){
 			if ( $pg['vlan_type'] === 'single' ){
 
-				# create portgroup
+				// create portgroup
 				$file1_content .= "Get-VMHost {$esxi['name']} | Get-VirtualSwitch -Name '{$dst_svs_name}' | New-VirtualPortGroup -Name 'mig-{$pg['name']}' -VLanId {$pg['vlan']}\n";
 
 			}
-			# move every VM to it
-			foreach($pdo->query("SELECT id, moref, name FROM vm WHERE esxi_id = '{$esxi['id']}' AND present = 1") as $vm){
+			// move every VM to it
+			foreach($pdo->query("SELECT id, moref, name, instance_uuid FROM vm WHERE esxi_id = '{$esxi['id']}' AND present = 1") as $vm){
 
-				# loop through vnics
+				// loop through vnics
 				foreach($pdo->query("SELECT * FROM vnic WHERE vm_id = '{$vm['id']}' AND portgroup_id = '{$pg['id']}' AND present = 1") as $vnic){
 
-					$vnics_changed[] = array( $vm['name'], $vnic['name'], $pg['name'], $esxi['name'] );
-					$file2_content .= "Get-VMHost {$esxi['name']} | Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
+					$vnics_changed[] = array( $vm['name'], $vm['instance_uuid'], $vnic['name'], $pg['name'], $esxi['name'] );
+					//$file2_content .= "Get-VMHost {$esxi['name']} | Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
+					$file2_content .= "Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
 
 				}		
 			}
@@ -302,6 +302,9 @@ function powercli_move_vm_vnics($dvs_array, $esxi_array, $dst_svs_name, $outut_d
 			fputcsv($fp, $vnic);
 		}
 		fclose($fp);
+
+		// create json file too
+		file_put_contents($outut_dir . 'csv/VNICS_CHANGED.json',json_encode($vnics_changed));
 
 	}
 
