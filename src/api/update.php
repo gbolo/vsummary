@@ -327,13 +327,14 @@ function update_resourcepool($data){
         $pdo->beginTransaction();
         $pdo->query( 'UPDATE resourcepool SET present = 0 WHERE present = 1 AND vcenter_id = ' . $pdo->quote($vcenter_id) );
 
-        $stmt = $pdo->prepare('INSERT INTO resourcepool (id,name,type,status,vapp_state,parent,cluster_id,configured_memory_mb,cpu_reservation,cpu_limit,mem_reservation,mem_limit,vcenter_id) ' . 
-                'VALUES(:id,:name,:type,:status,:vapp_state,:parent,:cluster_id,:configured_memory_mb,:cpu_reservation,:cpu_limit,:mem_reservation,:mem_limit,:vcenter_id) ' .
-                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),status=VALUES(status),vapp_state=VALUES(vapp_state),parent=VALUES(parent),cluster_id=VALUES(cluster_id),configured_memory_mb=VALUES(configured_memory_mb),cpu_reservation=VALUES(cpu_reservation),cpu_limit=VALUES(cpu_limit),mem_reservation=VALUES(mem_reservation),mem_limit=VALUES(mem_limit),present=1');
+        $stmt = $pdo->prepare('INSERT INTO resourcepool (id,moref,name,type,status,vapp_state,parent,parent_moref,cluster_id,configured_memory_mb,cpu_reservation,cpu_limit,mem_reservation,mem_limit,vcenter_id) ' . 
+                'VALUES(:id,:moref,:name,:type,:status,:vapp_state,:parent,:parent_moref,:cluster_id,:configured_memory_mb,:cpu_reservation,:cpu_limit,:mem_reservation,:mem_limit,:vcenter_id) ' .
+                'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),status=VALUES(status),vapp_state=VALUES(vapp_state),parent=VALUES(parent),parent_moref=VALUES(parent_moref),cluster_id=VALUES(cluster_id),configured_memory_mb=VALUES(configured_memory_mb),cpu_reservation=VALUES(cpu_reservation),cpu_limit=VALUES(cpu_limit),mem_reservation=VALUES(mem_reservation),mem_limit=VALUES(mem_limit),present=1');
 
         foreach ($data as $res) {
 
             $id = md5( $res['vcenter_id'] . $res['moref'] );
+            $moref = $res['moref'];
             $name = $res['name'];
             $type = $res['type'];
             $status = $res['status'];
@@ -341,8 +342,10 @@ function update_resourcepool($data){
             if ( strpos($res['parent_moref'], 'domain-') === false ){
                 # this is the cluster's default root resource pool
                 $parent = md5( $res['vcenter_id'] . $res['parent_moref'] );
+                $parent_moref = $res['parent_moref'];
             } else {
                 $parent = 'cluster';
+                $parent_moref = $res['parent_moref'];
             }
             $cluster_id = md5( $res['vcenter_id'] . $res['cluster_moref'] );
             $configured_memory_mb = $res['configured_memory_mb'];
@@ -353,11 +356,13 @@ function update_resourcepool($data){
             $vcenter_id = $res['vcenter_id'];
 
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->bindParam(':moref', $moref, PDO::PARAM_STR);
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':type', $type, PDO::PARAM_STR);
             $stmt->bindParam(':status', $status, PDO::PARAM_STR);
             $stmt->bindParam(':vapp_state', $vapp_state, PDO::PARAM_STR);
             $stmt->bindParam(':parent', $parent, PDO::PARAM_STR);
+            $stmt->bindParam(':parent_moref', $parent_moref, PDO::PARAM_STR);
             $stmt->bindParam(':cluster_id', $cluster_id, PDO::PARAM_STR);
             $stmt->bindParam(':configured_memory_mb', $configured_memory_mb);
             $stmt->bindParam(':cpu_reservation', $cpu_reservation);
