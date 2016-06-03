@@ -188,7 +188,11 @@ function powercli_import_vm_folders($folder_array, $filename){
 			*/
 
 			// array of strings
-			$file_content .= "\$folderArray += '{$folder['path']}'\n";
+
+			// Powershell escapes single quote with a consecutive single quote!
+			// http://technet.microsoft.com/en-us/library/dd315325.aspx
+			$folder_path = str_replace("'", "''", $folder['path']);
+			$file_content .= "\$folderArray += '$folder_path'\n";
 
 		}
 	}
@@ -285,7 +289,7 @@ function powercli_move_vm_vnics($dvs_array, $esxi_array, $dst_svs_name, $outut_d
 				// loop through vnics
 				foreach($pdo->query("SELECT * FROM vnic WHERE vm_id = '{$vm['id']}' AND portgroup_id = '{$pg['id']}' AND present = 1") as $vnic){
 
-					$vnics_changed[] = array( $vm['name'], $vm['instance_uuid'], $vnic['name'], $pg['name'], $esxi['name'] );
+					$vnics_changed[] = array( "vm_name" => $vm['name'], "instance_uuid" => $vm['instance_uuid'], "vnic" => $vnic['name'], "portgroup" => $pg['name'], "esxi" => $esxi['name'] );
 					//$file2_content .= "Get-VMHost {$esxi['name']} | Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
 					$file2_content .= "Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
 
@@ -312,51 +316,58 @@ function powercli_move_vm_vnics($dvs_array, $esxi_array, $dst_svs_name, $outut_d
 
 
 
-function powercli_restore_vm_vnics($esxi_array, $outut_dir){
+function powercli_restore_vm_vnics($vm_array, $vnics_changed, $outut_dir){
 
-	global $pdo;
+	// GENERATE POWERCLI
+	$file_content = "### MOVING VMS BACK TO DVS\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
 
-	foreach($esxi_array as $esxi){
+	foreach ( $vnics_changed as $vnic ){
 
-		$file1 = $outut_dir . 'create_vswitch_pg_' . $esxi['name'] . '.ps1';
-		$file2 = $outut_dir . 'change_vm_pg_' . $esxi['name'] . '.ps1';
-		$file3 = $outut_dir . 'csv/VNICS_CHANGED.csv';
+		$key = array_search($vnic['instance_uuid'], array_column($vm_array, 'instance_uuid'));
+		$vm_moref = $vm_array[$key]['moref'];
 
-		$vnics_changed = array();
-
-		$file1_content = "### CREATING NEW PORTGROUPS ON STANDARD VSWITCH FOR {$esxi['name']} ###\n";
-		$file2_content = "### CHANGING PORTGROUPS FOR EACH VM ON {$esxi['name']} ###\n";
-
-		foreach($dvs_array as $pg){
-			if ( $pg['vlan_type'] === 'single' ){
-
-				# create portgroup
-				$file1_content .= "Get-VMHost {$esxi['name']} | Get-VirtualSwitch -Name '{$dst_svs_name}' | New-VirtualPortGroup -Name 'mig-{$pg['name']}' -VLanId {$pg['vlan']}\n";
-
-			}
-			# move every VM to it
-			foreach($pdo->query("SELECT id, name, moref, instance_uuid FROM vm WHERE esxi_id = '{$esxi['id']}' AND present = 1") as $vm){
-
-				# loop through vnics
-				foreach($pdo->query("SELECT * FROM vnic WHERE vm_id = '{$vm['id']}' AND portgroup_id = '{$pg['id']}' AND present = 1") as $vnic){
-
-					$vnics_changed[] = array( $vm['name'], $vnic['name'], $vm['instance_uuid'], $pg['name'], $esxi['name'] );
-					$file2_content .= "Get-VMHost {$esxi['name']} | Get-VM -Id VirtualMachine-{$vm['moref']} | Get-NetworkAdapter -Name '{$vnic['name']}' | Set-NetworkAdapter -NetworkName 'mig-{$pg['name']}' -Confirm:\$false -RunAsync\n";
-
-				}		
-			}
-
-		}
-
-		file_put_contents($file1, $file1_content);
-		file_put_contents($file2, $file2_content);
-
-		$fp = fopen($file3, 'w');
-		foreach($vnics_changed as $vnic){
-			fputcsv($fp, $vnic);
-		}
-		fclose($fp);
+		$file_content .= "Get-VM -Id VirtualMachine-{$vm_moref} | Get-NetworkAdapter -Name '{$vnic['vnic']}' | Set-NetworkAdapter -NetworkName '{$vnic['portgroup']}' -Confirm:\$false -RunAsync\n";
 
 	}
+
+	file_put_contents($outut_dir.'RESTORE-VM-PORTGROUPS.ps1', $file_content);
+
+}
+
+
+function powercli_restore_vm_folders($vm_source_array, $vm_array, $outut_dir){
+
+	$vm_folder_move = array();
+
+	foreach($vm_source_array as $vm){
+
+		$folder = $vm['folder'];
+		if ( !is_null($folder) ){
+			$key = array_search($vm['instance_uuid'], array_column($vm_array, 'instance_uuid'));
+			$vm_moref = $vm_array[$key]['moref'];
+			$vm_folder_move[$folder][] = $vm_moref;
+		}
+
+	}
+
+	// GENERATE POWERCLI
+	$file_content = "### MOVING VMS BACK TO ORIGINAL FOLDERS\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
+
+	foreach ( $vm_folder_move as $folder => $vm ){
+
+		$file_content .= '$folder = Get-FolderByPath -Path "'.$folder."\" -Separator '/'\n";
+		foreach ($vm as $moref){
+			$file_content .= "Get-VM -Id 'VirtualMachine-{$moref}' | Move-VM -Destination \$folder\n";
+		}
+
+	}
+
+	file_put_contents($outut_dir.'RESTORE-VM-FOLDERS.ps1', $file_content);
 
 }
