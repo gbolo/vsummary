@@ -376,6 +376,9 @@ function update_resourcepool($data){
         }
         $pdo->commit();
 
+        // Update resourcepool full path if successful
+        update_resourcepool_full_path($vcenter_id);
+
     } catch (PDOException $e) {
         // rollback transaction on error
         $pdo->rollback();
@@ -383,6 +386,7 @@ function update_resourcepool($data){
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
     }
+
 }
 
 
@@ -895,6 +899,9 @@ function update_folder($data){
         }
         $pdo->commit();
 
+        // Update resourcepool full path if successful
+        update_folder_full_path($vcenter_id);
+
     } catch (PDOException $e) {
         // rollback transaction on error
         $pdo->rollback();
@@ -902,9 +909,7 @@ function update_folder($data){
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
     }
-
-    // update folder full path
-    update_folder_full_path($vcenter_id);
+    
 }
 
 function update_folder_full_path($vcenter_id){
@@ -1007,6 +1012,102 @@ function update_folder_full_path($vcenter_id){
     }
 
 }
+
+
+function update_resourcepool_full_path($vcenter_id){
+
+    // import array_column function to support php versions older than 5.5
+    require_once('lib/array_column.php');
+
+    global $pdo;
+
+    // make arrays to save sql queries and make function faster
+    $resourcepools = array();
+
+    // populate folders
+    $query = "select r.name, r.moref, r.parent_moref, cluster.name AS cluster FROM resourcepool r LEFT JOIN cluster ON r.cluster_id = cluster.id WHERE r.vcenter_id = '$vcenter_id' AND r.present=1";
+    foreach($pdo->query($query) as $respool){
+        $resourcepools[] = $respool;
+    }
+
+    // Loop through folders and determine full path
+    foreach ( $resourcepools as $res ){
+        $continue = true;
+        $search_id = $res['parent_moref'];
+        $parent_type = explode("-", $search_id)[0];
+        
+        $res['full_path'] = '';
+
+        // initialize and wipe array
+        $full_path_array = array();
+
+        // stop when parent is a datacenter
+        if ($parent_type == 'domain'){
+            $continue = false;
+        }
+
+        while ( $continue ) {
+            $key = array_search( $search_id, array_column($resourcepools,'moref') );
+            if ( $key === false  ){
+                // stop if parent not found
+                $continue = false;
+            } else {
+                $full_path_array[] = $resourcepools[$key]['name'];
+                $search_id = $resourcepools[$key]['parent_moref'];
+            }
+            
+        }
+
+        // add the name and cluster
+        $full_path_array[] = $res['cluster'];
+
+        // reverse order to start from cluster
+        $ordered_path = array_reverse($full_path_array);
+
+        // remove the root pool of the cluster that's always called Resources
+        unset($ordered_path[1]);
+
+        // create a string from the paths
+        foreach ( $ordered_path as $part ){
+            $res['full_path'] .= $part.'/';
+        }
+
+        // add the name of this resource to the end
+        $res['full_path'] .= $res['name'];
+
+        // calculate id of this resource
+        $rp_id = md5( $vcenter_id . $res['moref'] );
+
+        try {
+
+            // start transaction
+            $pdo->beginTransaction();
+
+            // prepare statement to avoid sql injections
+            $stmt = $pdo->prepare('UPDATE resourcepool ' . 
+                    'SET full_path=:full_path ' .
+                    'WHERE id=' . $pdo->quote($rp_id) );
+
+            $stmt->bindParam(':full_path', $res['full_path'], PDO::PARAM_STR);
+
+            // execute prepared statement
+            $stmt->execute();
+
+            // commit transaction
+            $pdo->commit();
+
+        } catch (PDOException $e) {
+            // rollback transaction on error
+            $pdo->rollback();
+            // return 500
+            http_response_code(500);
+        }
+
+
+    }
+
+}
+
 
 
 function vlan_trunk_to_string($vlan_start, $vlan_end){
