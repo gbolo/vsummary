@@ -71,13 +71,14 @@ Function Get-FolderByPath {
       foreach($strPath in $Path){
         $root = Get-Folder -Name Datacenters -Server $vc
         $strPath.Split($Separator) | %{
-          $root = Get-Inventory -Name $_ -Location $root -Server $vc -NoRecursion
+          $foldername = [System.Web.HttpUtility]::UrlDecode($_)
+          $root = Get-Inventory -Name $foldername -Location $root -Server $vc -NoRecursion
           if((Get-Inventory -Location $root -NoRecursion | Select -ExpandProperty Name) -contains "vm"){
             $root = Get-Inventory -Name "vm" -Location $root -Server $vc -NoRecursion
           }
         }
         $root | where {$_ -is [VMware.VimAutomation.ViCore.Impl.V1.Inventory.FolderImpl]}|%{
-          Get-Folder -Name $_.Name -Location $root.Parent -NoRecursion -Server $vc
+          Get-Folder -Name $foldername -Location $root.Parent -NoRecursion -Server $vc
         }
       }
     }
