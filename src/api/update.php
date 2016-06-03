@@ -1030,12 +1030,12 @@ function update_resourcepool_full_path($vcenter_id){
         $resourcepools[] = $respool;
     }
 
-    // Loop through folders and determine full path
+    // Loop through resourcepools and determine full path
     foreach ( $resourcepools as $res ){
         $continue = true;
         $search_id = $res['parent_moref'];
         $parent_type = explode("-", $search_id)[0];
-        
+
         $res['full_path'] = '';
 
         // initialize and wipe array
@@ -1046,12 +1046,22 @@ function update_resourcepool_full_path($vcenter_id){
             $continue = false;
         }
 
+        // for migration purposes, keep track of any vapps in path
+        $res['vapp_in_path'] = 0;
+
         while ( $continue ) {
             $key = array_search( $search_id, array_column($resourcepools,'moref') );
             if ( $key === false  ){
                 // stop if parent not found
                 $continue = false;
             } else {
+                // since we are here, check if parent is vapp for migration purposes.
+                // we can do this by checking for a v after - 
+                if ( explode("-", $search_id)[1][0] == 'v' ){
+                    $res['vapp_in_path'] = 1;
+                }
+
+                // continue with path logic
                 $full_path_array[] = $resourcepools[$key]['name'];
                 $search_id = $resourcepools[$key]['parent_moref'];
             }
@@ -1085,10 +1095,11 @@ function update_resourcepool_full_path($vcenter_id){
 
             // prepare statement to avoid sql injections
             $stmt = $pdo->prepare('UPDATE resourcepool ' . 
-                    'SET full_path=:full_path ' .
+                    'SET full_path=:full_path, vapp_in_path=:vapp_in_path ' .
                     'WHERE id=' . $pdo->quote($rp_id) );
 
             $stmt->bindParam(':full_path', $res['full_path'], PDO::PARAM_STR);
+            $stmt->bindParam(':vapp_in_path', $res['vapp_in_path'], PDO::PARAM_INT);
 
             // execute prepared statement
             $stmt->execute();
