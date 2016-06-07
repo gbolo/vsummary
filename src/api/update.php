@@ -1025,7 +1025,7 @@ function update_resourcepool_full_path($vcenter_id){
     $resourcepools = array();
 
     // populate folders
-    $query = "select r.name, r.moref, r.parent_moref, cluster.name AS cluster FROM resourcepool r LEFT JOIN cluster ON r.cluster_id = cluster.id WHERE r.vcenter_id = '$vcenter_id' AND r.present=1";
+    $query = "select r.name, r.moref, r.parent_moref, c.name AS cluster, d.name AS datacenter FROM resourcepool r LEFT JOIN cluster c ON r.cluster_id = c.id LEFT JOIN datacenter d ON c.datacenter_id = d.esxi_folder_id WHERE r.vcenter_id = '$vcenter_id' AND r.present=1";
     foreach($pdo->query($query) as $respool){
         $resourcepools[] = $respool;
     }
@@ -1068,8 +1068,9 @@ function update_resourcepool_full_path($vcenter_id){
             
         }
 
-        // add the name and cluster
+        // add the cluster and datacenter name
         $full_path_array[] = $res['cluster'];
+        $full_path_array[] = $res['datacenter'];
 
         // reverse order to start from cluster
         $ordered_path = array_reverse($full_path_array);
