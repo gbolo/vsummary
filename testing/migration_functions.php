@@ -371,3 +371,31 @@ function powercli_restore_vm_folders($vm_source_array, $vm_array, $outut_dir){
 	file_put_contents($outut_dir.'RESTORE-VM-FOLDERS.ps1', $file_content);
 
 }
+
+function powercli_export_vapps($vcenter_id, $cluster_id, $outut_dir){
+
+	global $pdo;
+
+	$query = "select name,moref from resourcepool 
+	WHERE present=1 AND vapp_in_path = 0 AND type='VirtualApp' 
+	AND vcenter_id='$vcenter_id' AND cluster_id='$cluster_id'";
+
+	$sth = $pdo->prepare($query);
+	$sth->execute();
+	$result = $sth->fetchAll();
+
+	$file_content = "### EXPORT VAPPS FROM SOURCE VCENTER\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "SOURCE vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
+
+	foreach ($result as $vapp){
+
+		$file_content .= "Get-VApp -Id 'VirtualApp-{$vapp['moref']}' | Stop-VApp -force \n";
+		$file_content .= "Get-VApp -Id 'VirtualApp-{$vapp['moref']}' | Export-VApp -destination '.\\vapps' \n";
+
+	}
+
+	file_put_contents($outut_dir.'EXPORT-VAPPS.ps1', $file_content);
+
+}
