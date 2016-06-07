@@ -29,11 +29,15 @@ Python progream to dump information from the vCenter's Database
 from __future__ import print_function
 
 from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 
 import argparse
 import atexit
 import getpass
 import ssl
+
+from tools import cli
+from tools import pchelper
 
 
 def GetArgs():
@@ -66,6 +70,30 @@ def main():
 
     atexit.register(Disconnect, si)
 
+    vm_properties = ["name", "config.uuid", "config.hardware.numCPU",
+                     "config.hardware.memoryMB", "guest.guestState",
+                     "config.guestFullName", "config.guestId",
+                     "config.version"]
+
+    root_folder = si.content.rootFolder
+    view = pchelper.get_container_view(si, obj_type=[vim.VirtualMachine])
+    vm_data = pchelper.collect_properties(si, view_ref=view,
+                                          obj_type=vim.VirtualMachine,
+                                          path_set=vm_properties,
+                                          include_mors=True)
+    for vm in vm_data:
+        print("-" * 70)
+        print("Name:                    {0}".format(vm["name"]))
+        print("BIOS UUID:               {0}".format(vm["config.uuid"]))
+        print("CPUs:                    {0}".format(vm["config.hardware.numCPU"]))
+        print("MemoryMB:                {0}".format(vm["config.hardware.memoryMB"]))
+        print("Guest PowerState:        {0}".format(vm["guest.guestState"]))
+        print("Guest Full Name:         {0}".format(vm["config.guestFullName"]))
+        print("Guest Container Type:    {0}".format(vm["config.guestId"]))
+        print("Container Version:       {0}".format(vm["config.version"]))
+
+    print("")
+    print("Found {0} VirtualMachines.".format(len(vm_data)))
 
 
 
