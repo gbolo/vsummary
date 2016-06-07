@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python
 
 #
 #  Copyright (c) 2016 Frank Felhoffer, George Bolo
@@ -22,3 +21,56 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  DEALINGS IN THE SOFTWARE.
 #
+
+"""
+Python progream to dump information from the vCenter's Database
+"""
+
+from __future__ import print_function
+
+from pyVim.connect import SmartConnect, Disconnect
+
+import argparse
+import atexit
+import getpass
+import ssl
+
+
+def GetArgs():
+
+   parser = argparse.ArgumentParser(description='')
+   parser.add_argument('-s', '--host', required=True, action='store', help='')
+   parser.add_argument('-o', '--port', type=int, default=443, action='store', help='')
+   parser.add_argument('-u', '--user', required=True, action='store', help='')
+   parser.add_argument('-p', '--password', required=False, action='store', help='')
+   args = parser.parse_args()
+   return args
+
+
+def main():
+
+    args = GetArgs()
+    if args.password:
+        password = args.password
+    else:
+        password = getpass.getpass(prompt='Password: ' % (args.host,args.user))
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    context.verify_mode = ssl.CERT_NONE
+    
+    si = SmartConnect(host=args.host, user=args.user, pwd=password, port=int(args.port), sslContext=context)
+
+    if not si:
+        print("Could not connect ...")
+        return -1
+
+    atexit.register(Disconnect, si)
+
+
+
+
+    return 0
+
+# Start program
+if __name__ == "__main__":
+    main()
