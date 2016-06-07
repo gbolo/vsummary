@@ -70,10 +70,31 @@ def main():
 
     atexit.register(Disconnect, si)
 
-    vm_properties = ["name", "config.uuid", "config.hardware.numCPU",
-                     "config.hardware.memoryMB", "guest.guestState",
-                     "config.guestFullName", "config.guestId",
-                     "config.version"]
+    vm_properties = ["name",
+                     "config.files.vmpathname",
+                     "config.hardware.numCPU",
+                     "config.hardware.memoryMB",
+                     "config.guestId",
+                     "config.version",
+                     "config.uuid", 
+                     "config.instanceUuid",
+                     "config.changeVersion",
+                     "config.Template",
+                     "config.guestFullName",
+                     "guest.ToolsVersion",
+                     "guest.ToolsRunningStatus",
+                     "guest.Hostname",
+                     "guest.IpAddress",
+                     "guest.guestState",
+                     "parent",
+                     "parentVApp",
+                     "resourcePool",
+                     "summary.Quickstats.OverallCpuUsage",
+                     "summary.Quickstats.HostMemoryUsage",
+                     "summary.Quickstats.GuestMemoryUsage",
+                     "summary.Quickstats.UptimeSeconds",
+                     "runtime.PowerState",
+                     "runtime.Host"]
 
     root_folder = si.content.rootFolder
     view = pchelper.get_container_view(si, obj_type=[vim.VirtualMachine])
@@ -81,16 +102,35 @@ def main():
                                           obj_type=vim.VirtualMachine,
                                           path_set=vm_properties,
                                           include_mors=True)
+
     for vm in vm_data:
         print("-" * 70)
         print("Name:                    {0}".format(vm["name"]))
-        print("BIOS UUID:               {0}".format(vm["config.uuid"]))
+        print("VM Path Name:            {0}".format(vm["config.files.vmpathname"]))
         print("CPUs:                    {0}".format(vm["config.hardware.numCPU"]))
         print("MemoryMB:                {0}".format(vm["config.hardware.memoryMB"]))
-        print("Guest PowerState:        {0}".format(vm["guest.guestState"]))
-        print("Guest Full Name:         {0}".format(vm["config.guestFullName"]))
-        print("Guest Container Type:    {0}".format(vm["config.guestId"]))
+        print("Guest ID:                {0}".format(vm["config.guestId"]))
         print("Container Version:       {0}".format(vm["config.version"]))
+        print("BIOS UUID:               {0}".format(vm["config.uuid"]))
+        print("Instance UUID:           {0}".format(vm["config.instanceUuid"]))
+        print("Change Version:          {0}".format(vm["config.changeVersion"]))
+        print("Template:                {0}".format(vm["config.Template"]))
+        print("Guest Full Name:         {0}".format(vm["config.guestFullName"]))
+        print("Guest Tools Version:     {0}".format(vm["guest.ToolsVersion"]))
+        print("Guest Tools Running:     {0}".format(vm["guest.ToolsRunningStatus"]))
+        print("Guest Hostname:          {0}".format(vm["guest.Hostname"]))
+        print("Guest IP Address:        {0}".format(vm["guest.IpAddress"]))
+        print("Guest PowerState:        {0}".format(vm["guest.guestState"]))
+        print("Guest Container Type:    {0}".format(vm["config.guestId"]))
+        print("Parent:                  {0}".format(vm["parent"]))
+        print("Parent vApp:             {0}".format(vm["parentVApp"]))
+        print("Resource Pool:           {0}".format(vm["resourcePool"]))
+        print("Quickstat CPU Usage:     {0}".format(vm["summary.Quickstats.OverallCpuUsage"]))
+        print("Quickstat Host Memory:   {0}".format(vm["summary.Quickstats.HostMemoryUsage"]))
+        print("Quickstat Guest Memory:  {0}".format(vm["summary.Quickstats.GuestMemoryUsage"]))
+        print("Quickstat Uptime (sec):  {0}".format(vm["summary.Quickstats.UptimeSeconds"]))
+        print("Power State:             {0}".format(vm["runtime.PowerState"]))
+        print("Host:                    {0}".format(vm["runtime.Host"]))
 
     print("")
     print("Found {0} VirtualMachines.".format(len(vm_data)))
