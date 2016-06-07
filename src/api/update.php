@@ -1075,8 +1075,8 @@ function update_resourcepool_full_path($vcenter_id){
         // reverse order to start from cluster
         $ordered_path = array_reverse($full_path_array);
 
-        // remove the root pool of the cluster that's always called Resources
-        unset($ordered_path[1]);
+        // remove the hidden root pool of the cluster that's always called Resources
+        unset($ordered_path[2]);
 
         // create a string from the paths
         foreach ( $ordered_path as $part ){
