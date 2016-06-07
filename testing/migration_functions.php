@@ -399,3 +399,62 @@ function powercli_export_vapps($vcenter_id, $cluster_id, $outut_dir){
 	file_put_contents($outut_dir.'EXPORT-VAPPS.ps1', $file_content);
 
 }
+
+
+function powercli_import_resourcepools($vcenter_id, $cluster_id, $outut_dir){
+
+	global $pdo;
+
+	$query = "SELECT name,moref,full_path FROM resourcepool 
+	WHERE present=1 AND type='ResourcePool' AND parent != 'cluster'
+	AND vcenter_id='$vcenter_id' AND cluster_id='$cluster_id'
+	ORDER BY full_path";
+
+	$sth = $pdo->prepare($query);
+	$sth->execute();
+	$result = $sth->fetchAll();
+
+	$file_content = "### IMPORT RESOURCEPOOL STRUCTURE FROM SOURCE VCENTER\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
+
+
+	$rpool_array = array();
+	foreach ($result as $rpool){
+
+		# create the 1st level resourcepools in cluster
+		$paths = explode('/',$rpool['full_path']);
+		if ( count( $paths ) == 3 ){
+			$pool_name = str_replace("'", "''", $rpool['name']);
+			$file_content .= "\$pool_name = [System.Web.HttpUtility]::UrlDecode('$pool_name')\n";
+			$file_content .= "\$cluster = Get-Cluster -Name {$paths[1]}\n";
+			$file_content .= "New-ResourcePool -Location \$cluster -Name \$pool_name\n";
+		} else {
+			$rpool_array[] = $rpool;
+		}
+	}
+
+	$file_content .= '$resourcePoolArray = @()'."\n";
+
+	foreach ($rpool_array as $rpool){
+
+			# get parent path
+			$full_path_array = explode('/',$rpool['full_path']);
+			$parent_path_array = array_slice($full_path_array, 0, -1);
+			$parent_path = str_replace( "'", "''", implode('/', $parent_path_array) );
+			$rpool_parent_path = str_replace("'", "''", $parent_path);
+			$pool_name = str_replace( "'", "''", $rpool['name'] );
+
+			$file_content .= '$rpool = New-Object System.Object'."\n";
+			$file_content .= "\$rpool | Add-Member -type NoteProperty -name Name -Value '$pool_name'\n";
+			$file_content .= "\$rpool | Add-Member -type NoteProperty -name ParentPath -Value '$parent_path'\n";
+			$file_content .= '$resourcePoolArray += $rpool'."\n";
+
+	}
+
+	$file_content .= 'Import-Cluster-ResoucePools $resourcePoolArray'."\n";
+
+	file_put_contents($outut_dir.'IMPORT-RESOURCEPOOLS.ps1', $file_content);
+
+}
