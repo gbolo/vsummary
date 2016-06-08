@@ -228,8 +228,8 @@ Function Import-Cluster-Vapps ( [string]$cluster_name, [string]$folder) {
 Function Import-Cluster-ResoucePools ( [object]$resourcePoolArray ) {
 
   $resourcePoolArray | % {
-    $pool_name = $_.Name
-    $pool_path = [System.Web.HttpUtility]::UrlDecode($_.ParentPath)
+    $pool_name = [System.Web.HttpUtility]::UrlDecode($_.Name)
+    $pool_path = $_.ParentPath
     $search = Get-VIObjectByPath -Path $pool_path
 
     # create resourcepool only if found
@@ -247,4 +247,22 @@ Function Import-Cluster-ResoucePools ( [object]$resourcePoolArray ) {
 
 }
 
+Function Restore-VMs-ByFolder ( [string]$FolderPath, [object]$vmsArray ){
 
+  $search = Get-VIObjectByPath -Path $FolderPath
+
+  # Move VM if path found
+  if ($search.Found){
+    $moref = $search.Node.Moref.ToString()
+    $folder = Get-Folder -Id $moref
+    $vmsArray | % {
+      $vm_id = $_.Id
+      $vm_name = $_.Name
+      Write-Host "MOVING VM: $vm_name"
+      Get-VM -Id $vm_id | Move-VM -Destination $folder
+    }
+  } else{
+    Write-Host "ERROR - FOLDER NOT FOUND: $FolderPath"
+  }
+
+}

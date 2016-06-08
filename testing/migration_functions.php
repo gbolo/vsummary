@@ -338,40 +338,6 @@ function powercli_restore_vm_vnics($vm_array, $vnics_changed, $outut_dir){
 }
 
 
-function powercli_restore_vm_folders($vm_source_array, $vm_array, $outut_dir){
-
-	$vm_folder_move = array();
-
-	foreach($vm_source_array as $vm){
-
-		$folder = $vm['folder'];
-		if ( !is_null($folder) ){
-			$key = array_search($vm['instance_uuid'], array_column($vm_array, 'instance_uuid'));
-			$vm_moref = $vm_array[$key]['moref'];
-			$vm_folder_move[$folder][] = $vm_moref;
-		}
-
-	}
-
-	// GENERATE POWERCLI
-	$file_content = "### MOVING VMS BACK TO ORIGINAL FOLDERS\n";
-	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
-	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
-	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
-
-	foreach ( $vm_folder_move as $folder => $vm ){
-
-		$file_content .= '$folder = Get-FolderByPath -Path "'.$folder."\" -Separator '/'\n";
-		foreach ($vm as $moref){
-			$file_content .= "Get-VM -Id 'VirtualMachine-{$moref}' | Move-VM -Destination \$folder\n";
-		}
-
-	}
-
-	file_put_contents($outut_dir.'RESTORE-VM-FOLDERS.ps1', $file_content);
-
-}
-
 function powercli_export_vapps($vcenter_id, $cluster_id, $outut_dir){
 
 	global $pdo;
@@ -456,5 +422,53 @@ function powercli_import_resourcepools($vcenter_id, $cluster_id, $outut_dir){
 	$file_content .= 'Import-Cluster-ResoucePools $resourcePoolArray'."\n";
 
 	file_put_contents($outut_dir.'IMPORT-RESOURCEPOOLS.ps1', $file_content);
+
+}
+
+
+function powercli_restore_vm_folders($vm_source_array, $vm_array, $outut_dir){
+
+	$vm_folder_move = array();
+
+	foreach($vm_source_array as $vm){
+
+		$folder = $vm['folder'];
+		if ( !is_null($folder) ){
+			$key = array_search($vm['instance_uuid'], array_column($vm_array, 'instance_uuid'));
+			$vm_moref = $vm_array[$key]['moref'];
+			$vm_name = $vm_array[$key]['name'];
+			$vm_folder_move[$folder][] = array('moref' => $vm_moref, 'name' => $vm_name);
+		}
+
+	}
+
+	// GENERATE POWERCLI
+	$file_content = "### MOVING VMS BACK TO ORIGINAL FOLDERS\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
+	
+
+	foreach ( $vm_folder_move as $folder => $vms ){
+
+		$file_content .= '$vmsByFolderArray = @()'."\n";
+
+		foreach ($vms as $vm){
+			$vm_moref = 'VirtualMachine-'.$vm['moref'];
+			
+			$vm_name = str_replace( "'", "''", $vm['name']);
+			$file_content .= '$vm = New-Object System.Object'."\n";
+			$file_content .= "\$vm | Add-Member -type NoteProperty -name Id -Value '$vm_moref'\n";
+			$file_content .= "\$vm | Add-Member -type NoteProperty -name Name -Value '$vm_name'\n";
+			$file_content .= '$vmsByFolderArray += $vm'."\n";
+
+		}
+
+		$vm_folder_path = str_replace( "'", "''", $folder);
+		$file_content .= "Restore-VMs-ByFolder '$vm_folder_path' \$vmsByFolderArray \n";
+
+	}
+
+	file_put_contents($outut_dir.'RESTORE-VM-FOLDERS.ps1', $file_content);
 
 }
