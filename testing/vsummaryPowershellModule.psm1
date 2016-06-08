@@ -212,14 +212,16 @@ Function Export-Cluster-Vapps ( [string]$cluster_name ) {
     }
 }
 
-Function Import-Cluster-Vapps ( [string]$cluster_name, [string]$folder) {
+Function Import-Cluster-Vapps ( [string]$folder) {
 
+    $cluster_name = Read-Host "DESTINATION Cluster Name: "
+    $esxi_name = Read-Host "DESTINATION ESXi Name: "
     Write-Host "IMPORTING vApps IN CLUSTER: $cluster_name"
     $confirmation = Read-Host "  Are you Sure You Want To Proceed?: (y/n) "
     if ($confirmation -eq 'y') {
         foreach( $vapp in Get-ChildItem $folder -recurse | Where {$_.extension -eq ".ovf"} ){
             $ovf_path = $vapp.FullName
-            Import-vApp -Source "$ovf_path" -VMHost (get-vmhost "esxi1.lab1.midgar.local") -Location (get-cluster $cluster_name) -force
+            Import-vApp -Source "$ovf_path" -VMHost (get-vmhost $esxi_name) -Location (get-cluster $cluster_name) -force
         }
     }
 }

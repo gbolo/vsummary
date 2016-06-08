@@ -47,7 +47,7 @@ function gen_vm_array($vcenter_id, $dc_name, $cluster_id=null){
 	global $pdo;
 
 	$query = "
-	select vm.name AS name, vm.moref AS moref, vm.instance_uuid AS instance_uuid, vm.vapp_id AS vapp_id, esxi.name AS esxi_name, vm.template AS template, folder.full_path AS folder, cluster.name AS cluster, resourcepool.name AS resourcepool, datacenter.name AS datacenter FROM vm 
+	select vm.name AS name, vm.moref AS moref, vm.instance_uuid AS instance_uuid, vm.vapp_id AS vapp_id, esxi.name AS esxi_name, vm.template AS template, folder.full_path AS folder, cluster.name AS cluster, resourcepool.name AS resourcepool, resourcepool.full_path AS rpool_full_path, datacenter.name AS datacenter FROM vm 
 	LEFT JOIN folder ON vm.folder_id = folder.id LEFT JOIN esxi ON vm.esxi_id=esxi.id 
 	LEFT JOIN cluster ON esxi.cluster_id=cluster.id 
 	LEFT JOIN resourcepool ON vm.resourcepool_id = resourcepool.id
@@ -56,7 +56,7 @@ function gen_vm_array($vcenter_id, $dc_name, $cluster_id=null){
 
 	if ( !is_null($cluster_id) ){
 		$query = "
-		select vm.name AS name, vm.moref AS moref, vm.instance_uuid AS instance_uuid, vm.vapp_id AS vapp_id, esxi.name AS esxi_name, vm.template AS template, folder.full_path AS folder, cluster.name AS cluster, resourcepool.name AS resourcepool, datacenter.name AS datacenter FROM vm 
+		select vm.name AS name, vm.moref AS moref, vm.instance_uuid AS instance_uuid, vm.vapp_id AS vapp_id, esxi.name AS esxi_name, vm.template AS template, folder.full_path AS folder, cluster.name AS cluster, resourcepool.name AS resourcepool, resourcepool.full_path AS rpool_full_path, datacenter.name AS datacenter FROM vm 
 		LEFT JOIN folder ON vm.folder_id = folder.id LEFT JOIN esxi ON vm.esxi_id=esxi.id 
 		LEFT JOIN cluster ON esxi.cluster_id=cluster.id 
 		LEFT JOIN resourcepool ON vm.resourcepool_id = resourcepool.id
@@ -89,6 +89,43 @@ function gen_dvs_pg_array($dvs_id){
 	return $result;
 
 }
+
+function gen_rpool_array($cluster_id){
+
+	global $pdo;
+
+	$query = "
+	SELECT moref, full_path FROM resourcepool 
+	WHERE present=1 AND type='ResourcePool' AND parent != 'cluster'
+	AND cluster_id='{$cluster_id}'
+	";
+
+	$sth = $pdo->prepare($query);
+	$sth->execute();
+	$result = $sth->fetchAll();
+
+	return $result;
+
+}
+
+function gen_vapp_array($cluster_id){
+
+	global $pdo;
+
+	$query = "
+	SELECT moref, full_path FROM resourcepool 
+	WHERE present=1 AND type='VirtualApp'
+	AND cluster_id='{$cluster_id}'
+	";
+
+	$sth = $pdo->prepare($query);
+	$sth->execute();
+	$result = $sth->fetchAll();
+
+	return $result;
+
+}
+
 
 function gen_esxi_array($vcenter_id, $dc_name, $cluster_id=null){
 
@@ -470,5 +507,62 @@ function powercli_restore_vm_folders($vm_source_array, $vm_array, $outut_dir){
 	}
 
 	file_put_contents($outut_dir.'RESTORE-VM-FOLDERS.ps1', $file_content);
+
+}
+
+function powercli_import_vapps($cluster_name, $outut_dir){
+
+	$folder = 'vapps';
+	$file_content = "Import-Cluster-Vapps '$cluster_name' '$folder'";
+
+	file_put_contents($outut_dir.'IMPORT_VAPPS.ps1', $file_content);
+}
+
+
+function powercli_restore_vm_rpools($VM_ARRAY, $VM_SOURCE_ARRAY, $RESOURCEPOOL_ARRAY, $VAPP_ARRAY, $outut_dir){
+
+
+	// GENERATE POWERCLI
+	$file_content = "### MOVING VMS BACK TO ORIGINAL RESOURCEPOOLS AND VAPPS\n";
+	$file_content .= 'Import-Module .\vsummaryPowershellModule.psm1;'."\n";
+	$file_content .= '$vc_fqdn = Read-Host "DESTINATION vCenter"'."\n";
+	$file_content .= 'Connect-vcenter $vc_fqdn'."\n";
+
+	foreach( $VM_ARRAY as $vm ){
+
+		// match migrated vms by instance uuid
+		$key = array_search($vm['instance_uuid'], array_column($VM_SOURCE_ARRAY, 'instance_uuid'));
+
+		// found VM
+		if ( $key !== false  ){
+
+			// check if its not a vapp
+			if ( $VM_SOURCE_ARRAY[$key]['vapp_id'] == 'none' ){
+
+				// move only if vm was not in root resourcepool before migration
+				if ( $vm['rpool_full_path'] != $VM_SOURCE_ARRAY[$key]['rpool_full_path'] ){
+
+					// find resourcepool new moref
+					$key2 = array_search($VM_SOURCE_ARRAY[$key]['rpool_full_path'], array_column($RESOURCEPOOL_ARRAY, 'full_path'));
+					$file_content .= "\$pool = Get-ResourcePool -Id ResourcePool-{$RESOURCEPOOL_ARRAY[$key2]['moref']}\n";
+					$file_content .= "Get-VM -Id VirtualMachine-{$vm['moref']} | Move-VM -Destination \$pool \n";
+				}
+
+			} else {
+				// find vapp new moref
+				$key2 = array_search($VM_SOURCE_ARRAY[$key]['rpool_full_path'], array_column($VAPP_ARRAY, 'full_path'));
+				$file_content .= "\$vapp = Get-vApp -Id VirtualApp-{$VAPP_ARRAY[$key2]['moref']}\n";
+				$file_content .= "Get-VM -Id VirtualMachine-{$vm['moref']} | Move-VM -Destination \$vapp \n";
+			}
+
+		} else {
+			$file_content .= "Write-Host VM {$vm['name']} NOT FOUND!! {$vm['instance_uuid']}\n";
+		}
+
+
+	}
+
+	file_put_contents($outut_dir.'RESTORE-VM-POOLS-VAPPS.ps1', $file_content);
+
 
 }
