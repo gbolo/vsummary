@@ -105,57 +105,57 @@ def main():
 
     for vm in vm_data:
         print("-" * 70)
-        if vm["name"]:
+        if "name" in vm:
             print("Name:                    {0}".format(vm["name"]))
-        if vm["config.files.vmPathName"]:
+        if "config.files.vmPathName" in vm:
             print("VM Path Name:            {0}".format(vm["config.files.vmPathName"]))
-        if vm["config.hardware.numCPU"]:
+        if "config.hardware.numCPU" in vm:
             print("CPUs:                    {0}".format(vm["config.hardware.numCPU"]))
-        if vm["config.hardware.memoryMB"]:
+        if "config.hardware.memoryMB" in vm:
             print("MemoryMB:                {0}".format(vm["config.hardware.memoryMB"]))
-        if vm["config.guestId"]:
+        if "config.guestId" in vm:
             print("Guest ID:                {0}".format(vm["config.guestId"]))
-        if vm["config.version"]:
+        if "config.version" in vm:
             print("Container Version:       {0}".format(vm["config.version"]))
-        if vm["config.uuid"]:
+        if "config.uuid" in vm:
             print("BIOS UUID:               {0}".format(vm["config.uuid"]))
-        if vm["config.instanceUuid"]:
+        if "config.instanceUuid" in vm:
             print("Instance UUID:           {0}".format(vm["config.instanceUuid"]))
-        if vm["config.changeVersion"]:
+        if "config.changeVersion" in vm:
             print("Change Version:          {0}".format(vm["config.changeVersion"]))
-        if vm["config.template"]:
+        if "config.template" in vm:
             print("Template:                {0}".format(vm["config.template"]))
-        if vm["config.guestFullName"]:
+        if "config.guestFullName" in vm:
             print("Guest Full Name:         {0}".format(vm["config.guestFullName"]))
-        if vm["guest.toolsVersion"]:
+        if "guest.toolsVersion" in vm:
             print("Guest Tools Version:     {0}".format(vm["guest.toolsVersion"]))
-        if vm["guest.toolsRunningStatus"]:
+        if "guest.toolsRunningStatus" in vm:
             print("Guest Tools Running:     {0}".format(vm["guest.toolsRunningStatus"]))
-        if vm["guest.hostName"]:
+        if "guest.hostName" in vm:
             print("Guest Hostname:          {0}".format(vm["guest.hostName"]))
-        if vm["guest.ipAddress"]:
+        if "guest.ipAddress" in vm:
             print("Guest IP Address:        {0}".format(vm["guest.ipAddress"]))
-        if vm["guest.guestState"]:
+        if "guest.guestState" in vm:
             print("Guest PowerState:        {0}".format(vm["guest.guestState"]))
-        if vm["config.guestId"]:
+        if "config.guestId" in vm:
             print("Guest Container Type:    {0}".format(vm["config.guestId"]))
-        if vm["parent"]:
+        if "parent" in vm:
             print("Parent:                  {0}".format(vm["parent"]))
-        if vm["parentVApp"]:
+        if "parentVApp" in vm:
             print("Parent vApp:             {0}".format(vm["parentVApp"]))
-        if vm["resourcePool"]:
+        if "resourcePool" in vm:
             print("Resource Pool:           {0}".format(vm["resourcePool"]))
-        if vm["summary.quickStats.overallCpuUsage"]:
+        if "summary.quickStats.overallCpuUsage" in vm:
             print("Quickstat CPU Usage:     {0}".format(vm["summary.quickStats.overallCpuUsage"]))
-        if vm["summary.quickStats.hostMemoryUsage"]:
+        if "summary.quickStats.hostMemoryUsage" in vm:
             print("Quickstat Host Memory:   {0}".format(vm["summary.quickStats.hostMemoryUsage"]))
-        if vm["summary.quickStats.guestMemoryUsage"]:
+        if "summary.quickStats.guestMemoryUsage" in vm:
             print("Quickstat Guest Memory:  {0}".format(vm["summary.quickStats.guestMemoryUsage"]))
-        if vm["summary.quickStats.uptimeSeconds"]:
+        if "summary.quickStats.uptimeSeconds" in vm:
             print("Quickstat Uptime (sec):  {0}".format(vm["summary.quickStats.uptimeSeconds"]))
-        if vm["runtime.powerState"]:
+        if "runtime.powerState" in vm:
             print("Power State:             {0}".format(vm["runtime.powerState"]))
-        if vm["runtime.host"]:
+        if "runtime.host" in vm:
             print("Host:                    {0}".format(vm["runtime.host"]))
 
     print("")
