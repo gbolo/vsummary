@@ -1,24 +1,16 @@
 <?php
+
+// Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
 require_once('lib/Datatables.php');
 
+// Load some common configs
 require_once('lib/mysql_config.php');
+require_once('lib/common.php');
 
 use Ozdemir\Datatables\Datatables;
 use Ozdemir\Datatables\DB\MySQL;
-
-// used to convert bytes
-$units = explode(' ', 'B KB MB GB TB PB');
-function format_size($size) {
-    global $units;
-    $mod = 1024;
-    for ($i = 0; $size > $mod; $i++) {
-        $size /= $mod;
-    }
-    $endIndex = strpos($size, ".")+3;
-    return substr( $size, 0, $endIndex).' '.$units[$i];
-}
 
 // Create object
 $dt = new Datatables(new MySQL($config));
