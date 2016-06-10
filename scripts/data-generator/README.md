@@ -1,6 +1,6 @@
 ## vSummary - SAMPLE DATA GENERATOR
 
-This script <gen_sample_data.php> can be used to generate semi-randnom sample data that can be sent to the vsummary api for processing
+This script <gen_sample_data.php> can be used to generate semi-random sample data that can be sent to the vsummary api for processing
 
 
 ### OUTPUT OF SCRIPT
