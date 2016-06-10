@@ -421,11 +421,10 @@ FROM    portgroup
 LEFT JOIN
         vswitch
 ON      portgroup.vswitch_id = vswitch.id
-    AND portgroup.present = 1
 LEFT JOIN
         vcenter
 ON      portgroup.vcenter_id = vcenter.id
-    AND portgroup.present = 1
+WHERE   portgroup.present = 1
 GROUP BY
         portgroup.id;
 
