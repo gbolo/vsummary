@@ -553,6 +553,7 @@ Function Get-VSVirtualDisk ( [string]$vc_uuid ){
 
 function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
 
+    ## Create an OrderedDictionary
     $hshChecksToRun = [ordered]@{
         ESXI = "Get-VSEsxi"
         PNIC = "Get-VSPhysicalNic"
@@ -570,8 +571,8 @@ function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
         FOLDER = "Get-VSFolder"
         CLUSTER = "Get-VSCluster"
     }
-    
-    ## Run Checks
+
+    ## Run Checks in OrderedDictionary
     $hshChecksToRun.Keys | Foreach-Object {
         $strThisCheckTopic = $_
         $strFunctionToInvoke = $hshChecksToRun[$strThisCheckTopic]
@@ -591,17 +592,8 @@ function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
 
 }
 
-
-# ADD YOUR vSUMMARY PHP ENDPOINT HERE:
-$vsummary_url = 'http://vsummary.linuxctl.com/api/update.php'
-
-# ADD YOUR VCENTER SERVERS LIKE THIS:
-$vcenters = @{
-    LAB = @{ fqdn = 'vcsa1.lab.linuxctl.com'; readonly_user = 'readonly@vsphere.local'; password = 'changeme'; };
-    VDI = @{ fqdn = 'vcsa1.vdi.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
-    PROD = @{ fqdn = 'vcsa1.prod.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
-    DR = @{ fqdn = 'vcsa1.dr.linuxctl.com'; readonly_user = 'ro@vsphere.local'; password = 'changeme'; }; 
-}
+# Load/Source the required configuration file
+. .\vsummary_config.ps1
 
 foreach($vc in $vcenters.Keys)
 {
