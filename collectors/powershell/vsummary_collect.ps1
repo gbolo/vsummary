@@ -19,7 +19,7 @@ TODO:
 
 #>
 
-function post_to_vsummary($json, $url)
+function Send-VSVSummaryData($json, $url)
 {
     # maybe add gzip and auth or api key?
     try {
@@ -50,22 +50,7 @@ function Hash($textToHash)
     return $res;
 }
 
-function Get-VMHostSerialNumber {
-    param([VMware.VimAutomation.Types.VMHost[]]$InputObject = $null)
-
-    process {
-        $hView = $_ | Get-View -Property Hardware
-        $serviceTag =  $hView.Hardware.SystemInfo.OtherIdentifyingInfo | where {$_.IdentifierType.Key -eq "ServiceTag" }
-        $assetTag =  $hView.Hardware.SystemInfo.OtherIdentifyingInfo | where {$_.IdentifierType.Key -eq "AssetTag" }
-        $obj = New-Object psobject
-        $obj | Add-Member -MemberType NoteProperty -Name VMHost -Value $_
-        $obj | Add-Member -MemberType NoteProperty -Name ServiceTag -Value $serviceTag.IdentifierValue
-        $obj | Add-Member -MemberType NoteProperty -Name AssetTag -Value $assetTag.IdentifierValue
-        Write-Output $obj
-    }
-}
-
-Function Get-vmSummary ( [string]$vc_uuid ){
+Function Get-VSVirtualMachine ( [string]$vc_uuid ){
 
     $objecttype = "VM"
 
@@ -122,10 +107,10 @@ Function Get-vmSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-resourcePoolSummary ( [string]$vc_uuid ){
+Function Get-VSResourcePool ( [string]$vc_uuid ){
 
     $objecttype = "RES"
 
@@ -166,10 +151,10 @@ Function Get-resourcePoolSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-vNicSummary ( [string]$vc_uuid ){
+Function Get-VSVirtualNic ( [string]$vc_uuid ){
 
     $objecttype = "VNIC"
 
@@ -182,6 +167,7 @@ Function Get-vNicSummary ( [string]$vc_uuid ){
         $vm_moref = $vm.MoRef.Value
         $esxi_moref = $vm.Runtime.Host.Value
         ## updated a bit of View data (to be used in the LinkedView properties later -- this is faster than using multiple Get-View calls for properties that are MoRefs themselves)
+        ## source: https://communities.vmware.com/message/1887826
         $vm.UpdateViewData("Runtime.Host.ConfigManager.NetworkSystem.NetworkInfo.Vswitch","Runtime.Host.ConfigManager.NetworkSystem.NetworkInfo.ProxySwitch","Runtime.Host.ConfigManager.NetworkSystem.NetworkInfo.PortGroup")
         $vm.Config.Hardware.Device | ?{$_ -is [VMware.Vim.VirtualEthernetCard]} | %{
             $vnic = $_
@@ -230,13 +216,13 @@ Function Get-vNicSummary ( [string]$vc_uuid ){
             } ## end new-object
         } ## end foreach-object
     } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 
 
 
 }
 
-Function Get-EsxiSummary ( [string]$vc_uuid ){
+Function Get-VSEsxi ( [string]$vc_uuid ){
 
     $objecttype = "ESXI"
 
@@ -293,10 +279,10 @@ Function Get-EsxiSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-pNicSummary ( [string]$vc_uuid ){
+Function Get-VSPhysicalNic ( [string]$vc_uuid ){
 
     $objecttype = "PNIC"
 
@@ -316,11 +302,11 @@ Function Get-pNicSummary ( [string]$vc_uuid ){
                 } ## end new-object
             } ## end foreach-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
 
-Function Get-svsSummary ( [string]$vc_uuid ){
+Function Get-VSStandardVswitch ( [string]$vc_uuid ){
 
     $objecttype = "SVS"
 
@@ -339,10 +325,10 @@ Function Get-svsSummary ( [string]$vc_uuid ){
                 } ## end new-object
             } ## end foreach-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-clusterSummary ( [string]$vc_uuid ){
+Function Get-VSCluster ( [string]$vc_uuid ){
 
     $objecttype = "CLUSTER"
 
@@ -372,10 +358,10 @@ Function Get-clusterSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-dvsSummary ( [string]$vc_uuid ){
+Function Get-VSDistributedVswitch ( [string]$vc_uuid ){
 
     $objecttype = "DVS"
 
@@ -393,10 +379,10 @@ Function Get-dvsSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-dcSummary ( [string]$vc_uuid ){
+Function Get-VSDatacenter ( [string]$vc_uuid ){
 
     $objecttype = "DC"
 
@@ -413,11 +399,11 @@ Function Get-dcSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
 
-Function Get-folderSummary ( [string]$vc_uuid ){
+Function Get-VSFolder ( [string]$vc_uuid ){
 
     $objecttype = "FOLDER"
 
@@ -434,11 +420,11 @@ Function Get-folderSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
 
-Function Get-dvsPgSummary ( [string]$vc_uuid ){
+Function Get-VSDistributedPortGroup ( [string]$vc_uuid ){
 
     $objecttype = "DVSPG"
 
@@ -478,10 +464,10 @@ Function Get-dvsPgSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-Function Get-svsPgSummary ( [string]$vc_uuid ){
+Function Get-VSStandardPortGroup ( [string]$vc_uuid ){
 
     $objecttype = "SVSPG"
 
@@ -500,11 +486,11 @@ Function Get-svsPgSummary ( [string]$vc_uuid ){
                 } ## end new-object
             } ## end foreach-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
 
-Function Get-datastoreSummary ( [string]$vc_uuid ){
+Function Get-VSDatastore ( [string]$vc_uuid ){
 
     $objecttype = "DS"
 
@@ -527,12 +513,12 @@ Function Get-datastoreSummary ( [string]$vc_uuid ){
                 objecttype = $objecttype
             } ## end new-object
         } ## end foreach-object
-    } |  convertto-JSON
+    } |  ConvertTo-Json
 }
 
 
 
-Function Get-vDiskSummary ( [string]$vc_uuid ){
+Function Get-VSVirtualDisk ( [string]$vc_uuid ){
 
     $objecttype = "VDISK"
 
@@ -562,39 +548,39 @@ Function Get-vDiskSummary ( [string]$vc_uuid ){
                 } ## end new-object
             } ## end foreach-object
         } ## end foreach-object
-    } | convertto-JSON
+    } | ConvertTo-Json
 }
 
-function vsummary_checks( [string]$vc_uuid, [string]$url ){
+function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
     # Run Checks
-    $status = post_to_vsummary (Get-EsxiSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSEsxi $vc_uuid) $url
     Write-Host "esxi check http status code: $status"
-    $status = post_to_vsummary (Get-pNicSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSPhysicalNic $vc_uuid) $url
     Write-Host "pnic check http status code: $status"
-    $status = post_to_vsummary (Get-datastoreSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSDatastore $vc_uuid) $url
     Write-Host "datastore check http status code: $status"
-    $status = post_to_vsummary (Get-vmSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSVirtualMachine $vc_uuid) $url
     Write-Host "vm check http status code: $status"
-    $status = post_to_vsummary (Get-svsSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSStandardVswitch $vc_uuid) $url
     Write-Host "vswitch check http status code: $status"
-    $status = post_to_vsummary (Get-dvsSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSDistributedVswitch $vc_uuid) $url
     Write-Host "dvs check http status code: $status"
-    $status = post_to_vsummary (Get-svsPgSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSStandardPortGroup $vc_uuid) $url
     Write-Host "vswitch_pg check http status code: $status"
-    $status = post_to_vsummary (Get-dvsPgSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSDistributedPortGroup $vc_uuid) $url
     Write-Host "dvs_pg check http status code: $status"
-    $status = post_to_vsummary (Get-vNicSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSVirtualNic $vc_uuid) $url
     Write-Host "vnic check http status code: $status"
-    $status = post_to_vsummary (Get-vDiskSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSVirtualDisk $vc_uuid) $url
     Write-Host "vdisk check http status code: $status"
-    $status = post_to_vsummary (Get-resourcePoolSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSResourcePool $vc_uuid) $url
     Write-Host "resourcepool check http status code: $status"
-    $status = post_to_vsummary (Get-dcSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSDatacenter $vc_uuid) $url
     Write-Host "datacenter check http status code: $status"
     # Folder check needs to be done after datacenter check
-    $status = post_to_vsummary (Get-folderSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSFolder $vc_uuid) $url
     Write-Host "folder check http status code: $status"
-    $status = post_to_vsummary (Get-clusterSummary $vc_uuid) $url
+    $status = Send-VSVSummaryData (Get-VSCluster $vc_uuid) $url
     Write-Host "Cluster check http status code: $status"
 }
 
@@ -635,14 +621,14 @@ foreach($vc in $vcenters.Keys)
             vc_fqdn = $vc_fqdn
             objecttype = 'VCENTER'
         }
-        $json = $vc_obj | ConvertTo-JSON
+        $json = $vc_obj | ConvertTo-Json
 
         # SEND VCENTER INFO
-        $status = post_to_vsummary $json $vsummary_url
+        $status = Send-VSVSummaryData $json $vsummary_url
         Write-Host "vcenter check http status code: $status"
 
         # SEND ALL CHECKS
-        vsummary_checks $vc_uuid $vsummary_url
+        Invoke-VSFunctions $vc_uuid $vsummary_url
 
     } Else {
         Write-Host "Could not connect to $vc_fqdn"
