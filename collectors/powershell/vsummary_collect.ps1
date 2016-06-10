@@ -553,30 +553,39 @@ Function Get-VSVirtualDisk ( [string]$vc_uuid ){
 
 function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
 
-    ## Create an OrderedDictionary
     $hshChecksToRun = [ordered]@{
-        esxi = "Get-VSEsxi"
-        pnic = "Get-VSPhysicalNic"
-        datastore = "Get-VSDatastore"
-        vm = "Get-VSVirtualMachine"
-        vswitch = "Get-VSStandardVswitch"
-        dvs = "Get-VSDistributedVswitch"
-        vswitch_pg = "Get-VSStandardPortGroup"
-        dvs_pg = "Get-VSDistributedPortGroup"
-        vnic = "Get-VSVirtualNic"
-        vdisk = "Get-VSVirtualDisk"
-        resourcepool = "Get-VSResourcePool"
-        datacenter = "Get-VSDatacenter"
+        ESXI = "Get-VSEsxi"
+        PNIC = "Get-VSPhysicalNic"
+        DS = "Get-VSDatastore"
+        VM = "Get-VSVirtualMachine"
+        SVS = "Get-VSStandardVswitch"
+        DVS = "Get-VSDistributedVswitch"
+        SVSPG = "Get-VSStandardPortGroup"
+        DVSPG = "Get-VSDistributedPortGroup"
+        VNIC = "Get-VSVirtualNic"
+        VDISK = "Get-VSVirtualDisk"
+        RES = "Get-VSResourcePool"
+        DC = "Get-VSDatacenter"
         # Folder check needs to be done after datacenter check
-        folder = "Get-VSFolder"
-        cluster = "Get-VSCluster"
+        FOLDER = "Get-VSFolder"
+        CLUSTER = "Get-VSCluster"
     }
-
-    ## Run Checks from OrderedDictionary
+    
+    ## Run Checks
     $hshChecksToRun.Keys | Foreach-Object {
         $strThisCheckTopic = $_
         $strFunctionToInvoke = $hshChecksToRun[$strThisCheckTopic]
-        $status = Send-VSVSummaryData (& $strFunctionToInvoke $vc_uuid) $url
+        $json = & $strFunctionToInvoke $vc_uuid
+        # Check if $json is empty
+        if (!$json) { 
+            $vc_obj = New-Object -TypeName PSobject -Property @{
+                vcenter_id = $vc_uuid
+                objecttype = $strThisCheckTopic
+                empty = 'DELETE'
+            }
+            $json = $vc_obj | ConvertTo-Json
+        }
+        $status = Send-VSVSummaryData $json $url
         Write-Verbose -Verbose "$strThisCheckTopic check http status code: $status"
     }
 
