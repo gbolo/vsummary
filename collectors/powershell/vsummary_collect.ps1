@@ -552,36 +552,34 @@ Function Get-VSVirtualDisk ( [string]$vc_uuid ){
 }
 
 function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
-    # Run Checks
-    $status = Send-VSVSummaryData (Get-VSEsxi $vc_uuid) $url
-    Write-Host "esxi check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSPhysicalNic $vc_uuid) $url
-    Write-Host "pnic check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSDatastore $vc_uuid) $url
-    Write-Host "datastore check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSVirtualMachine $vc_uuid) $url
-    Write-Host "vm check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSStandardVswitch $vc_uuid) $url
-    Write-Host "vswitch check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSDistributedVswitch $vc_uuid) $url
-    Write-Host "dvs check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSStandardPortGroup $vc_uuid) $url
-    Write-Host "vswitch_pg check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSDistributedPortGroup $vc_uuid) $url
-    Write-Host "dvs_pg check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSVirtualNic $vc_uuid) $url
-    Write-Host "vnic check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSVirtualDisk $vc_uuid) $url
-    Write-Host "vdisk check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSResourcePool $vc_uuid) $url
-    Write-Host "resourcepool check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSDatacenter $vc_uuid) $url
-    Write-Host "datacenter check http status code: $status"
-    # Folder check needs to be done after datacenter check
-    $status = Send-VSVSummaryData (Get-VSFolder $vc_uuid) $url
-    Write-Host "folder check http status code: $status"
-    $status = Send-VSVSummaryData (Get-VSCluster $vc_uuid) $url
-    Write-Host "Cluster check http status code: $status"
+
+    ## Create an OrderedDictionary
+    $hshChecksToRun = [ordered]@{
+        esxi = "Get-VSEsxi"
+        pnic = "Get-VSPhysicalNic"
+        datastore = "Get-VSDatastore"
+        vm = "Get-VSVirtualMachine"
+        vswitch = "Get-VSStandardVswitch"
+        dvs = "Get-VSDistributedVswitch"
+        vswitch_pg = "Get-VSStandardPortGroup"
+        dvs_pg = "Get-VSDistributedPortGroup"
+        vnic = "Get-VSVirtualNic"
+        vdisk = "Get-VSVirtualDisk"
+        resourcepool = "Get-VSResourcePool"
+        datacenter = "Get-VSDatacenter"
+        # Folder check needs to be done after datacenter check
+        folder = "Get-VSFolder"
+        cluster = "Get-VSCluster"
+    }
+
+    ## Run Checks from OrderedDictionary
+    $hshChecksToRun.Keys | Foreach-Object {
+        $strThisCheckTopic = $_
+        $strFunctionToInvoke = $hshChecksToRun[$strThisCheckTopic]
+        $status = Send-VSVSummaryData (& $strFunctionToInvoke $vc_uuid) $url
+        Write-Verbose -Verbose "$strThisCheckTopic check http status code: $status"
+    }
+
 }
 
 
