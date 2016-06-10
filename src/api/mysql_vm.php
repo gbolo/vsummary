@@ -59,5 +59,10 @@ $dt->edit('memory_mb', function ($data){
     return $hr;
 });
 
+$dt->edit('stat_uptime_sec', function ($data){
+    $hr = uptime_human_readable($data['stat_uptime_sec']);
+    return $hr;
+});
+
 // Respond with results
 echo $dt->generate();

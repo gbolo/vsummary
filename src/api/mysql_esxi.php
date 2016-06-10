@@ -58,5 +58,20 @@ $dt->edit('cpu_mhz', function ($data){
     return $hr;
 });
 
+$dt->edit('stat_memory_usage', function ($data){
+    $hr = format_size($data['stat_memory_usage']*1000*1000);
+    return $hr;
+});
+
+$dt->edit('stat_cpu_usage', function ($data){
+    $hr = $data['stat_cpu_usage'] . ' MHZ';
+    return $hr;
+});
+
+$dt->edit('stat_uptime_sec', function ($data){
+    $hr = uptime_human_readable($data['stat_uptime_sec']);
+    return $hr;
+});
+
 // Respond with results
 echo $dt->generate();
