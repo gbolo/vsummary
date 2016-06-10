@@ -1,7 +1,7 @@
 <?php
 
 // SQL server connection information
-require_once('../src/api/lib/mysql_config.php');
+require_once('../../src/api/lib/mysql_config.php');
 
 // set up PDO
 try {
