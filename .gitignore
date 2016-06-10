@@ -1,3 +1,6 @@
 ### mysql config details ###
 src/api/lib/mysql_config.php
+
+### scripts and testing
 scripts/testing/*
+scripts/vcenter-migrator/output/*
