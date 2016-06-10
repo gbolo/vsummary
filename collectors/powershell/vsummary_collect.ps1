@@ -269,7 +269,7 @@ Function Get-EsxiSummary ( [string]$vc_uuid ){
                 moref = $esxi.MoRef.Value
                 max_evc = $esxi.Summary.MaxEVCModeKey
                 current_evc = $esxi.Summary.CurrentEVCModeKey
-                status = $esxi.Summary.OverallStatus
+                status = [string]$esxi.Summary.OverallStatus
                 power_state = $esxi.Summary.Runtime.PowerState
                 in_maintenance_mode = $esxi.Summary.Runtime.InMaintenanceMode
                 vendor = $esxi.Summary.Hardware.Vendor
