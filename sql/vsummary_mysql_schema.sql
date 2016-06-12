@@ -354,7 +354,8 @@ SELECT
 FROM esxi 
 LEFT JOIN
     vcenter
-ON  esxi.vcenter_id = vcenter.id;
+ON  esxi.vcenter_id = vcenter.id
+WHERE esxi.present = 1;
 
 
 CREATE VIEW view_datastore AS
