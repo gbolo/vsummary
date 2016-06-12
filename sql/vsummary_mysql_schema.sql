@@ -318,24 +318,20 @@ FROM    vnic
 LEFT JOIN
         portgroup
 ON      vnic.portgroup_id = portgroup.id
-    AND vnic.present = 1
-    AND portgroup.present = 1
 LEFT JOIN
         vm
 ON      vnic.vm_id = vm.id
-    AND vm.present = 1
 LEFT JOIN
         esxi
 ON      vm.esxi_id = esxi.id
-    AND esxi.present = 1
 LEFT JOIN
         vswitch
 ON      portgroup.vswitch_id = vswitch.id
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id
-GROUP BY
-        vnic.id;
+WHERE   vnic.present = 1
+
 
 
 CREATE VIEW view_esxi AS
