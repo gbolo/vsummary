@@ -281,16 +281,13 @@ FROM    vm
 LEFT JOIN
         folder
 ON      vm.folder_id = folder.id
-    AND vm.present = 1
 LEFT JOIN
         vdisk
 ON      vm.id = vdisk.vm_id
-    AND vm.present = 1
     AND vdisk.present = 1
 LEFT JOIN
         vnic
 ON      vm.id = vnic.vm_id
-    AND vm.present = 1
     AND vnic.present = 1
 LEFT JOIN
         esxi
@@ -298,6 +295,7 @@ ON      vm.esxi_id = esxi.id
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id
+WHERE vm.present = 1
 GROUP BY
         vm.id;
 
@@ -367,7 +365,7 @@ FROM    datastore
 LEFT JOIN
         vcenter
 ON      datastore.vcenter_id = vcenter.id
-    AND datastore.present = 1
+WHERE   datastore.present = 1
 GROUP BY
         datastore.id;
 
@@ -386,19 +384,16 @@ FROM    vdisk
 LEFT JOIN
         vm
 ON      vdisk.vm_id = vm.id
-    AND vdisk.present = 1
 LEFT JOIN
         datastore
 ON      vdisk.datastore_id = datastore.id
-    AND vdisk.present = 1
 LEFT JOIN
         esxi
 ON      vdisk.esxi_id = esxi.id
-    AND vdisk.present = 1
 LEFT JOIN
         vcenter
 ON      vdisk.vcenter_id = vcenter.id
-    AND vdisk.present = 1
+WHERE   vdisk.present = 1
 GROUP BY
         vdisk.id;
 
