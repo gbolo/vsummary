@@ -328,7 +328,7 @@ ON      portgroup.vswitch_id = vswitch.id
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id
-WHERE   vnic.present = 1
+WHERE   vnic.present = 1;
 
 
 
