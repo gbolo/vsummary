@@ -349,6 +349,8 @@ SELECT
   esxi.*, 
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name,
+  coalesce(cluster.name,'n/a') AS cluster,
+  datacenter.name AS datacenter,
   ( SELECT coalesce(sum(vm.vcpu),0)
     FROM vm
     WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vcpus_powered_on,
@@ -362,6 +364,12 @@ SELECT
     FROM pnic 
     WHERE pnic.esxi_id = esxi.id AND pnic.present = 1) pnics
 FROM esxi 
+LEFT JOIN
+        cluster
+ON      esxi.cluster_id = cluster.id
+LEFT JOIN
+        datacenter
+ON      cluster.datacenter_id = datacenter.esxi_folder_id
 LEFT JOIN
     vcenter
 ON  esxi.vcenter_id = vcenter.id

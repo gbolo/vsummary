@@ -42,6 +42,8 @@ vms_powered_on,
 vcpus_powered_on,
 vmemory_mb_powered_on,
 pnics,
+cluster,
+datacenter,
 vcenter_fqdn,
 vcenter_short_name
 FROM view_esxi
