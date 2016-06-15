@@ -526,7 +526,7 @@ function update_vdisk($data){
                     $capacity_bytes = $vdisk['capacity_bytes'];
                 }
                 $path = $vdisk['path'];
-                $thin_provisioned = var_export( $vdisk['thin_provisioned'], true );
+                $thin_provisioned = $vdisk['thin_provisioned'];
                 $datastore_id = md5( $vdisk['vcenter_id'] . $vdisk['datastore_moref'] );
                 $uuid = $vdisk['uuid'];
                 $disk_object_id = $vdisk['disk_object_id'];
@@ -1036,7 +1036,7 @@ function update_folder($data){
 
             }
         }
-        
+
         $pdo->commit();
 
         // Update resourcepool full path if successful

@@ -257,7 +257,7 @@ Function Get-VSEsxi ( [string]$vc_uuid ){
                 current_evc = $esxi.Summary.CurrentEVCModeKey
                 status = [string]$esxi.Summary.OverallStatus
                 power_state = $esxi.Summary.Runtime.PowerState
-                in_maintenance_mode = $esxi.Summary.Runtime.InMaintenanceMode
+                in_maintenance_mode = [string]$esxi.Summary.Runtime.InMaintenanceMode
                 vendor = $esxi.Summary.Hardware.Vendor
                 model = $esxi.Summary.Hardware.Model
                 uuid = $esxi.Summary.Hardware.Uuid
@@ -537,7 +537,7 @@ Function Get-VSVirtualDisk ( [string]$vc_uuid ){
                     capacity_bytes = $vdisk.CapacityInBytes
                     capacity_kb = $vdisk.capacityInKB
                     path = $vdisk.Backing.Filename
-                    thin_provisioned = $vdisk.Backing.ThinProvisioned
+                    thin_provisioned = [string]$vdisk.Backing.ThinProvisioned
                     datastore_moref = $vdisk.Backing.Datastore.Value
                     uuid = $vdisk.Backing.uuid
                     disk_object_id = $vdisk.diskObjectId
