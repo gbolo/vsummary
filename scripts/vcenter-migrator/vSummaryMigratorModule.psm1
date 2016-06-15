@@ -1,12 +1,13 @@
 # VSUMMARY POWERSHELL MODULE
 
-Function Connect-vcenter ($vc_fqdn){
+Function Connect-vcenter ($vc_fqdn, $vcenter_type){
 
     if ($global:DefaultVIServers.Count -gt 0) {
         Disconnect-VIServer -Server * -Force -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
     }
 
-    $creds = get-credential
+    $filename = ".\" + $vcenter_type + "_vcenter_creds.xml"
+    $creds = $filename | Import-Clixml
     $c = Connect-VIServer $vc_fqdn -Credential $creds
 
     if ($c){
@@ -212,18 +213,16 @@ Function Export-Cluster-Vapps ( [string]$cluster_name ) {
     }
 }
 
-Function Import-Cluster-Vapps ( [string]$folder) {
+Function Import-Cluster-Vapps ( [string]$folder, [string]$cluster_name ) {
 
-    $cluster_name = Read-Host "DESTINATION Cluster Name: "
     $esxi_name = Read-Host "DESTINATION ESXi Name: "
     Write-Host "IMPORTING vApps IN CLUSTER: $cluster_name"
-    $confirmation = Read-Host "  Are you Sure You Want To Proceed?: (y/n) "
-    if ($confirmation -eq 'y') {
-        foreach( $vapp in Get-ChildItem $folder -recurse | Where {$_.extension -eq ".ovf"} ){
-            $ovf_path = $vapp.FullName
-            Import-vApp -Source "$ovf_path" -VMHost (get-vmhost $esxi_name) -Location (get-cluster $cluster_name) -force
-        }
+
+    foreach( $vapp in Get-ChildItem $folder -recurse | Where {$_.extension -eq ".ovf"} ){
+        $ovf_path = $vapp.FullName
+        Import-vApp -Source "$ovf_path" -VMHost (get-vmhost $esxi_name) -Location (get-cluster $cluster_name) -force
     }
+
 }
 
 
