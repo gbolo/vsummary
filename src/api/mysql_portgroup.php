@@ -24,6 +24,7 @@ vlan_type,
 vswitch_name,
 vswitch_type,
 vswitch_max_mtu,
+vnics,
 vcenter_fqdn,
 vcenter_short_name
 FROM view_portgroup

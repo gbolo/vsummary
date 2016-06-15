@@ -428,7 +428,10 @@ SELECT DISTINCT
   vswitch.type AS vswitch_type,
   vswitch.max_mtu AS vswitch_max_mtu,
   vcenter.fqdn AS vcenter_fqdn,
-  vcenter.short_name AS vcenter_short_name
+  vcenter.short_name AS vcenter_short_name,
+  ( SELECT coalesce(count(vnic.id),0)
+    FROM vnic 
+    WHERE vnic.portgroup_id = portgroup.id AND vnic.present = 1) vnics
 FROM    portgroup
 LEFT JOIN
         vswitch
