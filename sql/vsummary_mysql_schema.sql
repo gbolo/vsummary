@@ -265,7 +265,7 @@ CREATE VIEWS TO SIMPLIFY QUEIRES IN APPLICATION
 */
 
 
-CREATE VIEW view_vm AS
+CREATE VIEW view_vm2 AS
 SELECT  
   vm.*,
   folder.full_path AS folder,
@@ -275,6 +275,8 @@ SELECT
   esxi.cpu_model AS esxi_cpu_model,
   coalesce(COUNT(distinct vdisk.id),0) AS vdisks,
   coalesce(COUNT(distinct vnic.id),0) AS vnics,
+  coalesce(cluster.name,'n/a') AS cluster,
+  datacenter.name AS datacenter,
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name
 FROM    vm
@@ -292,6 +294,12 @@ ON      vm.id = vnic.vm_id
 LEFT JOIN
         esxi
 ON      vm.esxi_id = esxi.id
+LEFT JOIN
+        cluster
+ON      esxi.cluster_id = cluster.id
+LEFT JOIN
+        datacenter
+ON      cluster.datacenter_id = datacenter.id
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id
