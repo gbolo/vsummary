@@ -3,7 +3,11 @@
 vSummary is an open source  tool for collecting and displaying a summary of your vSphere Environment(s).
 
 For a **LIVE DEMO**, please click this link: 
+<<<<<<< HEAD
 [http://vsummary.linuxctl.com/index.php?view=vm](http://vsummary.linuxctl.com/index.php?view=vm) 
+=======
+**[vsummary.linuxctl.com](https://vsummary.linuxctl.com/index.php?view=vm)**
+>>>>>>> origin/master
 
 ### Screenshots
 ![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_1.png "Screenshot 1")
@@ -33,7 +37,11 @@ The following requirements for vSummary have been identified so far:
 6. Modify the file [mysql_config.php](https://github.com/gbolo/vSummary/blob/master/src/api/lib/mysql_config.php) with the correct database information.
 7. Prepare a Windows environment which has powershell version 3+ and vSphere PowerCLI 5.5+ installed
 8. Allow execution of powershell files that are not signed: `Set-ExecutionPolicy -Scope "CurrentUser" -ExecutionPolicy "unrestricted"`
+<<<<<<< HEAD
 9. Download the powershell script [vsummary_collect.ps1](https://github.com/gbolo/vSummary/blob/master/powershell/vsummary_collect.ps1) and modify the vcenter server list and api endpoint located near the end of the script.
+=======
+9. Download the powershell script [vsummary_collect.ps1](https://github.com/gbolo/vSummary/blob/master/collectors/powershell/vsummary_collect.ps1) and modify the vcenter server list and api endpoint located near the end of the script.
+>>>>>>> origin/master
 10. Execute the powershell script, then once complete visit your webserver address to see the results.
 11. Create an automated job to run this script X amount of times per day.
 

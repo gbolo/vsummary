@@ -25,7 +25,11 @@ class CodeigniterAdapter implements DatabaseInterface {
 
     public function count($query)
     {
+<<<<<<< HEAD
         $query = "Select count(*) as rowcount," . substr($query, 6);
+=======
+        $query = "Select count(*) as rowcount from ($query)t";
+>>>>>>> origin/master
         $data =  $this->CI->db->query($query, $this->escape)->result_array();
 
         return $data[0]['rowcount'];
