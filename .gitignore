@@ -1,3 +1,4 @@
 ### mysql config details ###
 src/api/lib/mysql_config.php
 testing/output/*
+*.pyc
