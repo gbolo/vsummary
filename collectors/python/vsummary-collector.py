@@ -36,6 +36,7 @@ import atexit
 import getpass
 import ssl
 import json
+import urllib2
 
 from tools import cli
 from tools import pchelper
@@ -51,28 +52,14 @@ def GetArgs():
    parser.add_argument('-o', '--port', type=int, default=443, action='store', help='')
    parser.add_argument('-u', '--user', required=True, action='store', help='')
    parser.add_argument('-p', '--password', required=False, action='store', help='')
+   parser.add_argument('-a', '--api', required=True, action='store', help='')
    args = parser.parse_args()
    return args
 
 
-def main():
+def vm_inventory(si, api_url):
 
-    args = GetArgs()
-    if args.password:
-        password = args.password
-    else:
-        password = getpass.getpass(prompt='Password: ' % (args.host,args.user))
-
-    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-    context.verify_mode = ssl.CERT_NONE
-    
-    si = SmartConnect(host=args.host, user=args.user, pwd=password, port=int(args.port), sslContext=context)
-
-    if not si:
-        print("Could not connect ...")
-        return -1
-
-    atexit.register(Disconnect, si)
+    vc_uuid = "null"
 
     vm_properties = ["name",
                      "config.files.vmPathName",
@@ -112,7 +99,6 @@ def main():
     #
 
     vm_data_compat = []
-    vc_uuid = "null"
 
     for vm in vm_data:
 
@@ -258,14 +244,34 @@ def main():
         else:
             vm_compat['vcenter_id'] = null
 
-
-#        print(vm_compat)
-        print(json.dumps(vm_compat,indent=4, separators=(',', ': ')))
+        vm_data_compat.append(vm_compat)
 
 
-#    print (vm_data)
-#    json_dump = json.dumps(vm_data)
-#    print(json.dumps(vm_data,indent=4, separators=(',', ': ')))
+    #
+    #  Generating the JSON post data
+    #
+
+    json_post_data = json.dumps(vm_data_compat)
+
+
+    #
+    #  The POST request itself
+    #
+
+    try:
+        req = urllib2.Request(api_url)
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json_post_data)
+        print (response.getcode())
+
+    except:
+        print ("HTTP Post Failed!")
+
+
+    #
+    #  DEBUG
+    #
 
     if debug:
         for vm in vm_data:
@@ -326,7 +332,31 @@ def main():
     print("")
     print("Found {0} VirtualMachines.".format(len(vm_data)))
 
+    
 
+
+
+def main():
+
+    args = GetArgs()
+    if args.password:
+        password = args.password
+    else:
+        password = getpass.getpass(prompt='Password: ' % (args.host,args.user))
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    context.verify_mode = ssl.CERT_NONE
+    
+    si = SmartConnect(host=args.host, user=args.user, pwd=password, port=int(args.port), sslContext=context)
+
+    if not si:
+        print("Could not connect ...")
+        return -1
+
+    atexit.register(Disconnect, si)
+
+
+    vm_inventory(si, args.api)
 
     return 0
 
