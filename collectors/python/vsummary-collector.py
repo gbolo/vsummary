@@ -57,9 +57,7 @@ def GetArgs():
    return args
 
 
-def vm_inventory(si, api_url):
-
-    vc_uuid = "null"
+def vm_inventory(si, vc_uuid, api_url):
 
     vm_properties = ["name",
                      "config.files.vmPathName",
@@ -333,8 +331,19 @@ def vm_inventory(si, api_url):
     print("Found {0} VirtualMachines.".format(len(vm_data)))
 
     
+def host_inventory(si):
 
+    host_properties = ["name",
+                       "owner.value",
+                       "parent.value",
+                       "runtime.overallStatus",
+                       "summary.configuredMemoryMB",
+                       "summary.config.cpuAllocation.reservation",
+                       "summary.config.cpuAllocation.limit",
+                       "summary.config.memoryAllocation.reservation",
+                       "summary.config.memoryAllocation.limit"]
 
+                
 
 def main():
 
@@ -356,7 +365,7 @@ def main():
     atexit.register(Disconnect, si)
 
 
-    vm_inventory(si, args.api)
+    vm_inventory(si, "null", args.api)
 
     return 0
 
