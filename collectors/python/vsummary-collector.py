@@ -102,7 +102,7 @@ def vm_inventory(si, vc_uuid, api_url):
 
         vm_compat = {}
 
-	vm_compat['objecttype'] = "VM"
+        vm_compat['objecttype'] = "VM"
 
         if "name" in vm:
             vm_compat['name'] = vm["name"]
@@ -240,7 +240,7 @@ def vm_inventory(si, vc_uuid, api_url):
         if vc_uuid:
             vm_compat['vcenter_id'] = vc_uuid
         else:
-            vm_compat['vcenter_id'] = null
+            vm_compat['vcenter_id'] = "null"
 
         vm_data_compat.append(vm_compat)
 
@@ -331,19 +331,125 @@ def vm_inventory(si, vc_uuid, api_url):
     print("Found {0} VirtualMachines.".format(len(vm_data)))
 
     
-def host_inventory(si):
+def respool_inventory(si, vc_uuid, api_url):
 
-    host_properties = ["name",
-                       "owner.value",
-                       "parent.value",
-                       "runtime.overallStatus",
-                       "summary.configuredMemoryMB",
-                       "summary.config.cpuAllocation.reservation",
-                       "summary.config.cpuAllocation.limit",
-                       "summary.config.memoryAllocation.reservation",
-                       "summary.config.memoryAllocation.limit"]
+    respool_properties = ["name",
+                          "owner",
+                          "parent",
+                          "runtime.overallStatus",
+                          "summary.configuredMemoryMB",
+                          "summary.config.cpuAllocation.reservation",
+                          "summary.config.cpuAllocation.limit",
+                          "summary.config.memoryAllocation.reservation",
+                          "summary.config.memoryAllocation.limit",
+                          "summary.config.entity"]
 
-                
+    root_folder = si.content.rootFolder
+    view = pchelper.get_container_view(si, obj_type=[vim.ResourcePool])
+    respool_data = pchelper.collect_properties(si, view_ref=view,
+                                               obj_type=vim.ResourcePool,
+                                               path_set=respool_properties,
+                                               include_mors=True)
+
+    #
+    #  Creating variables matching the variables of the PowerCLI script
+    #
+
+    respool_data_compat = []
+
+    # print (respool_data)
+
+    for respool in respool_data:
+
+        respool_compat = {}
+
+        respool_compat['objecttype'] = "RES"
+        respool_compat['type'] = "ResourcePool"
+
+        if "name" in respool:
+            respool_compat['name'] = respool['name']
+        else:
+            respool_compat['name'] = "null"
+
+        if "obj" in respool:
+            _, ref = str(respool["obj"]).replace("'", "").split(":")
+            respool_compat['moref'] = ref
+        else:
+            respool_compat['moref'] = "null"
+
+        if "runtime.overallStatus"  in respool:
+            respool_compat['status'] = respool['runtime.overallStatus']
+        else:
+            respool_compat['status'] = "null"
+
+        if "parent" in respool:
+            _, ref = str(respool["parent"]).replace("'", "").split(":")
+            respool_compat['parent_moref'] = ref
+        else:
+            respool_compat['parent_moref'] = "null"
+
+        if "owner" in respool:
+            _, ref = str(respool["owner"]).replace("'", "").split(":")
+            respool_compat['cluster_moref'] = ref
+        else:
+            respool_compat['cluster_moref'] = "null"
+
+        if "summary.configuredMemoryMB" in respool:
+            respool_compat['configured_memory_mb'] = respool['summary.configuredMemoryMB']
+        else:
+            respool_compat['configured_memory_mb'] = "null"
+
+        if "summary.config.cpuAllocation.reservation" in respool:
+            respool_compat['cpu_reservation'] = respool['summary.config.cpuAllocation.reservation']
+        else:
+            respool_compat['cpu_reservation'] = "null"
+
+        if "summary.config.cpuAllocation.limit" in respool:
+            respool_compat['cpu_limit'] = respool['summary.config.cpuAllocation.limit']
+        else:
+            respool_compat['cpu_limit'] = "null"
+
+        if "summary.config.memoryAllocation.reservation" in respool:
+            respool_compat['mem_reservation'] = respool['summary.config.memoryAllocation.reservation']
+        else:
+            respool_compat['mem_reservation'] = "null"
+
+        if "summary.config.memoryAllocation.limit" in respool:
+            respool_compat['mem_limit'] = respool['summary.config.memoryAllocation.limit']
+        else:
+            respool_compat['mem_limit'] = "null"
+
+        if vc_uuid:
+            respool_compat['vcenter_id'] = vc_uuid
+        else:
+            respool_compat['vcenter_id'] = "null"
+
+        if "summary.config.entity.name" in respool:
+            print (respool['summary.config.entity'])
+
+        respool_data_compat.append(respool_compat)
+
+
+    #
+    #  Generating the JSON post data
+    #
+
+    json_post_data = json.dumps(respool_data_compat)
+
+    #
+    #  The POST request itself
+    #
+
+    try:
+        req = urllib2.Request(api_url)
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json_post_data)
+        print(response.getcode())
+
+    except:
+        print("HTTP Post Failed!")
+
 
 def main():
 
@@ -365,7 +471,8 @@ def main():
     atexit.register(Disconnect, si)
 
 
-    vm_inventory(si, "null", args.api)
+    # vm_inventory(si, "null", args.api)
+    respool_inventory(si, "null", args.api)
 
     return 0
 
