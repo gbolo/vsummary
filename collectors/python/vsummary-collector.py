@@ -86,6 +86,12 @@ def vm_inventory(si, vc_uuid, api_url):
                      "runtime.powerState",
                      "runtime.host"]
 
+    #
+    #
+    #
+
+    content = si.RetrieveContent()
+
     root_folder = si.content.rootFolder
     view = pchelper.get_container_view(si, obj_type=[vim.VirtualMachine])
     vm_data = pchelper.collect_properties(si, view_ref=view,
@@ -251,19 +257,48 @@ def vm_inventory(si, vc_uuid, api_url):
         #
 
         if "config.hardware.device" in vm:
-
             for dev in vm["config.hardware.device"]:
-
                 if isinstance(dev, vim.vm.device.VirtualEthernetCard):
-
                     dev_backing = dev.backing
-
                     if hasattr(dev_backing, 'port'):
                         portGroupKey = dev.backing.port.portgroupKey
                         dvsUuid = dev.backing.port.switchUuid
+                        try:
+                            dvs = content.dvSwitchManager.QueryDvsByUuid(dvsUuid)
+                        except:
+                            portGroup = "** Error: DVS not found **"
+                            vlanId = "NA"
+                            vSwitch = "NA"
+                        else:
+                            pgObj = dvs.LookupDvPortGroup(portGroupKey)
+                            portGroup = pgObj.config.name
+                            vlanId = str(pgObj.config.defaultPortConfig.vlan.vlanId)
+                            vSwitch = str(dvs.name)
+                    else:
+                        portGroup = dev.backing.network.name
+                        vmHost = vm.runtime.host
 
-                        print(portGroupKey)
-                        print(dvsUuid)
+                    if portGroup is None:
+                        portGroup = 'NA'
+
+                    print('\t' + dev.deviceInfo.label + '->' + dev.macAddress +
+                          ' @ ' + vSwitch + '->' + portGroup +
+                          ' (VLAN ' + vlanId + ')')
+
+
+#                name = $_.DeviceInfo.Label               - dev.deviceInfo.label
+#                vm_moref = $vm_moref                     - vm_compat['moref']
+#                esxi_moref = $esxi_moref                 - vm_compat['esxi_moref']
+#                type = $_.GetType().Name                 -
+#                mac = $_.MacAddress                      - dev.macAddress
+#                connected = $connected                   - dev.connectable.connected
+#                status = $status                         -
+#                portgroup_name = $portgroup_name         -
+#                portgroup_moref = $portgroup_moref       - portGroupKey
+#                vswitch_type = $vswitch_type             -
+#                vswitch_name = $vswitch_name             - vSwitch
+#                vcenter_id = $vc_uuid                    - OK
+#                objecttype = $objecttype                 - "VNIC"
 
 
     #
