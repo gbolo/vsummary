@@ -63,6 +63,7 @@ def vm_inventory(si, vc_uuid, api_url):
                      "config.files.vmPathName",
                      "config.hardware.numCPU",
                      "config.hardware.memoryMB",
+                     "config.hardware.device",
                      "config.guestId",
                      "config.version",
                      "config.uuid", 
@@ -243,6 +244,26 @@ def vm_inventory(si, vc_uuid, api_url):
             vm_compat['vcenter_id'] = "null"
 
         vm_data_compat.append(vm_compat)
+
+
+        #
+        #  Processing the vnic information
+        #
+
+        if "config.hardware.device" in vm:
+
+            for dev in vm["config.hardware.device"]:
+
+                if isinstance(dev, vim.vm.device.VirtualEthernetCard):
+
+                    dev_backing = dev.backing
+
+                    if hasattr(dev_backing, 'port'):
+                        portGroupKey = dev.backing.port.portgroupKey
+                        dvsUuid = dev.backing.port.switchUuid
+
+                        print(portGroupKey)
+                        print(dvsUuid)
 
 
     #
