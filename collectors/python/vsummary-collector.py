@@ -293,7 +293,7 @@ def vm_inventory(si, vc_uuid, api_url):
                     #  Generating PowerCLI Compatible Output
                     #
 
-                    vnic_compat = []
+                    vnic_compat = {}
 
                     vnic_compat["vm_moref"] = vm_compat['moref']
                     vnic_compat["esxi_moref"] = vm_compat['esxi_moref']
