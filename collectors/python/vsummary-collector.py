@@ -261,8 +261,11 @@ def vm_inventory(si, vc_uuid, api_url):
                 if isinstance(dev, vim.vm.device.VirtualEthernetCard):
                     dev_backing = dev.backing
                     if hasattr(dev_backing, 'port'):
+
                         portGroupKey = dev.backing.port.portgroupKey
                         dvsUuid = dev.backing.port.switchUuid
+                        switch_type = "VmwareDistributedVirtualSwitch"
+
                         try:
                             dvs = content.dvSwitchManager.QueryDvsByUuid(dvsUuid)
                         except:
@@ -276,29 +279,42 @@ def vm_inventory(si, vc_uuid, api_url):
                             vSwitch = str(dvs.name)
                     else:
                         portGroup = dev.backing.network.name
+                        switch_type = "Standard"
                         vmHost = vm.runtime.host
 
                     if portGroup is None:
                         portGroup = 'NA'
 
-                    print('\t' + dev.deviceInfo.label + '->' + dev.macAddress +
-                          ' @ ' + vSwitch + '->' + portGroup +
-                          ' (VLAN ' + vlanId + ')')
+#                    print('\t' + dev.deviceInfo.label + '->' + dev.macAddress +
+#                          ' @ ' + vSwitch + '->' + portGroup +
+#                          ' (VLAN ' + vlanId + ')')
 
+                    #
+                    #  Generating PowerCLI Compatible Output
+                    #
 
-#                name = $_.DeviceInfo.Label               - dev.deviceInfo.label
-#                vm_moref = $vm_moref                     - vm_compat['moref']
-#                esxi_moref = $esxi_moref                 - vm_compat['esxi_moref']
-#                type = $_.GetType().Name                 -
-#                mac = $_.MacAddress                      - dev.macAddress
-#                connected = $connected                   - dev.connectable.connected
-#                status = $status                         -
-#                portgroup_name = $portgroup_name         -
-#                portgroup_moref = $portgroup_moref       - portGroupKey
-#                vswitch_type = $vswitch_type             -
-#                vswitch_name = $vswitch_name             - vSwitch
-#                vcenter_id = $vc_uuid                    - OK
-#                objecttype = $objecttype                 - "VNIC"
+                    vnic_compat = []
+
+                    vnic_compat["vm_moref"] = vm_compat['moref']
+                    vnic_compat["esxi_moref"] = vm_compat['esxi_moref']
+                    vnic_compat["vcenter_id"] = vm_compat['vcenter_id']
+                    vnic_compat["objecttype"] = "VNIC"
+                    vnic_compat["name"] = dev.deviceInfo.label
+                    vnic_compat["mac"] = dev.macAddress
+                    vnic_compat["connected"] = dev.connectable.connected
+                    vnic_compat["status"] = dev.connectable.status
+                    vnic_compat["portgroup_name"] = portGroup
+                    vnic_compat["portgroup_moref"] = portGroupKey
+                    vnic_compat["vswitch_name"] = vSwitch
+
+                    if isinstance(dev, vim.vm.device.VirtualE1000):
+                        vnic_compat["type"] = "VirtualE1000"
+                    elif isinstance(dev, vim.vm.device.VirtualVmxnet3):
+                        vnic_compat["type"] = "VirtualVmxnet3"
+                    else:
+                        vnic_compat["type"] = "N/A"
+
+                    print(vnic_compat)
 
 
     #
@@ -527,8 +543,8 @@ def main():
     atexit.register(Disconnect, si)
 
 
-    # vm_inventory(si, "null", args.api)
-    respool_inventory(si, "null", args.api)
+    vm_inventory(si, "null", args.api)
+    # respool_inventory(si, "null", args.api)
 
     return 0
 
