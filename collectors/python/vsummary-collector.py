@@ -320,7 +320,7 @@ def vm_inventory(si, vc_uuid, api_url):
                         vnic_compat["type"] = "N/A"
                         # vnic_compat["type"] = str(type(dev))
 
-                    vm_data_compat.append(vnic_compat)
+                    vnic_data_compat.append(vnic_compat)
 
 
     #
