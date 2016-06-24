@@ -273,22 +273,21 @@ def vm_inventory(si, vc_uuid, api_url):
                             portGroup = "** Error: DVS not found **"
                             vlanId = "NA"
                             vSwitch = "NA"
+                            portgroup_moref = "NA"
                         else:
                             pgObj = dvs.LookupDvPortGroup(portGroupKey)
                             portGroup = pgObj.config.name
                             vlanId = str(pgObj.config.defaultPortConfig.vlan.vlanId)
                             vSwitch = str(dvs.name)
+                            portgroup_moref = pgObj._moId
                     else:
                         portGroup = dev.backing.network.name
                         switch_type = "HostVirtualSwitch"
-                        print(dev)
+                        portgroup_moref = "null"
 
                     if portGroup is None:
-                        portGroup = 'NA'
+                        portGroup = "NA"
 
-#                    print('\t' + dev.deviceInfo.label + '->' + dev.macAddress +
-#                          ' @ ' + vSwitch + '->' + portGroup +
-#                          ' (VLAN ' + vlanId + ')')
 
                     #
                     #  Generating PowerCLI Compatible Output
@@ -305,7 +304,7 @@ def vm_inventory(si, vc_uuid, api_url):
                     vnic_compat["connected"] = dev.connectable.connected
                     vnic_compat["status"] = dev.connectable.status
                     vnic_compat["portgroup_name"] = portGroup
-                    vnic_compat["portgroup_moref"] = portGroupKey
+                    vnic_compat["portgroup_moref"] = portgroup_moref
                     vnic_compat["vswitch_name"] = vSwitch
                     vnic_compat["vswitch_type"] = switch_type
 
