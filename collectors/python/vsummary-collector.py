@@ -312,9 +312,9 @@ def vm_inventory(si, vc_uuid, api_url):
                     elif isinstance(dev, vim.vm.device.VirtualVmxnet3):
                         vnic_compat["type"] = "VirtualVmxnet3"
                     else:
-                        vnic_compat["type"] = "N/A"
+                        vnic_compat["type"] = str(type(dev))
 
-                    print(vnic_compat)
+                    print(json.dumps(vnic_compat, indent=4, sort_keys=True))
 
 
     #
