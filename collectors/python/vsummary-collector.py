@@ -104,6 +104,7 @@ def vm_inventory(si, vc_uuid, api_url):
     #
 
     vm_data_compat = []
+    vnic_data_compat = []
 
     for vm in vm_data:
 
@@ -309,23 +310,28 @@ def vm_inventory(si, vc_uuid, api_url):
 
                     if isinstance(dev, vim.vm.device.VirtualE1000):
                         vnic_compat["type"] = "VirtualE1000"
+                    elif isinstance(dev, vim.vm.device.VirtualE1000e):
+                        vnic_compat["type"] = "VirtualE1000e"
                     elif isinstance(dev, vim.vm.device.VirtualVmxnet3):
                         vnic_compat["type"] = "VirtualVmxnet3"
+                    elif isinstance(dev, vim.vm.device.VirtualPCNet32):
+                        vnic_compat["type"] = "VirtualPCNet32"
                     else:
-                        vnic_compat["type"] = str(type(dev))
+                        vnic_compat["type"] = "N/A"
+                        # vnic_compat["type"] = str(type(dev))
 
-                    print(json.dumps(vnic_compat, indent=4, sort_keys=True))
+                    vm_data_compat.append(vnic_compat)
 
 
     #
-    #  Generating the JSON post data
+    #  Generating the JSON post data for VMs
     #
 
     json_post_data = json.dumps(vm_data_compat)
 
 
     #
-    #  The POST request itself
+    #  The POST request itself for VMs
     #
 
     try:
@@ -337,6 +343,29 @@ def vm_inventory(si, vc_uuid, api_url):
 
     except:
         print ("HTTP Post Failed!")
+
+    #
+    #  Generating the JSON post data for vNICs
+    #
+
+    json_post_data = json.dumps(vnic_data_compat)
+
+
+    #
+    #  The POST request for vNICs
+    #
+
+    print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
+
+#    try:
+#        req = urllib2.Request(api_url)
+#        req.add_header('Content-Type', 'application/json')
+
+#        response = urllib2.urlopen(req, json_post_data)
+#        print(response.getcode())
+
+#    except:
+#        print("HTTP Post Failed!")
 
 
     #
