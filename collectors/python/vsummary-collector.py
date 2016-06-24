@@ -281,7 +281,6 @@ def vm_inventory(si, vc_uuid, api_url):
                     else:
                         portGroup = dev.backing.network.name
                         switch_type = "HostVirtualSwitch"
-                        vmHost = vm.runtime.host
                         print(dev)
 
                     if portGroup is None:
@@ -308,6 +307,7 @@ def vm_inventory(si, vc_uuid, api_url):
                     vnic_compat["portgroup_name"] = portGroup
                     vnic_compat["portgroup_moref"] = portGroupKey
                     vnic_compat["vswitch_name"] = vSwitch
+                    vnic_compat["vswitch_type"] = switch_type
 
                     if isinstance(dev, vim.vm.device.VirtualE1000):
                         vnic_compat["type"] = "VirtualE1000"
