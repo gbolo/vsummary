@@ -280,8 +280,9 @@ def vm_inventory(si, vc_uuid, api_url):
                             vSwitch = str(dvs.name)
                     else:
                         portGroup = dev.backing.network.name
-                        switch_type = "Standard"
+                        switch_type = "HostVirtualSwitch"
                         vmHost = vm.runtime.host
+                        print(dev)
 
                     if portGroup is None:
                         portGroup = 'NA'
