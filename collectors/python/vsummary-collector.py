@@ -646,8 +646,13 @@ def folder_inventory(si, vc_uuid, api_url):
         folder_compat['objecttype'] = "FOLDER"
         folder_compat['name'] = folder['name'] if "name" in folder else None
         folder_compat['moref'] = folder['obj']._moId if "obj" in folder else None
-        folder_compat['type'] = folder['childType'] if "childType" in folder else None
         folder_compat['parent_moref'] = folder['parent']._moId if "parent" in folder else None
+
+        if "childType" in folder:
+            type_str = " ".join(folder['childType'])
+            folder_compat['type'] = type_str
+        else:
+            folder_compat['type'] = None
 
         folder_data_compat.append(folder_compat)
 
