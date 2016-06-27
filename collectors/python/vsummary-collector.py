@@ -57,6 +57,30 @@ def GetArgs():
    return args
 
 
+def send_vsummary_data(data, url):
+
+    #
+    #  Generating the JSON post data
+    #
+
+    json_post_data = json.dumps(data)
+
+
+    #
+    #  The POST request itself
+    #
+
+    try:
+        req = urllib2.Request(url)
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json_post_data)
+        return(response.getcode())
+
+    except:
+        return(511)
+
+
 def vm_inventory(si, vc_uuid, api_url):
 
     vm_properties = ["name",
@@ -92,7 +116,6 @@ def vm_inventory(si, vc_uuid, api_url):
 
     content = si.RetrieveContent()
 
-    root_folder = si.content.rootFolder
     view = pchelper.get_container_view(si, obj_type=[vim.VirtualMachine])
     vm_data = pchelper.collect_properties(si, view_ref=view,
                                           obj_type=vim.VirtualMachine,
@@ -111,145 +134,38 @@ def vm_inventory(si, vc_uuid, api_url):
 
         vm_compat = {}
 
+        vm_compat['vcenter_id'] = vc_uuid
         vm_compat['objecttype'] = "VM"
 
-        if "name" in vm:
-            vm_compat['name'] = vm["name"]
-        else:
-            vm_compat['name'] = "null"
-
-        if "config.files.vmPathName" in vm:
-            vm_compat['vmx_path'] = vm["config.files.vmPathName"]
-        else:
-            vm_compat['vmx_path'] = "null"
-
-        if "config.hardware.numCPU" in vm:
-            vm_compat['vcpu'] = vm["config.hardware.numCPU"]
-        else:
-            vm_compat['vcpu'] = "null"
-
-        if "config.hardware.memoryMB" in vm:
-            vm_compat['memory_mb'] = vm["config.hardware.memoryMB"]
-        else:
-            vm_compat['memory_mb'] = "null"
-
-        if "config.guestId" in vm:
-            vm_compat['config_guest_os'] = vm["config.guestId"]
-        else:
-            vm_compat['config_guest_os'] = "null"
-
-        if "config.version" in vm:
-            vm_compat['config_version'] = vm["config.version"]
-        else:
-            vm_compat['config_version'] = "null"
-
-        if "config.uuid" in vm:
-            vm_compat['smbios_uuid'] = vm["config.uuid"]
-        else:
-            vm_compat['smbios_uuid'] = "null"
-
-        if "config.instanceUuid" in vm:
-            vm_compat['instance_uuid'] = vm["config.instanceUuid"]
-        else:
-            vm_compat['instance_uuid'] = "null"
-
-        if "config.changeVersion" in vm:
-            vm_compat['config_change_version'] = vm["config.changeVersion"]
-        else:
-            vm_compat['config_change_version'] = "null"
-
-        if "config.template" in vm:
-            vm_compat['template'] = vm["config.template"]
-        else:
-            vm_compat['template'] = "null"
-
-        if "guest.toolsVersion" in vm:
-            vm_compat['guest_tools_version'] = vm["guest.toolsVersion"]
-        else:
-            vm_compat['guest_tools_version'] = "null"
-
-        if "guest.toolsRunningStatus" in vm:
-            vm_compat['guest_tools_running'] = vm["guest.toolsRunningStatus"]
-        else:
-            vm_compat['guest_tools_running'] = "null"
-
-        if "guest.hostName" in vm:
-            vm_compat['guest_hostname'] = vm["guest.hostName"]
-        else:
-            vm_compat['guest_hostname'] = "null"
-
-        if "guest.ipAddress" in vm:
-            vm_compat['guest_ip'] = vm["guest.ipAddress"]
-        else:
-            vm_compat['guest_ip'] = "null"
-
-        if "config.guestId" in vm:
-            vm_compat['config_guest_os'] = vm["config.guestId"]
-        else:
-            vm_compat['config_guest_os'] = "null"
-
-        if "parent" in vm:
-            _, ref = str(vm["parent"]).replace("'","").split(":")
-            vm_compat['folder_moref'] = ref
-        else:
-            vm_compat['folder_moref'] = "null"
-
-        if "parentVApp" in vm:
-            _, ref = str(vm["parentVApp"]).replace("'","").split(":")
-            vm_compat['vapp_moref'] = ref
-        else:
-            vm_compat['vapp_moref'] = "null"
-
-        if "resourcePool" in vm:
-            _, ref = str(vm["resourcePool"]).replace("'","").split(":")
-            vm_compat['resourcepool_moref'] = ref
-        else:
-            vm_compat['resourcepool_moref'] = "null"
-
-        if "summary.quickStats.overallCpuUsage" in vm:
-            vm_compat['stat_cpu_usage'] = vm["summary.quickStats.overallCpuUsage"]
-        else:
-            vm_compat['stat_cpu_usage'] = "null"
-
-        if "summary.quickStats.hostMemoryUsage" in vm:
-            vm_compat['stat_host_memory_usage'] = vm["summary.quickStats.hostMemoryUsage"]
-        else:
-            vm_compat['stat_host_memory_usage'] = "null"
-
-        if "summary.quickStats.guestMemoryUsage" in vm:
-            vm_compat['stat_guest_memory_usage'] = vm["summary.quickStats.guestMemoryUsage"]
-        else:
-            vm_compat['stat_guest_memory_usage'] = "null"
-
-        if "summary.quickStats.uptimeSeconds" in vm:
-            vm_compat['stat_uptime_sec'] = vm["summary.quickStats.uptimeSeconds"]
-        else:
-            vm_compat['stat_uptime_sec'] = "null"
+        vm_compat['name'] = vm['name'] if "name" in vm else None
+        vm_compat['vmx_path'] = vm['config.files.vmPathName'] if "config.files.vmPathName" in vm else None
+        vm_compat['vcpu'] = vm['config.hardware.numCPU'] if "config.hardware.numCPU" in vm else None
+        vm_compat['memory_mb'] = vm['config.hardware.memoryMB'] if "config.hardware.memoryMB" in vm else None
+        vm_compat['config_guest_os'] = vm['config.guestId'] if "config.guestId" in vm else None
+        vm_compat['config_version'] = vm['config.version'] if "config.version" in vm else None
+        vm_compat['smbios_uuid'] = vm['config.uuid'] if "config.uuid" in vm else None
+        vm_compat['instance_uuid'] = vm['config.instanceUuid'] if "config.instanceUuid" in vm else None
+        vm_compat['config_change_version'] = vm['config.changeVersion'] if "config.changeVersion" in vm else None
+        vm_compat['template'] = vm['config.template'] if "config.template" in vm else None
+        vm_compat['guest_tools_version'] = vm['guest.toolsVersion'] if "guest.toolsVersion" in vm else None
+        vm_compat['guest_tools_running'] = vm['guest.toolsRunningStatus'] if "guest.toolsRunningStatus" in vm else None
+        vm_compat['guest_hostname'] = vm['guest.hostName'] if "guest.hostName" in vm else None
+        vm_compat['guest_ip'] = vm['guest.ipAddress'] if "guest.ipAddress" in vm else None
+        vm_compat['config_guest_os'] = vm['config.guestId'] if "config.guestId" in vm else None
+        vm_compat['folder_moref'] = vm['parent']._moId if "parent" in vm else None
+        vm_compat['vapp_moref'] = vm['parentVApp']._moId if "parentVApp" in vm else None
+        vm_compat['resourcepool_moref'] = vm['resourcePool']._moId if "resourcePool" in vm else None
+        vm_compat['stat_cpu_usage'] = vm['summary.quickStats.overallCpuUsage'] if "summary.quickStats.overallCpuUsage" in vm else None
+        vm_compat['stat_host_memory_usage'] = vm['summary.quickStats.hostMemoryUsage'] if "summary.quickStats.hostMemoryUsage" in vm else None
+        vm_compat['stat_guest_memory_usage'] = vm['summary.quickStats.guestMemoryUsage'] if "summary.quickStats.guestMemoryUsage" in vm else None
+        vm_compat['stat_uptime_sec'] = vm['summary.quickStats.uptimeSeconds'] if "summary.quickStats.uptimeSeconds" in vm else None
+        vm_compat['esxi_moref'] = vm['runtime.host']._moId if "runtime.host" in vm else None
+        vm_compat['moref'] = vm['obj']._moId if "obj" in vm else None
 
         if "runtime.powerState" in vm:
-            power_state = 0
-            if vm["runtime.powerState"] == "poweredOn":
-                power_state = 1
-            vm_compat['power_state'] = power_state
+            vm_compat['power_state'] = 1 if vm["runtime.powerState"] == "poweredOn" else 0
         else:
-            vm_compat['power_state'] = "null"
-
-        if "runtime.host" in vm:
-            _, ref = str(vm["runtime.host"]).replace("'","").split(":")
-            vm_compat['esxi_moref'] = ref
-        else:
-            vm_compat['esxi_moref'] = "null"
-
-        if "obj" in vm:
-            _, ref = str(vm["obj"]).replace("'","").split(":")
-            vm_compat['moref'] = ref
-        else:
-            vm_compat['moref'] = "null"
-
-        if vc_uuid:
-            vm_compat['vcenter_id'] = vc_uuid
-        else:
-            vm_compat['vcenter_id'] = "null"
+            vm_compat['power_state'] = None
 
         vm_data_compat.append(vm_compat)
 
@@ -343,53 +259,34 @@ def vm_inventory(si, vc_uuid, api_url):
 
                     vdisk_data_compat.append(vdisk_compat)
 
-    #
-    #  Generating the JSON post data for VMs
-    #
-
-#    json_post_data = json.dumps(vm_data_compat)
-
-
-    #
-    #  The POST request itself for VMs
-    #
-
- #   try:
-#        req = urllib2.Request(api_url)
-#        req.add_header('Content-Type', 'application/json')
-
-#        response = urllib2.urlopen(req, json_post_data)
-#        print (response.getcode())
-
-#    except:
-#        print ("HTTP Post Failed!")
-
-    #
-    #  Generating the JSON post data for vNICs
-    #
-
-#    json_post_data = json.dumps(vnic_data_compat)
-
-
-    #
-    #  The POST request for vNICs
-    #
-
-    # print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
-    print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
-
-#    try:
-#        req = urllib2.Request(api_url)
-#        req.add_header('Content-Type', 'application/json')
-
-#        response = urllib2.urlopen(req, json_post_data)
-#        print(response.getcode())
-
-#    except:
-#        print("HTTP Post Failed!")
-
     print("")
     print("Found {0} VirtualMachines.".format(len(vm_data)))
+    print("Found {0} vNICs.".format(len(vnic_data_compat)))
+    print("Found {0} vDisks.".format(len(vdisk_data_compat)))
+
+
+    #
+    #  Sending over data
+    #
+
+#    if (send_vsummary_data(vm_data_compat, api_url) == 200):
+#        print("VM Data Sending: OK!")
+#    else:
+#        print("VM Data Sending: ERROR!")
+
+#    if (send_vsummary_data(vnic_data_compat, api_url) == 200):
+#        print("VM vNIC Data Sending: OK!")
+#    else:
+#        print("VM vNIC Data Sending: ERROR!")
+
+#    if (send_vsummary_data(vdisk_data_compat, api_url) == 200):
+#        print("VM vDisk Data Sending: OK!")
+#    else:
+#        print("VM vDisk Data Sending: ERROR!")
+
+    print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
+    print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
+    print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
 
     
 def respool_inventory(si, vc_uuid, api_url):
@@ -931,13 +828,13 @@ def main():
     # host_inventory(si, None, args.api)
 
     # datastore_inventory(si, None, args.api)
-    # vm_inventory(si, None, args.api)
+    vm_inventory(si, None, args.api)
     # respool_inventory(si, None, args.api)
     # datacenter_inventory(si, None, args.api)
     # folder_inventory(si, None, args.api)
     # cluster_inventory(si, None, args.api)
     # dvs_inventory(si, None, args.api)
-    dvs_portgroup_inventory(si, None, args.api)
+    # dvs_portgroup_inventory(si, None, args.api)
 
     return 0
 
