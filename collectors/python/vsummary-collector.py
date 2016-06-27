@@ -853,19 +853,27 @@ def main():
 
     atexit.register(Disconnect, si)
 
+    # Figuring out the UUID of the vcenter server
+    content = si.RetrieveContent()
+
+    if content.about.instanceUuid:
+        vc_uuid = content.about.instanceUuid
+    else:
+        vc_uuid = None
+
     # host_inventory have to be run before vm_inventory as collected information here is being used
     # to get information about host related network objects such as standard switces, etc.
-    host_inventory(si, None, args.api)
-    vm_inventory(si, None, args.api)
-    datastore_inventory(si, None, args.api)
-    respool_inventory(si, None, args.api)
-    datacenter_inventory(si, None, args.api)
-    dvs_inventory(si, None, args.api)
-    dvs_portgroup_inventory(si, None, args.api)
+    host_inventory(si, vc_uuid, args.api)
+    vm_inventory(si, vc_uuid, args.api)
+    datastore_inventory(si, vc_uuid, args.api)
+    respool_inventory(si, vc_uuid, args.api)
+    datacenter_inventory(si, vc_uuid, args.api)
+    dvs_inventory(si, vc_uuid, args.api)
+    dvs_portgroup_inventory(si, vc_uuid, args.api)
 
     # Folder check needs to be done after datacenter check (API requirement)
-    folder_inventory(si, None, args.api)
-    cluster_inventory(si, None, args.api)
+    folder_inventory(si, vc_uuid, args.api)
+    cluster_inventory(si, vc_uuid, args.api)
 
     return 0
 
