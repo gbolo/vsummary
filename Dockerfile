@@ -36,11 +36,7 @@ COPY ./docker/php-fpm.conf /data/php-fpm/conf/php-fpm.conf
 COPY ./docker/supervisord.conf /etc/supervisord.conf
 
 COPY ./sql/vsummary_mysql_schema.sql /data/mysql/conf/vsummary_mysql_schema.sql
-<<<<<<< HEAD
-COPY ./testing/gen_sample_data.php /data/gen_sample_data.php
-=======
 COPY ./scripts/data-generator/gen_sample_data.php /data/gen_sample_data.php
->>>>>>> origin/master
 COPY ./docker/wrapper.sh /wrapper.sh
 
 COPY ./src /data/nginx/www/
