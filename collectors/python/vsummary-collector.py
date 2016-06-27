@@ -318,7 +318,6 @@ def respool_inventory(si, vc_uuid, api_url):
                           "summary.config.memoryAllocation.limit",
                           "summary.config.entity"]
 
-    root_folder = si.content.rootFolder
     view = pchelper.get_container_view(si, obj_type=[vim.ResourcePool])
     respool_data = pchelper.collect_properties(si, view_ref=view,
                                                obj_type=vim.ResourcePool,
@@ -330,8 +329,6 @@ def respool_inventory(si, vc_uuid, api_url):
     #
 
     respool_data_compat = []
-
-    # print (respool_data)
 
     for respool in respool_data:
 
@@ -539,6 +536,8 @@ def host_inventory(si, vc_uuid, api_url):
 
 def datastore_inventory(si, vc_uuid, api_url):
 
+    print("Datastore Inventory")
+
     datastore_properties = ["name",
                             "overallStatus",
                             "summary.capacity",
@@ -569,14 +568,20 @@ def datastore_inventory(si, vc_uuid, api_url):
 
         datastore_data_compat.append(ds_compat)
 
-    #
-    #
-    #
+    print("  + Found {} Data Stores.".format(len(datastore_data_compat)))
 
-    print(json.dumps(datastore_data_compat, indent=4, sort_keys=True))
+    # Sending
+    ds_ret = send_vsummary_data(datastore_data_compat, api_url)
+
+    print("  + Sending Data Stores: {}".format(ds_ret['reason']))
+
+    if verbose:
+        print(json.dumps(datastore_data_compat, indent=4, sort_keys=True))
 
 
 def datacenter_inventory(si, vc_uuid, api_url):
+
+    print("Data Center Inventory")
 
     datacenter_properties = ["name",
                              "hostFolder",
@@ -591,8 +596,6 @@ def datacenter_inventory(si, vc_uuid, api_url):
 
     for dc in datacenter_data:
 
-#        print(dc)
-
         dc_compat = {}
 
         dc_compat['vcenter_id'] = vc_uuid
@@ -605,14 +608,20 @@ def datacenter_inventory(si, vc_uuid, api_url):
 
         datacenter_data_compat.append(dc_compat)
 
-    #
-    #
-    #
+    print("  + Found {} Data Centers.".format(len(datacenter_data_compat)))
 
-    print(json.dumps(datacenter_data_compat, indent=4, sort_keys=True))
+    # Sending
+    dc_ret = send_vsummary_data(datacenter_data_compat, api_url)
+
+    print("  + Sending Data Centers: {}".format(dc_ret['reason']))
+
+    if verbose:
+        print(json.dumps(datacenter_data_compat, indent=4, sort_keys=True))
 
 
 def folder_inventory(si, vc_uuid, api_url):
+
+    print("Folder Inventory")
 
     folder_properties = ["name",
                          "parent",
@@ -638,14 +647,20 @@ def folder_inventory(si, vc_uuid, api_url):
 
         folder_data_compat.append(folder_compat)
 
-    #
-    #
-    #
+    print("  + Found {} Folders.".format(len(folder_data_compat)))
 
-    print(json.dumps(folder_data_compat, indent=4, sort_keys=True))
+    # Sending
+    folder_ret = send_vsummary_data(folder_data_compat, api_url)
+
+    print("  + Sending Folders: {}".format(folder_ret['reason']))
+
+    if verbose:
+        print(json.dumps(folder_data_compat, indent=4, sort_keys=True))
 
 
 def cluster_inventory(si, vc_uuid, api_url):
+
+    print("Cluster Inventory")
 
     cluster_properties = ["name",
                           "parent",
@@ -685,14 +700,20 @@ def cluster_inventory(si, vc_uuid, api_url):
 
         cluster_data_compat.append(cluster_compat)
 
-    #
-    #
-    #
+    print("  + Found {} Clusters.".format(len(cluster_data_compat)))
 
-    print(json.dumps(cluster_data_compat, indent=4, sort_keys=True))
+    # Sending
+    cluster_ret = send_vsummary_data(cluster_data_compat, api_url)
+
+    print("  + Sending Clusters: {}".format(cluster_ret['reason']))
+
+    if verbose:
+        print(json.dumps(cluster_data_compat, indent=4, sort_keys=True))
 
 
 def dvs_inventory(si, vc_uuid, api_url):
+
+    print("Distributed Virtual Switch Inventory")
 
     dvs_properties = ["name",
                       "summary.productInfo.version",
@@ -720,15 +741,20 @@ def dvs_inventory(si, vc_uuid, api_url):
 
         dvs_data_compat.append(dvs_compat)
 
+    print("  + Found {} DVS.".format(len(dvs_data_compat)))
 
-    #
-    #
-    #
+    # Sending
+    dvs_ret = send_vsummary_data(dvs_data_compat, api_url)
 
-    print(json.dumps(dvs_data_compat, indent=4, sort_keys=True))
+    print("  + Sending DVS: {}".format(dvs_ret['reason']))
+
+    if verbose:
+        print(json.dumps(dvs_data_compat, indent=4, sort_keys=True))
 
 
 def dvs_portgroup_inventory(si, vc_uuid, api_url):
+
+    print("DVS Port Group Inventory")
 
     dvspg_properties = ["name",
                         "config.defaultPortConfig",
@@ -742,8 +768,6 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
     dvspg_data_compat = []
 
     for dvspg in dvspg_data:
-
-        #print(dvspg)
 
         vlan = dvspg['config.defaultPortConfig'].vlan
 
@@ -781,11 +805,15 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
 
         dvspg_data_compat.append(dvspg_compat)
 
-    #
-    #
-    #
+    print("  + Found {} DVS Port Groups.".format(len(dvspg_data_compat)))
 
-    print(json.dumps(dvspg_data_compat, indent=4, sort_keys=True))
+    # Sending
+    dvspg_ret = send_vsummary_data(dvspg_data_compat, api_url)
+
+    print("  + Sending DVS Port Groups: {}".format(dvspg_ret['reason']))
+
+    if verbose:
+        print(json.dumps(dvspg_data_compat, indent=4, sort_keys=True))
 
 
 def main():
@@ -820,13 +848,15 @@ def main():
     # to get information about host related network objects such as standard switces, etc.
     host_inventory(si, None, args.api)
     vm_inventory(si, None, args.api)
-    # datastore_inventory(si, None, args.api)
-    # respool_inventory(si, None, args.api)
-    # datacenter_inventory(si, None, args.api)
-    # folder_inventory(si, None, args.api)
-    # cluster_inventory(si, None, args.api)
-    # dvs_inventory(si, None, args.api)
-    # dvs_portgroup_inventory(si, None, args.api)
+    datastore_inventory(si, None, args.api)
+    respool_inventory(si, None, args.api)
+    datacenter_inventory(si, None, args.api)
+    dvs_inventory(si, None, args.api)
+    dvs_portgroup_inventory(si, None, args.api)
+
+    # Folder check needs to be done after datacenter check (API requirement)
+    folder_inventory(si, None, args.api)
+    cluster_inventory(si, None, args.api)
 
     return 0
 
