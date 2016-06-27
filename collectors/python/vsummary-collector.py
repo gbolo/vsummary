@@ -58,7 +58,12 @@ def GetArgs():
 
 def send_vsummary_data(data, url):
 
-    if dryrun: return 0
+    ret = {}
+
+    if dryrun:
+        ret['code'] = 0
+        ret['reason'] = "DRYRUN!"
+        return ret
 
     #
     #  Generating the JSON post data
@@ -76,10 +81,22 @@ def send_vsummary_data(data, url):
         req.add_header('Content-Type', 'application/json')
 
         response = urllib2.urlopen(req, json_post_data)
-        return(response.getcode())
+
+        res_code = response.getcode()
+
+        if (res_code == 200):
+            ret['code'] = res_code
+            ret['reason'] = "OK!"
+        else:
+            ret['code'] = res_code
+            ret['reason'] = "ERROR (" + res_code + ")"
+
+        return ret
 
     except:
-        return(511)
+        ret['code'] = -1
+        ret['reason'] = "FATAL!"
+        return ret
 
 
 def vm_inventory(si, vc_uuid, api_url):
@@ -203,11 +220,16 @@ def vm_inventory(si, vc_uuid, api_url):
                     else:
                         portGroup = dev.backing.network.name
                         switch_type = "HostVirtualSwitch"
-                        portgroup_moref = "null"
+                        pg_key = vm_compat['esxi_moref'] + "_" + portGroup
+                        if pg_key in host_portgroups:
+                            vSwitch, vlanId = host_portgroups[pg_key].split(':')
+                        else:
+                            vSwitch = None
+                            vlanId = None
+                        portgroup_moref = None
 
                     if portGroup is None:
                         portGroup = "NA"
-
 
                     #
                     #  Generating PowerCLI Compatible Output
@@ -272,28 +294,8 @@ def vm_inventory(si, vc_uuid, api_url):
     vnic_ret = send_vsummary_data(vnic_data_compat, api_url)
     vdisk_ret = send_vsummary_data(vdisk_data_compat, api_url)
 
-    if (vm_ret == 200):
-        vm_ret_str = "OK!"
-    elif (vm_ret == 0):
-        vm_ret_str = "DRYRUN!"
-    else:
-        vm_ret_str = "ERROR!"
-
-    if (vnic_ret == 200):
-        vnic_ret_str = "OK!"
-    elif (vnic_ret == 0):
-        vnic_ret_str = "DRYRUN!"
-    else:
-        vnic_ret_str = "ERROR!"
-
-    if (vdisk_ret == 200):
-        vdisk_ret_str = "OK!"
-    elif (vdisk_ret == 0):
-        vdisk_ret_str = "DRYRUN!"
-    else:
-        vdisk_ret_str = "ERROR!"
-
-    print("  + Sending VMs: {}, vNICs: {}, vDisks: {}.".format(vm_ret_str, vnic_ret_str, vdisk_ret_str))
+    print("  + Sending VMs: {}, vNICs: {}, vDisks: {}.".format(vm_ret['reason'], vnic_ret['reason'],
+                                                               vdisk_ret['reason']))
 
     if verbose:
         print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
@@ -360,14 +362,7 @@ def respool_inventory(si, vc_uuid, api_url):
     # Sending
     rpool_ret = send_vsummary_data(respool_data_compat, api_url)
 
-    if (rpool_ret == 200):
-        rpool_ret_str = "OK!"
-    elif (rpool_ret == 0):
-        rpool_ret_str = "DRYRUN!"
-    else:
-        rpool_ret_str = "ERROR!"
-
-    print("  + Sending Resource Pools: {}".format(rpool_ret_str))
+    print("  + Sending Resource Pools: {}".format(rpool_ret['reason']))
 
     if verbose:
         print(json.dumps(respool_data_compat, indent=4, sort_keys=True))
@@ -376,7 +371,7 @@ def respool_inventory(si, vc_uuid, api_url):
 def host_inventory(si, vc_uuid, api_url):
 
     print("Host Inventory")
-    
+
     host_properties = ["name",
                        "parent",
                        "summary.maxEVCModeKey",
@@ -515,8 +510,31 @@ def host_inventory(si, vc_uuid, api_url):
 
                     portgroup_data_compat.append(pg_compat)
 
+                    # Generating Port Group data for lookups
+                    pg_key = host_compat['moref'] + "_" + pg_compat['name']
+                    host_portgroups[pg_key] = pg_compat['vswitch_name'] + ":" + str(pg_compat['vlan'])
 
-    print(json.dumps(portgroup_data_compat, indent=4, sort_keys=True))
+    print("  + Found {} Hosts, {} pNICs, {} vSwitces, {} Port Groups.".format(len(host_data_compat),
+                                                                              len(pnic_data_compat),
+                                                                              len(vswitch_data_compat),
+                                                                              len(portgroup_data_compat)))
+
+    # Sending
+    host_ret = send_vsummary_data(host_data_compat, api_url)
+    pnic_ret = send_vsummary_data(pnic_data_compat, api_url)
+    vsw_ret = send_vsummary_data(vswitch_data_compat, api_url)
+    pg_ret = send_vsummary_data(portgroup_data_compat, api_url)
+
+    print("  + Sending Hosts: {}, pNICs: {}, vSwitches: {}, PortGroups: {}".format(host_ret['reason'],
+                                                                                   pnic_ret['reason'],
+                                                                                   vsw_ret['reason'],
+                                                                                   pg_ret['reason']))
+
+    if verbose:
+        print(json.dumps(host_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(pnic_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vswitch_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(portgroup_data_compat, indent=4, sort_keys=True))
 
 
 def datastore_inventory(si, vc_uuid, api_url):
@@ -772,7 +790,8 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
 
 def main():
 
-    global dryrun, verbose
+    global dryrun, verbose, host_portgroups
+    host_portgroups = {}
 
     args = GetArgs()
     if args.password:
@@ -799,10 +818,9 @@ def main():
 
     # host_inventory have to be run before vm_inventory as collected information here is being used
     # to get information about host related network objects such as standard switces, etc.
-    # host_inventory(si, None, args.api)
-
-    # datastore_inventory(si, None, args.api)
+    host_inventory(si, None, args.api)
     vm_inventory(si, None, args.api)
+    # datastore_inventory(si, None, args.api)
     # respool_inventory(si, None, args.api)
     # datacenter_inventory(si, None, args.api)
     # folder_inventory(si, None, args.api)
