@@ -41,9 +41,6 @@ import urllib2
 from tools import cli
 from tools import pchelper
 
-# Change this to "1" if you wanna see debug output
-debug = 0
-
 
 def GetArgs():
 
@@ -53,11 +50,15 @@ def GetArgs():
    parser.add_argument('-u', '--user', required=True, action='store', help='')
    parser.add_argument('-p', '--password', required=False, action='store', help='')
    parser.add_argument('-a', '--api', required=True, action='store', help='')
+   parser.add_argument('-d', '--dryrun', required=False, action='store_true', help='')
+   parser.add_argument('-v', '--verbose', required=False, action='store_true', help='')
    args = parser.parse_args()
    return args
 
 
 def send_vsummary_data(data, url):
+
+    if dryrun: return 0
 
     #
     #  Generating the JSON post data
@@ -82,6 +83,8 @@ def send_vsummary_data(data, url):
 
 
 def vm_inventory(si, vc_uuid, api_url):
+
+    print("VM Inventory:")
 
     vm_properties = ["name",
                      "config.files.vmPathName",
@@ -259,34 +262,43 @@ def vm_inventory(si, vc_uuid, api_url):
 
                     vdisk_data_compat.append(vdisk_compat)
 
-    print("")
-    print("Found {0} VirtualMachines.".format(len(vm_data)))
-    print("Found {0} vNICs.".format(len(vnic_data_compat)))
-    print("Found {0} vDisks.".format(len(vdisk_data_compat)))
-
+    print("  + Found {} VMs, {} vNICs, {} vDisks.".format(len(vm_data), len(vnic_data_compat), len(vdisk_data_compat)))
 
     #
     #  Sending over data
     #
 
-#    if (send_vsummary_data(vm_data_compat, api_url) == 200):
-#        print("VM Data Sending: OK!")
-#    else:
-#        print("VM Data Sending: ERROR!")
+    vm_ret = send_vsummary_data(vm_data_compat, api_url)
+    vnic_ret = send_vsummary_data(vnic_data_compat, api_url)
+    vdisk_ret = send_vsummary_data(vdisk_data_compat, api_url)
 
-#    if (send_vsummary_data(vnic_data_compat, api_url) == 200):
-#        print("VM vNIC Data Sending: OK!")
-#    else:
-#        print("VM vNIC Data Sending: ERROR!")
+    if (vm_ret == 200):
+        vm_ret_str = "OK!"
+    elif (vm_ret == 0):
+        vm_ret_str = "DRYRUN!"
+    else:
+        vm_ret_str = "ERROR!"
 
-#    if (send_vsummary_data(vdisk_data_compat, api_url) == 200):
-#        print("VM vDisk Data Sending: OK!")
-#    else:
-#        print("VM vDisk Data Sending: ERROR!")
+    if (vnic_ret == 200):
+        vnic_ret_str = "OK!"
+    elif (vnic_ret == 0):
+        vnic_ret_str = "DRYRUN!"
+    else:
+        vnic_ret_str = "ERROR!"
 
-    print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
-    print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
-    print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
+    if (vdisk_ret == 200):
+        vdisk_ret_str = "OK!"
+    elif (vdisk_ret == 0):
+        vdisk_ret_str = "DRYRUN!"
+    else:
+        vdisk_ret_str = "ERROR!"
+
+    print("  + Sending VMs: {}, vNICs: {}, vDisks: {}.".format(vm_ret_str, vnic_ret_str, vdisk_ret_str))
+
+    if verbose:
+        print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
 
     
 def respool_inventory(si, vc_uuid, api_url):
@@ -806,11 +818,19 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
 
 def main():
 
+    global dryrun, verbose
+
     args = GetArgs()
     if args.password:
         password = args.password
     else:
         password = getpass.getpass(prompt='Password: ' % (args.host,args.user))
+
+    if args.dryrun: dryrun = True
+    else: dryrun = False
+
+    if args.verbose: verbose = True
+    else: verbose = False
 
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
     context.verify_mode = ssl.CERT_NONE
