@@ -228,14 +228,10 @@
                 scrollCollapse: true,
                 processing: true,
                 serverSide: true,
-<<<<<<< HEAD
-                ajax: "api/mysql_<?php echo $view; ?>.php",
-=======
                 ajax: {
                     url: 'api/mysql_<?php echo $view; ?>.php',
                     type: 'POST'
                 },
->>>>>>> origin/master
                 select: true,
                 buttons: [
                   'copy', 
