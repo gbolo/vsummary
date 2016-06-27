@@ -305,6 +305,8 @@ def vm_inventory(si, vc_uuid, api_url):
     
 def respool_inventory(si, vc_uuid, api_url):
 
+    # TODO: vApp Support might be added
+
     print("Resource Pool Inventory")
 
     respool_properties = ["name",
@@ -341,6 +343,7 @@ def respool_inventory(si, vc_uuid, api_url):
         respool_compat['name'] = respool['name'] if "name" in respool else None
         respool_compat['moref'] = respool["obj"]._moId if "obj" in respool else None
         respool_compat['status'] = respool['runtime.overallStatus'] if "runtime.overallStatus"  in respool else None
+        respool_compat['vapp_state'] = None
         respool_compat['parent_moref'] = respool["parent"]._moId if "parent" in respool else None
         respool_compat['cluster_moref'] = respool["owner"]._moId if "owner" in respool else None
         respool_compat['configured_memory_mb'] = respool['summary.configuredMemoryMB'] if "summary.configuredMemoryMB" in respool else None
@@ -348,9 +351,6 @@ def respool_inventory(si, vc_uuid, api_url):
         respool_compat['cpu_limit'] = respool['summary.config.cpuAllocation.limit'] if "summary.config.cpuAllocation.limit" in respool else None
         respool_compat['mem_reservation'] = respool['summary.config.memoryAllocation.reservation'] if "summary.config.memoryAllocation.reservation" in respool else None
         respool_compat['mem_limit'] = respool['summary.config.memoryAllocation.limit'] if "summary.config.memoryAllocation.limit" in respool else None
-
-        if "summary.config.entity.name" in respool:
-            print (respool['summary.config.entity'])
 
         respool_data_compat.append(respool_compat)
 
