@@ -303,6 +303,8 @@ def vm_inventory(si, vc_uuid, api_url):
     
 def respool_inventory(si, vc_uuid, api_url):
 
+    print("Resource Pool Inventory")
+
     respool_properties = ["name",
                           "owner",
                           "parent",
@@ -333,96 +335,48 @@ def respool_inventory(si, vc_uuid, api_url):
 
         respool_compat = {}
 
+        respool_compat['vcenter_id'] = vc_uuid
         respool_compat['objecttype'] = "RES"
         respool_compat['type'] = "ResourcePool"
 
-        if "name" in respool:
-            respool_compat['name'] = respool['name']
-        else:
-            respool_compat['name'] = "null"
-
-        if "obj" in respool:
-            _, ref = str(respool["obj"]).replace("'", "").split(":")
-            respool_compat['moref'] = ref
-        else:
-            respool_compat['moref'] = "null"
-
-        if "runtime.overallStatus"  in respool:
-            respool_compat['status'] = respool['runtime.overallStatus']
-        else:
-            respool_compat['status'] = "null"
-
-        if "parent" in respool:
-            _, ref = str(respool["parent"]).replace("'", "").split(":")
-            respool_compat['parent_moref'] = ref
-        else:
-            respool_compat['parent_moref'] = "null"
-
-        if "owner" in respool:
-            _, ref = str(respool["owner"]).replace("'", "").split(":")
-            respool_compat['cluster_moref'] = ref
-        else:
-            respool_compat['cluster_moref'] = "null"
-
-        if "summary.configuredMemoryMB" in respool:
-            respool_compat['configured_memory_mb'] = respool['summary.configuredMemoryMB']
-        else:
-            respool_compat['configured_memory_mb'] = "null"
-
-        if "summary.config.cpuAllocation.reservation" in respool:
-            respool_compat['cpu_reservation'] = respool['summary.config.cpuAllocation.reservation']
-        else:
-            respool_compat['cpu_reservation'] = "null"
-
-        if "summary.config.cpuAllocation.limit" in respool:
-            respool_compat['cpu_limit'] = respool['summary.config.cpuAllocation.limit']
-        else:
-            respool_compat['cpu_limit'] = "null"
-
-        if "summary.config.memoryAllocation.reservation" in respool:
-            respool_compat['mem_reservation'] = respool['summary.config.memoryAllocation.reservation']
-        else:
-            respool_compat['mem_reservation'] = "null"
-
-        if "summary.config.memoryAllocation.limit" in respool:
-            respool_compat['mem_limit'] = respool['summary.config.memoryAllocation.limit']
-        else:
-            respool_compat['mem_limit'] = "null"
-
-        if vc_uuid:
-            respool_compat['vcenter_id'] = vc_uuid
-        else:
-            respool_compat['vcenter_id'] = "null"
+        respool_compat['name'] = respool['name'] if "name" in respool else None
+        respool_compat['moref'] = respool["obj"]._moId if "obj" in respool else None
+        respool_compat['status'] = respool['runtime.overallStatus'] if "runtime.overallStatus"  in respool else None
+        respool_compat['parent_moref'] = respool["parent"]._moId if "parent" in respool else None
+        respool_compat['cluster_moref'] = respool["owner"]._moId if "owner" in respool else None
+        respool_compat['configured_memory_mb'] = respool['summary.configuredMemoryMB'] if "summary.configuredMemoryMB" in respool else None
+        respool_compat['cpu_reservation'] = respool['summary.config.cpuAllocation.reservation'] if "summary.config.cpuAllocation.reservation" in respool else None
+        respool_compat['cpu_limit'] = respool['summary.config.cpuAllocation.limit'] if "summary.config.cpuAllocation.limit" in respool else None
+        respool_compat['mem_reservation'] = respool['summary.config.memoryAllocation.reservation'] if "summary.config.memoryAllocation.reservation" in respool else None
+        respool_compat['mem_limit'] = respool['summary.config.memoryAllocation.limit'] if "summary.config.memoryAllocation.limit" in respool else None
 
         if "summary.config.entity.name" in respool:
             print (respool['summary.config.entity'])
 
         respool_data_compat.append(respool_compat)
 
+    print("  + Found {} Resource Pools.".format(len(respool_data_compat)))
 
-    #
-    #  Generating the JSON post data
-    #
+    # Sending
+    rpool_ret = send_vsummary_data(respool_data_compat, api_url)
 
-    json_post_data = json.dumps(respool_data_compat)
+    if (rpool_ret == 200):
+        rpool_ret_str = "OK!"
+    elif (rpool_ret == 0):
+        rpool_ret_str = "DRYRUN!"
+    else:
+        rpool_ret_str = "ERROR!"
 
-    #
-    #  The POST request itself
-    #
+    print("  + Sending Resource Pools: {}".format(rpool_ret_str))
 
-    try:
-        req = urllib2.Request(api_url)
-        req.add_header('Content-Type', 'application/json')
-
-        response = urllib2.urlopen(req, json_post_data)
-        print(response.getcode())
-
-    except:
-        print("HTTP Post Failed!")
+    if verbose:
+        print(json.dumps(respool_data_compat, indent=4, sort_keys=True))
 
 
 def host_inventory(si, vc_uuid, api_url):
 
+    print("Host Inventory")
+    
     host_properties = ["name",
                        "parent",
                        "summary.maxEVCModeKey",
