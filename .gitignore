@@ -1,9 +1,5 @@
 ### mysql config details ###
 src/api/lib/mysql_config.php
-<<<<<<< HEAD
-testing/output/*
-*.pyc
-=======
 
 ### powershell config
 collectors/powershell/vsummary_config.ps1
@@ -11,4 +7,6 @@ collectors/powershell/vsummary_config.ps1
 ### scripts and testing
 scripts/testing/*
 scripts/vcenter-migrator/output/*
->>>>>>> origin/master
+
+### Python bytecode
+*.pyc
