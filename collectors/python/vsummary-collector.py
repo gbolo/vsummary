@@ -418,7 +418,6 @@ def host_inventory(si, vc_uuid, api_url):
         host_compat['max_evc'] = host['summary.maxEVCModeKey'] if "summary.maxEVCModeKey" in host else None
         host_compat['current_evc'] = host['summary.currentEVCModeKey'] if "summary.currentEVCModeKey" in host else None
         host_compat['status'] = host['summary.overallStatus'] if "summary.overallStatus" in host else None
-        host_compat['power_state'] = host['summary.runtime.powerState'] if "summary.runtime.powerState" in host else None
         host_compat['in_maintenance_mode'] = host['summary.runtime.inMaintenanceMode'] if "summary.runtime.inMaintenanceMode" in host else None
         host_compat['vendor'] = host['summary.hardware.vendor'] if "summary.hardware.vendor" in host else None
         host_compat['model'] = host['summary.hardware.model'] if "summary.hardware.model" in host else None
@@ -437,6 +436,11 @@ def host_inventory(si, vc_uuid, api_url):
         host_compat['stat_memory_usage'] = host['summary.quickStats.overallMemoryUsage'] if "summary.quickStats.overallMemoryUsage" in host else None
         host_compat['stat_uptime_sec'] = host['summary.quickStats.uptime'] if "summary.quickStats.uptime" in host else None
         host_compat['cluster_moref'] = host['parent']._moId if "parent" in host else None
+
+        if "summary.runtime.powerState" in host:
+            host_compat['power_state'] = 1 if host['summary.runtime.powerState'] == "poweredOn" else 0
+        else:
+            host_compat['power_state'] = None
 
         host_data_compat.append(host_compat)
 
