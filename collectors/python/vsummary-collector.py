@@ -872,15 +872,16 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
             vlan_start = "na"
             vlan_end = "na"
 
+        # The API needs to be fixed to be able to implement this type of Port Groups
         elif isinstance(vlan, vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec):
-            print(vlan)
             vlan_type = "VmwareDistributedVirtualSwitchTrunkVlanSpec"
             vlan_id = "na"
-            vlan_start = vlan.vlanId.start
-            vlan_end = vlan.vlanId.end
+            vlan_start = "na"
+            vlan_end = "na"
 
         else:
             vlan_type = "TypeNotImplemented"
+            vlan_id = "na"
             vlan_start = "na"
             vlan_end = "na"
 
@@ -897,10 +898,7 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
         dvspg_compat['vlan_end'] = vlan_end
         dvspg_compat['dvs_moref'] = dvspg['config.distributedVirtualSwitch']._moId if "config.distributedVirtualSwitch" in dvspg else None
 
- #       print(json.dumps(dvspg_compat, indent=4, sort_keys=True))
         dvspg_data_compat.append(dvspg_compat)
-#        sys.exit(1)
-
 
     #
     #
