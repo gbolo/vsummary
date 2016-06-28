@@ -463,7 +463,9 @@ def host_inventory(si, vc_uuid, api_url):
                     pnic_compat['name'] = pnic.device
                     pnic_compat['mac'] = pnic.mac
                     pnic_compat['driver'] = pnic.driver
-                    pnic_compat['link_speed'] = pnic.spec.linkSpeed.speedMb
+                    pnic_compat['link_speed'] = "Down"
+                    if hasattr(pnic.linkSpeed, 'speedMb'):
+                        pnic_compat['link_speed'] = pnic.linkSpeed.speedMb
 
                     pnic_data_compat.append(pnic_compat)
 
