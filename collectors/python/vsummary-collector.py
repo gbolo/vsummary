@@ -836,7 +836,7 @@ def main():
     if args.password:
         password = args.password
     else:
-        password = getpass.getpass(prompt='Password: ' % (args.host,args.user))
+        password = getpass.getpass(prompt='Password for %s@%s: ' % (args.user,args.host))
 
     if args.dryrun: dryrun = True
     else: dryrun = False
