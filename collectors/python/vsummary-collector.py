@@ -36,7 +36,12 @@ import atexit
 import getpass
 import ssl
 import json
-import urllib2
+
+# python 3 uses urllib
+try:
+    import urllib2
+except ImportError:
+    import urllib as urllib2
 
 from tools import cli
 from tools import pchelper
