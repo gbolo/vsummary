@@ -36,6 +36,7 @@ import atexit
 import getpass
 import ssl
 import json
+from time import clock
 
 # python 3 uses urllib
 try:
@@ -45,6 +46,16 @@ except ImportError:
 
 from tools import cli
 from tools import pchelper
+
+START = clock()
+
+
+def show_time_spent():
+    end = clock()
+    total = end - START
+    print("")
+    print("-----------")
+    print("Time spent: {:.1f} seconds.".format(total))
 
 
 def GetArgs():
@@ -859,6 +870,7 @@ def main():
         return -1
 
     atexit.register(Disconnect, si)
+    atexit.register(show_time_spent)
 
     # Figuring out the UUID of the vcenter server
     content = si.RetrieveContent()
