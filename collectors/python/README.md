@@ -13,7 +13,7 @@ pip --help
 pip -V
 ```
 
-#### 2. Installint the vmware SDK
+#### 2. Install the vmware SDK
 ```
 pip install pyvmomi
 ```
