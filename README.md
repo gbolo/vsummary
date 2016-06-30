@@ -20,10 +20,10 @@ The following requirements for vSummary have been identified so far:
 * PHP 5.3+ (datatables php lib)
 * MYSQL 5.0+ (support create views)
 * POWERSHELL 3.0+ (convert-json, http-request)
-* POWERCLI 5.5+ (check api calls)
+* PYTHON 2.7+ OR POWERCLI 5.5+ (depending on collector chosen)
 * vCenter 5.5+ (check api calls)
 
-### Installation
+### Installation (PowerShell Collector)
 
 1. Use an existing, or prepare a new web server that is able to execute php code. Ensure php can handle: pdo-mysql, json.
 2. Use an existing, or prepare a new mysql database that is at least version 5.0.
@@ -36,6 +36,10 @@ The following requirements for vSummary have been identified so far:
 9. Download the powershell script [vsummary_collect.ps1](https://github.com/gbolo/vSummary/blob/master/collectors/powershell/vsummary_collect.ps1) and modify the vcenter server list and api endpoint located near the end of the script.
 10. Execute the powershell script, then once complete visit your webserver address to see the results.
 11. Create an automated job to run this script X amount of times per day.
+
+### Installation (Python Collector)
+
+Instructions comming soon...
 
 ### Docker
 
