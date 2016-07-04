@@ -533,7 +533,7 @@ def host_inventory(si, vc_uuid, api_url):
                     pg_key = host_compat['moref'] + "_" + pg_compat['name']
                     host_portgroups[pg_key] = pg_compat['vswitch_name'] + ":" + str(pg_compat['vlan'])
 
-    print("  + Found {} Hosts, {} pNICs, {} vSwitces, {} Port Groups.".format(len(host_data_compat),
+    print("  + Found {} Hosts, {} pNICs, {} vSwitches, {} PortGroups.".format(len(host_data_compat),
                                                                               len(pnic_data_compat),
                                                                               len(vswitch_data_compat),
                                                                               len(portgroup_data_compat)))
