@@ -22,7 +22,7 @@ pip install pyvmomi
 ### Example output of the script
 ```
 Host Inventory
-  + Found 119 Hosts, 550 pNICs, 119 vSwitces, 234 Port Groups.
+  + Found 119 Hosts, 550 pNICs, 119 vSwitches, 234 PortGroups.
   + Sending Hosts: OK!, pNICs: OK!, vSwitches: OK!, PortGroups: OK!
 VM Inventory:
   + Found 2900 VMs, 5262 vNICs, 3357 vDisks.
