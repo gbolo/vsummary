@@ -30,7 +30,8 @@ import time
 try:
     import urllib2
 except ImportError:
-    import urllib as urllib2
+    import urllib.request as urllib2
+
 
 
 # initiate ---------------------------------------------------------------------
@@ -81,13 +82,20 @@ def poll_vc():
         if content.about.instanceUuid:
             vc_uuid = content.about.instanceUuid
             http_status = 200
-            #result = datastore_inventory(si, vc_uuid)
-            api_url = "http://vsummary.midgar.dev/api/update.php"
-            r1 = host_inventory(si, vc_uuid, api_url)
-            r2 = vm_inventory(si, vc_uuid, api_url)
+            #api_url = "http://vsummary.midgar.dev/api/update.php"
+            api_url = "http://127.0.0.1:7777/api/update.php"
             result = {}
-            result['ESXi'] = r1
-            result['VM'] = r2
+            result['ESXi'] = host_inventory(si, vc_uuid, api_url)
+            result['VM'] = vm_inventory(si, vc_uuid, api_url)
+            result['ResPool'] = respool_inventory(si, vc_uuid, api_url)
+            result['DS'] = datastore_inventory(si, vc_uuid, api_url)
+            result['DC'] = datacenter_inventory(si, vc_uuid, api_url)
+            result['Folder'] = folder_inventory(si, vc_uuid, api_url)
+            result['Cluster'] = cluster_inventory(si, vc_uuid, api_url)
+            result['DVS'] = dvs_inventory(si, vc_uuid, api_url)
+            result['DVSPG'] = dvs_portgroup_inventory(si, vc_uuid, api_url)
+
+
         else:
             result = "Error Getting vCenter UUID!"
     except vim.fault.InvalidLogin:
@@ -101,43 +109,6 @@ def poll_vc():
 def timeout():
     time.sleep(160)
     return "Nothing to see here... Go Away!"
-
-def datastore_inventory(si, vc_uuid):
-
-    print("Datastore Inventory")
-
-    datastore_properties = ["name",
-                            "overallStatus",
-                            "summary.capacity",
-                            "summary.freeSpace",
-                            "summary.type",
-                            "summary.uncommitted"]
-
-    view = pchelper.get_container_view(si, obj_type=[vim.Datastore])
-
-    datastore_data = pchelper.collect_properties(si, view_ref=view, obj_type=vim.Datastore,
-                                                 path_set=datastore_properties, include_mors=True)
-
-    datastore_data_compat = []
-
-    for ds in datastore_data:
-
-        ds_compat = {}
-
-        ds_compat['vcenter_id'] = vc_uuid
-        ds_compat['objecttype'] = "DS"
-        ds_compat['name'] = ds['name'] if "name" in ds else None
-        ds_compat['moref'] = ds['obj']._moId
-        ds_compat['status'] = ds['overallStatus'] if "overallStatus" in ds else None
-        ds_compat['capacity_bytes'] = ds['summary.capacity'] if "summary.capacity" in ds else None
-        ds_compat['free_bytes'] = ds['summary.freeSpace'] if "summary.freeSpace" in ds else None
-        ds_compat['uncommitted_bytes'] = ds['summary.uncommitted'] if "summary.uncommitted" in ds else None
-        ds_compat['type'] = ds['summary.type'] if "summary.type" in ds else None
-
-        datastore_data_compat.append(ds_compat)
-
-    #print("  + Found {} Data Stores.".format(len(datastore_data_compat)))
-    return datastore_data_compat
 
 
 # --------------- VSUMMARY FUNCTIONS
@@ -324,9 +295,10 @@ def vm_inventory(si, vc_uuid, api_url):
 
                     vdisk_data_compat.append(vdisk_compat)
 
-    #
-    #  Sending over data
-    #
+    if verbose:
+        print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
 
     result = {}
     result['count'] = {}
@@ -337,19 +309,11 @@ def vm_inventory(si, vc_uuid, api_url):
     result['post']['VMs'] = send_vsummary_data(vm_data_compat, api_url)
     result['post']['vNICs'] = send_vsummary_data(vnic_data_compat, api_url)
     result['post']['vDisks'] = send_vsummary_data(vdisk_data_compat, api_url)
-
-    if verbose:
-        print(json.dumps(vm_data_compat, indent=4, sort_keys=True))
-        print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
-        print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
-
     return result
 
 def respool_inventory(si, vc_uuid, api_url):
 
     # TODO: vApp Support might be added
-
-    print("Resource Pool Inventory")
 
     respool_properties = ["name",
                           "owner",
@@ -396,16 +360,16 @@ def respool_inventory(si, vc_uuid, api_url):
 
         respool_data_compat.append(respool_compat)
 
-    print("  + Found {} Resource Pools.".format(len(respool_data_compat)))
-
-    # Sending
-    rpool_ret = send_vsummary_data(respool_data_compat, api_url)
-
-    print("  + Sending Resource Pools: {}".format(rpool_ret['reason']))
 
     if verbose:
         print(json.dumps(respool_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['ResPools'] = len(respool_data_compat)
+    result['post']['ResPools'] = send_vsummary_data(respool_data_compat, api_url)
+    return result
 
 def host_inventory(si, vc_uuid, api_url):
 
@@ -557,7 +521,11 @@ def host_inventory(si, vc_uuid, api_url):
                     pg_key = host_compat['moref'] + "_" + pg_compat['name']
                     host_portgroups[pg_key] = pg_compat['vswitch_name'] + ":" + str(pg_compat['vlan'])
 
-
+    if verbose:
+        print(json.dumps(host_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(pnic_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(vswitch_data_compat, indent=4, sort_keys=True))
+        print(json.dumps(portgroup_data_compat, indent=4, sort_keys=True))
 
     result = {}
     result['count'] = {}
@@ -570,20 +538,9 @@ def host_inventory(si, vc_uuid, api_url):
     result['post']['pNICs'] = send_vsummary_data(pnic_data_compat, api_url)
     result['post']['vSwitches'] = send_vsummary_data(vswitch_data_compat, api_url)
     result['post']['PortGroups'] = send_vsummary_data(portgroup_data_compat, api_url)
-
-
-    if verbose:
-        print(json.dumps(host_data_compat, indent=4, sort_keys=True))
-        print(json.dumps(pnic_data_compat, indent=4, sort_keys=True))
-        print(json.dumps(vswitch_data_compat, indent=4, sort_keys=True))
-        print(json.dumps(portgroup_data_compat, indent=4, sort_keys=True))
-
     return result
 
-
 def datastore_inventory(si, vc_uuid, api_url):
-
-    print("Datastore Inventory")
 
     datastore_properties = ["name",
                             "overallStatus",
@@ -615,20 +572,17 @@ def datastore_inventory(si, vc_uuid, api_url):
 
         datastore_data_compat.append(ds_compat)
 
-    print("  + Found {} Data Stores.".format(len(datastore_data_compat)))
-
-    # Sending
-    ds_ret = send_vsummary_data(datastore_data_compat, api_url)
-
-    print("  + Sending Data Stores: {}".format(ds_ret['reason']))
-
     if verbose:
         print(json.dumps(datastore_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['Datastores'] = len(datastore_data_compat)
+    result['post']['Datastores'] = send_vsummary_data(datastore_data_compat, api_url)
+    return result
 
 def datacenter_inventory(si, vc_uuid, api_url):
-
-    print("Data Center Inventory")
 
     datacenter_properties = ["name",
                              "hostFolder",
@@ -655,20 +609,17 @@ def datacenter_inventory(si, vc_uuid, api_url):
 
         datacenter_data_compat.append(dc_compat)
 
-    print("  + Found {} Data Centers.".format(len(datacenter_data_compat)))
-
-    # Sending
-    dc_ret = send_vsummary_data(datacenter_data_compat, api_url)
-
-    print("  + Sending Data Centers: {}".format(dc_ret['reason']))
-
     if verbose:
         print(json.dumps(datacenter_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['Datacenters'] = len(datacenter_data_compat)
+    result['post']['Datacenters'] = send_vsummary_data(datacenter_data_compat, api_url)
+    return result
 
 def folder_inventory(si, vc_uuid, api_url):
-
-    print("Folder Inventory")
 
     folder_properties = ["name",
                          "parent",
@@ -699,20 +650,17 @@ def folder_inventory(si, vc_uuid, api_url):
 
         folder_data_compat.append(folder_compat)
 
-    print("  + Found {} Folders.".format(len(folder_data_compat)))
-
-    # Sending
-    folder_ret = send_vsummary_data(folder_data_compat, api_url)
-
-    print("  + Sending Folders: {}".format(folder_ret['reason']))
-
     if verbose:
         print(json.dumps(folder_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['Folders'] = len(folder_data_compat)
+    result['post']['Folders'] = send_vsummary_data(folder_data_compat, api_url)
+    return result
 
 def cluster_inventory(si, vc_uuid, api_url):
-
-    print("Cluster Inventory")
 
     cluster_properties = ["name",
                           "parent",
@@ -752,20 +700,17 @@ def cluster_inventory(si, vc_uuid, api_url):
 
         cluster_data_compat.append(cluster_compat)
 
-    print("  + Found {} Clusters.".format(len(cluster_data_compat)))
-
-    # Sending
-    cluster_ret = send_vsummary_data(cluster_data_compat, api_url)
-
-    print("  + Sending Clusters: {}".format(cluster_ret['reason']))
-
     if verbose:
         print(json.dumps(cluster_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['Clusters'] = len(cluster_data_compat)
+    result['post']['Clusters'] = send_vsummary_data(cluster_data_compat, api_url)
+    return result
 
 def dvs_inventory(si, vc_uuid, api_url):
-
-    print("Distributed Virtual Switch Inventory")
 
     dvs_properties = ["name",
                       "summary.productInfo.version",
@@ -793,20 +738,17 @@ def dvs_inventory(si, vc_uuid, api_url):
 
         dvs_data_compat.append(dvs_compat)
 
-    print("  + Found {} DVS.".format(len(dvs_data_compat)))
-
-    # Sending
-    dvs_ret = send_vsummary_data(dvs_data_compat, api_url)
-
-    print("  + Sending DVS: {}".format(dvs_ret['reason']))
-
     if verbose:
         print(json.dumps(dvs_data_compat, indent=4, sort_keys=True))
 
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['DVS'] = len(dvs_data_compat)
+    result['post']['DVS'] = send_vsummary_data(dvs_data_compat, api_url)
+    return result
 
 def dvs_portgroup_inventory(si, vc_uuid, api_url):
-
-    print("DVS Port Group Inventory")
 
     dvspg_properties = ["name",
                         "config.defaultPortConfig",
@@ -857,17 +799,15 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
 
         dvspg_data_compat.append(dvspg_compat)
 
-    print("  + Found {} DVS Port Groups.".format(len(dvspg_data_compat)))
-
-    # Sending
-    dvspg_ret = send_vsummary_data(dvspg_data_compat, api_url)
-
-    print("  + Sending DVS Port Groups: {}".format(dvspg_ret['reason']))
-
     if verbose:
         print(json.dumps(dvspg_data_compat, indent=4, sort_keys=True))
 
-
+    result = {}
+    result['count'] = {}
+    result['post'] = {}
+    result['count']['DVS_PortGroups'] = len(dvspg_data_compat)
+    result['post']['DVS_PortGroups'] = send_vsummary_data(dvspg_data_compat, api_url)
+    return result
 
 
 
@@ -913,7 +853,7 @@ def send_vsummary_data(data, url):
     #
 
     json_post_data = json.dumps(data)
-
+    #print(data)
 
     #
     #  The POST request itself
@@ -937,9 +877,11 @@ def send_vsummary_data(data, url):
 
         return ret
 
-    except:
+    except Exception as e:
         ret['code'] = -1
         ret['reason'] = "FATAL!"
+        print("-----EXCEPTION!!-------")
+        print(e)
         return ret
 
 
