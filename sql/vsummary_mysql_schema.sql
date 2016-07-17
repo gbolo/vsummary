@@ -178,7 +178,13 @@ CREATE TABLE vcenter
 id VARCHAR(36) PRIMARY KEY NOT NULL,
 fqdn VARCHAR(128),
 short_name VARCHAR(64),
-present TINYINT DEFAULT 1
+user_name VARCHAR(128),
+password VARCHAR(128),
+last_poll VARCHAR(64),
+last_poll_status VARCHAR(32),
+last_poll_result TINYINT DEFAULT 0,
+last_poll_output TEXT,
+auto_poll TINYINT DEFAULT 0
 );
 
 
@@ -266,7 +272,7 @@ CREATE VIEWS TO SIMPLIFY QUEIRES IN APPLICATION
 
 
 CREATE VIEW view_vm AS
-SELECT  
+SELECT
   vm.*,
   folder.full_path AS folder,
   esxi.name AS esxi_name,
@@ -313,13 +319,13 @@ GROUP BY
 
 
 CREATE VIEW view_vnic AS
-SELECT  
+SELECT
   vnic.*,
-  vm.name AS vm_name, 
-  esxi.name AS esxi_name, 
+  vm.name AS vm_name,
+  esxi.name AS esxi_name,
   coalesce(portgroup.name,"ORPHANED") AS portgroup_name,
   portgroup.vlan,
-  coalesce(vswitch.name,"ORPHANED") AS vswitch_name, 
+  coalesce(vswitch.name,"ORPHANED") AS vswitch_name,
   vswitch.type AS vswitch_type,
   vswitch.max_mtu AS vswitch_max_mtu,
   vcenter.fqdn AS vcenter_fqdn,
@@ -345,8 +351,8 @@ WHERE   vnic.present = 1;
 
 
 CREATE VIEW view_esxi AS
-SELECT 
-  esxi.*, 
+SELECT
+  esxi.*,
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name,
   coalesce(cluster.name,'n/a') AS cluster,
@@ -358,12 +364,12 @@ SELECT
     FROM vm
     WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vmemory_mb_powered_on,
   ( SELECT coalesce(count(vm.id),0)
-    FROM vm 
+    FROM vm
     WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vms_powered_on,
   ( SELECT coalesce(count(pnic.id),0)
-    FROM pnic 
+    FROM pnic
     WHERE pnic.esxi_id = esxi.id AND pnic.present = 1) pnics
-FROM esxi 
+FROM esxi
 LEFT JOIN
         cluster
 ON      esxi.cluster_id = cluster.id
@@ -377,7 +383,7 @@ WHERE esxi.present = 1;
 
 
 CREATE VIEW view_datastore AS
-SELECT  
+SELECT
   datastore.*,
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name
@@ -391,7 +397,7 @@ GROUP BY
 
 
 CREATE VIEW view_vdisk AS
-SELECT  
+SELECT
   vdisk.*,
   vm.name AS vm_name,
   vm.power_state AS vm_power_state,
@@ -419,7 +425,7 @@ GROUP BY
 
 /* group standard vswitch portgroups only if actually the same */
 CREATE VIEW view_portgroup AS
-SELECT DISTINCT  
+SELECT DISTINCT
   portgroup.name,
   portgroup.type,
   portgroup.vlan,
@@ -430,7 +436,7 @@ SELECT DISTINCT
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name,
   ( SELECT coalesce(count(vnic.id),0)
-    FROM vnic 
+    FROM vnic
     WHERE vnic.portgroup_id = portgroup.id AND vnic.present = 1) vnics
 FROM    portgroup
 LEFT JOIN
@@ -445,8 +451,8 @@ GROUP BY
 
 
 CREATE VIEW view_vcenter AS
-SELECT 
-  vcenter.*, 
+SELECT
+  vcenter.*,
   ( SELECT coalesce(sum(vm.vcpu),0)
     FROM vm
     WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_vcpu_on,
@@ -454,56 +460,56 @@ SELECT
     FROM vm
     WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_memory_on,
   ( SELECT coalesce(count(vm.id),0)
-    FROM vm 
+    FROM vm
     WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_on,
   ( SELECT coalesce(count(vm.id),0)
-    FROM vm 
+    FROM vm
     WHERE vm.vcenter_id = vcenter.id AND vm.present = 1) vms,
   ( SELECT coalesce(count(datacenter.id),0)
-    FROM datacenter 
+    FROM datacenter
     WHERE datacenter.vcenter_id = vcenter.id AND datacenter.present = 1) datacenters,
   ( SELECT coalesce(count(cluster.id),0)
     FROM cluster
     WHERE cluster.vcenter_id = vcenter.id AND cluster.present = 1) clusters,
   ( SELECT coalesce(count(esxi.id),0)
-    FROM esxi 
+    FROM esxi
     WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_hosts,
   ( SELECT coalesce(sum(esxi.cpu_threads),0)
-    FROM esxi 
+    FROM esxi
     WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_cpu,
   ( SELECT coalesce(sum(esxi.memory_bytes),0)
-    FROM esxi 
+    FROM esxi
     WHERE esxi.vcenter_id = vcenter.id AND esxi.present = 1) esxi_memory,
   ( SELECT coalesce(count(vnic.id),0)
-    FROM vnic 
+    FROM vnic
     WHERE vnic.vcenter_id = vcenter.id AND vnic.present = 1) vnics,
   ( SELECT coalesce(count(vdisk.id),0)
-    FROM vdisk 
+    FROM vdisk
     WHERE vdisk.vcenter_id = vcenter.id AND vdisk.present = 1) vdisks,
   ( SELECT coalesce(count(datastore.id),0)
-    FROM datastore 
+    FROM datastore
     WHERE datastore.vcenter_id = vcenter.id AND datastore.present = 1) datastores,
   ( SELECT coalesce(count(portgroup.id),0)
-    FROM portgroup 
+    FROM portgroup
     WHERE portgroup.vcenter_id = vcenter.id AND portgroup.present = 1) portgroups,
   ( SELECT coalesce(count(vswitch.id),0)
     FROM vswitch
     WHERE vswitch.vcenter_id = vcenter.id AND vswitch.present = 1) vswitches,
   ( SELECT coalesce(count(resourcepool.id),0)
-    FROM resourcepool 
+    FROM resourcepool
     WHERE resourcepool.vcenter_id = vcenter.id AND resourcepool.present = 1) resourcepools
 FROM vcenter;
 
 
 
-/* 
+/*
 TESTING
 */
 
 /* portgroup non distinct */
 /*
 CREATE VIEW view_portgroup AS
-SELECT  
+SELECT
   portgroup.*,
   vswitch.name AS vswitch_name,
   vswitch.type AS vswitch_type,
@@ -524,10 +530,10 @@ GROUP BY
 
 
 CREATE VIEW view_esxi AS
-SELECT  
+SELECT
   esxi.*,
   coalesce(COUNT(distinct vm.id),0) AS vms_powered_on,
-  coalesce(SUM(vm.vcpu),0) AS vcpus_powered_on, 
+  coalesce(SUM(vm.vcpu),0) AS vcpus_powered_on,
   coalesce(SUM(vm.memory_mb),0) AS vmemory_mb_powered_on,
   coalesce(COUNT(distinct pnic.id),0) AS pnics,
   vcenter.fqdn AS vcenter_fqdn,
@@ -550,9 +556,9 @@ GROUP BY
         esxi.id;
 
 
-SELECT  
+SELECT
   esxi.id,
-  SUM(vm.vcpu) AS vm_vcpu, 
+  SUM(vm.vcpu) AS vm_vcpu,
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name
 FROM    esxi
