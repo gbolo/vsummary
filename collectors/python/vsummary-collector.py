@@ -47,8 +47,12 @@ except ImportError:
 from tools import cli
 from tools import pchelper
 
-START = clock()
+# Version information
+build_ver = 'v1.01'
+build_date = '2016-07-17'
 
+
+START = clock()
 
 def show_time_spent():
     end = clock()
@@ -804,12 +808,16 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
             vlan_start = "na"
             vlan_end = "na"
 
-        # The API needs to be fixed to be able to implement this type of Port Groups
         elif isinstance(vlan, vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec):
             vlan_type = "VmwareDistributedVirtualSwitchTrunkVlanSpec"
             vlan_id = "na"
-            vlan_start = "na"
-            vlan_end = "na"
+            vlan_start = ""
+            vlan_end = ""
+
+            for vlan_x in vlan.vlanId:
+
+                vlan_start += str(vlan_x.start) + " "
+                vlan_end += str(vlan_x.end) + " "
 
         else:
             vlan_type = "TypeNotImplemented"
@@ -826,8 +834,8 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
         dvspg_compat['moref'] = dvspg['obj']._moId if "obj" in dvspg else None
         dvspg_compat['vlan_type'] = vlan_type
         dvspg_compat['vlan'] = vlan_id
-        dvspg_compat['vlan_start'] = vlan_start
-        dvspg_compat['vlan_end'] = vlan_end
+        dvspg_compat['vlan_start'] = vlan_start.rstrip()
+        dvspg_compat['vlan_end'] = vlan_end.rstrip()
         dvspg_compat['dvs_moref'] = dvspg['config.distributedVirtualSwitch']._moId if "config.distributedVirtualSwitch" in dvspg else None
 
         dvspg_data_compat.append(dvspg_compat)
@@ -844,6 +852,9 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
 
 
 def main():
+
+    print("vSummary Python Collector {} ({})".format(build_ver, build_date))
+    print("--------------------------------------------")
 
     global dryrun, verbose, host_portgroups
     host_portgroups = {}
