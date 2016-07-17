@@ -7,6 +7,10 @@ if (isset($_GET['view'])){
 			$view = $_GET['view'];
 			$view_title = 'Virtual Machine';
 			break;
+		case 'poller':
+			$view = $_GET['view'];
+			$view_title = 'Poller';
+			break;
 		case 'esxi':
 			$view = $_GET['view'];
 			$view_title = 'ESXi Host';

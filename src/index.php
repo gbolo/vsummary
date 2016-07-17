@@ -89,6 +89,9 @@
                                 <!-- /input-group -->
                             </li>
                             <li>
+                                <a href="index.php?view=poller"><i class="fa fa-cogs fa-fw"></i> Poller</a>
+                            </li>
+                            <li>
                                 <a href="index.php?view=vm"><i class="fa fa-desktop fa-fw"></i> Virtual Machines</a>
                             </li>
                             <li>
@@ -183,13 +186,13 @@
     <script type="text/javascript" src="datatables/Responsive-2.0.2/js/responsive.bootstrap.min.js"></script>
     <script type="text/javascript" src="datatables/Scroller-1.4.1/js/dataTables.scroller.min.js"></script>
     <script type="text/javascript" src="datatables/Select-1.1.2/js/dataTables.select.min.js"></script>
-    
+
     <!-- Custom Theme JavaScript -->
     <script src="js/sb-admin-2.js"></script>
 
     <!-- vSummary Datatables Load Javascript -->
     <script>
-    
+
         $(document).ready(function() {
 
             // Setup - add a text input to each footer cell
@@ -234,7 +237,7 @@
                 },
                 select: true,
                 buttons: [
-                  'copy', 
+                  'copy',
                   'csv',
                   /*
                   {
@@ -249,20 +252,20 @@
                     show: ':hidden'
                   },
                   */
-                  { extend: 'colvis', 
-                    className: 'colvis', 
-                    text: 'Custom View' 
+                  { extend: 'colvis',
+                    className: 'colvis',
+                    text: 'Custom View'
                   }
                 ]
             });
-            
+
             // Apply the footer search
             $( table.table().container() ).on( 'keyup', 'tfoot input', function () {
                 table
                     .column( $(this).data('index') )
                     .search( this.value )
                     .draw();
-            } ); 
+            } );
 
         });
 
