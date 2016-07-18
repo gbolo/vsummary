@@ -1,3 +1,18 @@
+<form role="edit" method="post">
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <h4 class="modal-title" id="myModalLabel">Modify vCenter Credentials</h4>
+</div>
+<div class="modal-body">
+<div class="alert alert-warning" role="alert">
+  <strong>Warning!</strong>
+  <p>Please provide a user with <strong>read-only</strong> access to vcenter
+    since no greater permissions are required.<br />
+    Also keep in mind that passwords are not stored securely for auto-polling purposes.</p>
+</div>
+
 <?php
 
 ini_set('display_errors', 1);
@@ -42,30 +57,34 @@ if ( isset($_GET['id']) ){
 
 
 echo '
-<form role="edit" method="post">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>FQDN</th>
-        <th>SHORT NAME</th>
-        <th>USERNAME</th>
-        <th>PASSWORD</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>'.$rows[0]['id'].'</td>
-        <td><input name="fqdn" type="text" value="'.$rows[0]['fqdn'].'"></td>
-        <td><input name="short_name" type="text" value="'.$rows[0]['short_name'].'"></td>
-        <td><input name="user_name" type="text" value="'.$rows[0]['user_name'].'"></td>
-        <td><input name="password" type="password" value="'.$rows[0]['password'].'"></td>
-      </tr>
-    </tbody>
-  </table>
-  <hr />
-  <button type="submit" class="btn btn-default">Update</button>
-</form>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <td>ID:</td>
+      <td>'.$rows[0]['id'].'</td>
+    </tr>
+    <tr>
+      <td>FQDN:</td>
+      <td><input name="fqdn" type="text" value="'.$rows[0]['fqdn'].'"></td>
+    </tr>
+    <tr>
+      <td>ENV:</td>
+      <td><input name="short_name" type="text" value="'.$rows[0]['short_name'].'"></td>
+    </tr>
+    <tr>
+      <td>UserName:</td>
+      <td><input name="user_name" type="text" value="'.$rows[0]['user_name'].'"></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td><input name="password" type="password" value="'.$rows[0]['password'].'"></td>
+    </tr>
+    <tr>
+      <td>Enable Auto Poll:</td>
+      <td><input type="checkbox" name="auto_poll"></td>
+    </tr>
+  </tbody>
+</table>
 
 ';
 
@@ -74,3 +93,9 @@ echo '
 
 
 ?>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+  <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>

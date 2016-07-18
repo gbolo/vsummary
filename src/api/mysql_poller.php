@@ -25,15 +25,19 @@ fqdn,
 short_name,
 last_poll_status,
 last_poll_result,
-last_poll_output,
-auto_poll
+auto_poll,
+last_poll
 FROM vcenter
 ');
 
 // Modify output
 $dt->edit('id', function ($data){
     $GLOBALS['id'] = $data['id'];
-	  $edit = '<a href="edit.php?id='.$data['id'].'" class="btn btn-info btn-sm"><strong>EDIT</strong></a>';
+    $edit = '<div class="btn-group btn-group-sm" role="group" aria-label="options">';
+	  $edit .= '<a href="edit.php?id='.$data['id'].'" data-toggle="modal" data-target="#myModal" class="btn btn-primary btn-xs"><strong>EDIT</strong></a>';
+    $edit .= '<a href="view.php?id='.$data['id'].'" class="btn btn-info btn-xs"><strong>VIEW</strong></a>';
+    $edit .= '<a href="run.php?id='.$data['id'].'" class="btn btn-success btn-xs"><strong>RUN</strong></a>';
+    $edit .= '</div>';
     return $edit;
 });
 
@@ -47,11 +51,6 @@ $dt->edit('last_poll_result', function ($data){
     return $hr;
 });
 
-$dt->edit('last_poll_output', function ($data){
-    global $id;
-	  $edit = '<a href="view.php?id='.$GLOBALS['id'].'" class="btn btn-info btn-sm"><strong>VIEW</strong></a>';
-    return $edit;
-});
 
 $dt->edit('auto_poll', function ($data){
     if ( $data['auto_poll'] == 1 ){
