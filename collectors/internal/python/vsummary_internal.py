@@ -33,8 +33,7 @@ except ImportError:
     import urllib.request as urllib2
 
 
-
-# initiate ---------------------------------------------------------------------
+# --------------- VSUMMARY ROUTES ----------------------------------------------
 app = Flask(__name__)
 
 @app.route('/')
@@ -111,7 +110,8 @@ def timeout():
     return "Nothing to see here... Go Away!"
 
 
-# --------------- VSUMMARY FUNCTIONS
+# --------------- VSUMMARY COLLECTION FUNCTIONS --------------------------------
+
 def vm_inventory(si, vc_uuid, api_url):
 
     vm_properties = ["name",
@@ -775,8 +775,12 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
         elif isinstance(vlan, vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec):
             vlan_type = "VmwareDistributedVirtualSwitchTrunkVlanSpec"
             vlan_id = "na"
-            vlan_start = "na"
-            vlan_end = "na"
+            vlan_start = ""
+            vlan_end = ""
+
+            for vlan_x in vlan.vlanId:
+                vlan_start += str(vlan_x.start) + " "
+                vlan_end += str(vlan_x.end) + " "
 
         else:
             vlan_type = "TypeNotImplemented"
@@ -793,8 +797,8 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
         dvspg_compat['moref'] = dvspg['obj']._moId if "obj" in dvspg else None
         dvspg_compat['vlan_type'] = vlan_type
         dvspg_compat['vlan'] = vlan_id
-        dvspg_compat['vlan_start'] = vlan_start
-        dvspg_compat['vlan_end'] = vlan_end
+        dvspg_compat['vlan_start'] = vlan_start.rstrip()
+        dvspg_compat['vlan_end'] = vlan_end.rstrip()
         dvspg_compat['dvs_moref'] = dvspg['config.distributedVirtualSwitch']._moId if "config.distributedVirtualSwitch" in dvspg else None
 
         dvspg_data_compat.append(dvspg_compat)
@@ -810,39 +814,7 @@ def dvs_portgroup_inventory(si, vc_uuid, api_url):
     return result
 
 
-
-
-
-
-
-
-
-def update_db(vc_uuid):
-  # Connect to the database
-  connection = pymysql.connect(host='10.0.77.21',
-                               user='vsummary',
-                               password='changeme',
-                               db='vsummary',
-                               charset='utf8mb4',
-                               cursorclass=pymysql.cursors.DictCursor)
-
-  try:
-      with connection.cursor() as cursor:
-          # Read a single record
-          sql = "SELECT * FROM vdisk"
-          cursor.execute(sql)
-          result = cursor.fetchone()
-          print(result)
-  finally:
-      connection.close()
-
-def main():
-
-    vc_uuid = test_credentials()
-    print (vc_uuid)
-    update_db(vc_uuid)
-
-    return 0
+# ----------------- VSUMMARY SEND TO API ---------------------------------------
 
 def send_vsummary_data(data, url):
 
@@ -853,7 +825,6 @@ def send_vsummary_data(data, url):
     #
 
     json_post_data = json.dumps(data)
-    #print(data)
 
     #
     #  The POST request itself
@@ -880,9 +851,38 @@ def send_vsummary_data(data, url):
     except Exception as e:
         ret['code'] = -1
         ret['reason'] = "FATAL!"
-        print("-----EXCEPTION!!-------")
-        print(e)
+        #print("-----EXCEPTION!!-------")
+        #print(e)
         return ret
+
+
+# ----------------- VSUMMARY DATABASE RELATED ----------------------------------
+
+def get_vcenter_poller_info(vc_uuid):
+  # Connect to the database
+  connection = pymysql.connect(host='127.0.0.1',
+                               port=13306,
+                               user='vsummary',
+                               password='changeme',
+                               db='vsummary',
+                               charset='utf8mb4',
+                               cursorclass=pymysql.cursors.DictCursor)
+
+  try:
+      with connection.cursor() as cursor:
+          # Read a single record
+          sql = "SELECT * FROM vcenter WHERE id = %s"
+          cursor.execute(sql, (uuid))
+          result = cursor.fetchone()
+          print(result)
+          return result
+  finally:
+      connection.close()
+
+def main():
+    return 0
+
+
 
 
 # Start program
