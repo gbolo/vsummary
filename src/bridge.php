@@ -25,13 +25,91 @@ catch (PDOException $e) {
 
 // functions required
 
-function add_vcenter($pdo, $vc_uuid){
+function is_valid_domain($url){
 
-  $stmt = $pdo->prepare("SELECT * FROM vcenter WHERE id =?");
-  $stmt->bindValue(1, $vc_uuid, PDO::PARAM_STR);
-  $stmt->execute();
-  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $validation = FALSE;
+    /*Parse URL*/
+    $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
+    /*Check host exist else path assign to host*/
+    if(!isset($urlparts['host'])){
+        $urlparts['host'] = $urlparts['path'];
+    }
 
+    if($urlparts['host']!=''){
+       /*Add scheme if not found*/
+        if (!isset($urlparts['scheme'])){
+            $urlparts['scheme'] = 'http';
+        }
+        /*Validation*/
+        if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){
+            $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
+            $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";
+
+            if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
+                $validation = TRUE;
+            }
+        }
+    }
+
+  if(!$validation){
+      return false;
+  }else{
+      return true;
+  }
+
+}
+
+
+function validate_post_vars(){
+
+  if ( !empty($_POST['host'])
+    && !empty($_POST['short_name'])
+    && !empty($_POST['user'])
+    && !empty($_POST['pass'])
+   ){
+     $bool_host = filter_var($_POST['host'] ,FILTER_VALIDATE_IP);
+
+  } else {
+    echo '<b>Error</b> - Some Parameters are Missing!';
+    http_response_code(500);
+    exit();
+  }
+
+}
+
+function update_vcenter($vc_uuid){
+
+    try {
+
+        // grab the pdo object declared outside of this function
+        global $pdo;
+
+        // start transaction
+        $pdo->beginTransaction();
+
+        // prepare statement to avoid sql injections
+        $stmt = $pdo->prepare('INSERT INTO vcenter (id, fqdn, short_name, user_name, password) ' .
+                'VALUES(:id, :fqdn, :short_name, :user_name, :password) ' .
+                'ON DUPLICATE KEY UPDATE fqdn=VALUES(fqdn), short_name=VALUES(short_name), user_name=VALUES(user_name), password=VALUES(password)');
+
+        $stmt->bindParam(':id', $vc_uuid, PDO::PARAM_STR);
+        $stmt->bindParam(':fqdn', $_POST['host'], PDO::PARAM_STR);
+        $stmt->bindParam(':short_name', $_POST['short_name'], PDO::PARAM_STR);
+        $stmt->bindParam(':user_name', $_POST['user'], PDO::PARAM_STR);
+        $stmt->bindParam(':password', $_POST['pass'], PDO::PARAM_STR);
+
+        // execute prepared statement
+        $stmt->execute();
+
+        // commit transaction
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $pdo->rollback();
+        // return 500
+        http_response_code(500);
+    }
 }
 
 function test_vcenter_creds($host, $user, $pass){
@@ -76,10 +154,13 @@ function test_vcenter_creds($host, $user, $pass){
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+  validate_post_vars();
+
   $result = test_vcenter_creds($_POST['host'], $_POST['user'], $_POST['pass']);
 
   if ( $result['status'] == 200 ){
-    echo "SUCCESS";
+    $vc_uuid = $result['output'];
+    update_vcenter($vc_uuid);
   } else {
     echo $result['output'];
     http_response_code(500);
