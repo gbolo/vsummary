@@ -42,12 +42,24 @@ $dt->edit('id', function ($data){
 });
 
 $dt->edit('last_poll_status', function ($data){
-	  $hr = '<span class="label label-pill label-default">Idle</span>';
+    if ( $data['last_poll_status'] == 'Idle' ){
+        $hr = '<span class="label label-pill label-default">IDLE</span>';
+    } elseif ( $data['last_poll_status'] == 'running' ){
+        $hr = '<span class="label label-pill label-success">RUNNING</span>';
+    } else {
+        $hr = '<span class="label label-pill label-warning">UNKNOWN</span>';
+    }
     return $hr;
 });
 
 $dt->edit('last_poll_result', function ($data){
-	  $hr = '<span class="label label-pill label-success">Success</span>';
+    if ( $data['last_poll_result'] == 0 ){
+        $hr = '<span class="label label-pill label-default">UNKNOWN</span>';
+    } elseif ( $data['last_poll_result'] == 1 ){
+        $hr = '<span class="label label-pill label-success">SUCCESS</span>';
+    } else {
+        $hr = '<span class="label label-pill label-danger">FAILED</span>';
+    }
     return $hr;
 });
 
