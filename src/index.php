@@ -204,7 +204,7 @@
             // Load Datatables
             var table = $('#dt-vsummary-<?php echo $view; ?>').DataTable({
                 //dom: 'Blrtip',
-                dom: "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
+                dom: "<?php echo $dt_dom; ?>",
                 scrollY: '60vh',
                 /*
                 responsive: {
@@ -235,10 +235,9 @@
                     url: 'api/mysql_<?php echo $view; ?>.php',
                     type: 'POST'
                 },
-                select: true,
+                select: <?php echo $dt_select; ?>,
                 buttons: [
-                  'copy',
-                  'csv',
+                  <?php echo $dt_buttons; ?>
                   /*
                   {
                     extend: 'colvisGroup',
@@ -252,10 +251,6 @@
                     show: ':hidden'
                   },
                   */
-                  { extend: 'colvis',
-                    className: 'colvis',
-                    text: 'Custom View'
-                  }
                 ]
             });
 
@@ -290,12 +285,24 @@
 
 
     <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="pollerModal" tabindex="-1" role="dialog" aria-labelledby="Poller" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
             </div> <!-- /.modal-content -->
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->
+
+    <script>
+    /* reload modal content when canceling */
+    $('#pollerModal').on('hidden.bs.modal', function () {
+      $(this).removeData('bs.modal');
+    });
+
+
+
+
+
+    </script>
 
 </body>
 

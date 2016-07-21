@@ -60,24 +60,24 @@ echo '
 <table class="table table-striped">
   <tbody>
     <tr>
-      <td>ID:</td>
+      <td><strong>vCenter UUID:<strong></td>
       <td>'.$rows[0]['id'].'</td>
     </tr>
     <tr>
-      <td>FQDN:</td>
-      <td><input name="fqdn" type="text" value="'.$rows[0]['fqdn'].'"></td>
+      <td><label for="fqdn">FQDN or IP:</label></td>
+      <td><input name="fqdn" type="text" style="width:100%" value="'.$rows[0]['fqdn'].'"></td>
     </tr>
     <tr>
-      <td>ENV:</td>
-      <td><input name="short_name" type="text" value="'.$rows[0]['short_name'].'"></td>
+      <td><label for="short_name">Environment:</label></td>
+      <td><input name="short_name" type="text" style="width:100%" value="'.$rows[0]['short_name'].'"></td>
     </tr>
     <tr>
-      <td>UserName:</td>
-      <td><input name="user_name" type="text" value="'.$rows[0]['user_name'].'"></td>
+      <td><label for="user_name">Username:</label></td>
+      <td><input name="user_name" type="text" style="width:100%" value="'.$rows[0]['user_name'].'"></td>
     </tr>
     <tr>
-      <td>Password:</td>
-      <td><input name="password" type="password" value="'.$rows[0]['password'].'"></td>
+      <td><label for="password">Password:</label></td>
+      <td><input name="password" type="password" style="width:100%" value="'.$rows[0]['password'].'"></td>
     </tr>
     <tr>
       <td>Enable Auto Poll:</td>
@@ -95,7 +95,8 @@ echo '
 ?>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+  <button type="button" class="btn btn-danger" data-dismiss="modal">Remove This vCenter</button>
   <button type="submit" class="btn btn-primary">Save changes</button>
 </div>
 </form>

@@ -1,5 +1,16 @@
 <?php
 
+$dt_dom = "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
+$dt_select = "true";
+$dt_buttons = "
+'copy',
+'csv',
+{ extend: 'colvis',
+	className: 'colvis',
+	text: 'Custom View'
+}
+";
+
 if (isset($_GET['view'])){
 	switch($_GET['view'])
 	{
@@ -10,6 +21,17 @@ if (isset($_GET['view'])){
 		case 'poller':
 			$view = $_GET['view'];
 			$view_title = 'Poller';
+			$dt_select = "false";
+			$dt_buttons = "
+			{
+					text: '<i class=\"fa fa-plus-square fa-fw\"></i> <b>Add vCenter Server</b>',
+					className: 'btn-success',
+					action: function ( e, dt, node, config ) {
+							$(\"#pollerModal\").find(\".modal-content\").load(\"add.php\");
+							$(\"#pollerModal\").modal() ;
+					}
+			}
+			";
 			break;
 		case 'esxi':
 			$view = $_GET['view'];
