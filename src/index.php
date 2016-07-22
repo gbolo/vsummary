@@ -296,6 +296,7 @@
     /* reload modal content when canceling */
     $('#pollerModal').on('hidden.bs.modal', function () {
       $(this).removeData('bs.modal');
+      location.reload();
     });
 
 
