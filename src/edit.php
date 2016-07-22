@@ -61,11 +61,11 @@ echo '
   <tbody>
     <tr>
       <td><strong>vCenter UUID:<strong></td>
-      <td>'.$rows[0]['id'].'</td>
+      <td><input name="vc_uuid" type="hidden">'.$rows[0]['id'].'</input></td>
     </tr>
     <tr>
       <td><label for="fqdn">FQDN or IP:</label></td>
-      <td><input name="fqdn" type="text" style="width:100%" value="'.$rows[0]['fqdn'].'"></td>
+      <td><input name="host" type="text" style="width:100%" value="'.$rows[0]['fqdn'].'"></td>
     </tr>
     <tr>
       <td><label for="short_name">Environment:</label></td>
@@ -73,19 +73,20 @@ echo '
     </tr>
     <tr>
       <td><label for="user_name">Username:</label></td>
-      <td><input name="user_name" type="text" style="width:100%" value="'.$rows[0]['user_name'].'"></td>
+      <td><input name="user" type="text" style="width:100%" value="'.$rows[0]['user_name'].'"></td>
     </tr>
     <tr>
       <td><label for="password">Password:</label></td>
-      <td><input name="password" type="password" style="width:100%" value="'.$rows[0]['password'].'"></td>
+      <td><input name="pass" type="password" style="width:100%" value="'.$rows[0]['password'].'"></td>
     </tr>
     <tr>
       <td>Enable Auto Poll:</td>
-      <td><input type="checkbox" name="auto_poll"></td>
+      <td><input type="checkbox" name="autopoll"></td>
     </tr>
   </tbody>
 </table>
-
+<div id="message" class="alert alert-danger hidden" role="alert">
+</div>
 ';
 
 
@@ -97,6 +98,39 @@ echo '
 <div class="modal-footer">
   <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
   <button type="button" class="btn btn-danger" data-dismiss="modal">Remove This vCenter</button>
-  <button type="submit" class="btn btn-primary">Save changes</button>
+  <button type="submit" id="submit" class="btn btn-primary">Save changes</button>
 </div>
 </form>
+
+<script>
+function hideModal(){
+  $("#pollerModal").modal('hide');
+}
+
+$("#submit").click(function(e){
+    e.preventDefault();
+    //make ajax call
+    $.ajax({
+        type: "POST",
+        url: "bridge.php",
+        data: $('form').serialize(),
+        beforeSend: function(){
+            $("#message").html('<img src="img/ripple.gif" /> Executing Request');
+            $("#message").removeClass("hidden alert-danger");
+            $("#message").addClass("alert-info");
+        },
+        success: function(msg){
+            $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+            $("#message").removeClass("hidden alert-info alert-danger");
+            $("#message").addClass("alert-success");
+            setTimeout(hideModal, 1000);
+        },
+        error: function(jqXHR){
+            $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
+            $("#message").removeClass("hidden alert-info");
+            $("#message").addClass("alert-danger");
+        }
+    });
+
+});
+</script>

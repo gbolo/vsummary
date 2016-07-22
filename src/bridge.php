@@ -161,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ( $result['status'] == 200 ){
     $vc_uuid = $result['output'];
     update_vcenter($vc_uuid);
+    echo "Login Successful";
   } else {
     echo $result['output'];
     http_response_code(500);
