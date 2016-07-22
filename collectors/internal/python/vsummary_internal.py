@@ -104,6 +104,17 @@ def poll_vc():
     finally:
         return json.dumps(result), http_status
 
+@app.route('/vc_info', methods=['POST'])
+def vc_info():
+    result = "Error in request"
+    http_status = 500
+    try:
+        result = get_vcenter_poller_info(request.form['vc_uuid'])
+    except Exception as e:
+        result = str(e)
+    finally:
+        return result, http_status
+
 @app.route('/time')
 def timeout():
     time.sleep(160)
@@ -872,10 +883,10 @@ def get_vcenter_poller_info(vc_uuid):
       with connection.cursor() as cursor:
           # Read a single record
           sql = "SELECT * FROM vcenter WHERE id = %s"
-          cursor.execute(sql, (uuid))
+          cursor.execute(sql, (vc_uuid))
           result = cursor.fetchone()
           print(result)
-          return result
+          return json.dumps(result)
   finally:
       connection.close()
 
@@ -887,4 +898,4 @@ def main():
 
 # Start program
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+    app.run(host='0.0.0.0', debug=True, threaded=True)
