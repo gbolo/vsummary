@@ -3,7 +3,7 @@
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-  <h4 class="modal-title" id="myModalLabel">Modify vCenter Credentials</h4>
+  <h4 class="modal-title" id="editModal">Modify vCenter Credentials</h4>
 </div>
 <div class="modal-body">
 <div class="alert alert-warning" role="alert">
@@ -61,7 +61,7 @@ echo '
   <tbody>
     <tr>
       <td><strong>vCenter UUID:<strong></td>
-      <td><input name="vc_uuid" type="hidden">'.$rows[0]['id'].'</input></td>
+      <td><input name="vc_uuid" type="hidden" value="'.$rows[0]['id'].'">'.$rows[0]['id'].'</input></td>
     </tr>
     <tr>
       <td><label for="fqdn">FQDN or IP:</label></td>
@@ -97,7 +97,7 @@ echo '
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-  <button type="button" class="btn btn-danger" data-dismiss="modal">Remove This vCenter</button>
+  <button type="button" id="remove" class="btn btn-danger">Remove This vCenter</button>
   <button type="submit" id="submit" class="btn btn-primary">Save changes</button>
 </div>
 </form>
@@ -131,6 +131,31 @@ $("#submit").click(function(e){
             $("#message").addClass("alert-danger");
         }
     });
+});
 
+$("#remove").click(function(f){
+    f.preventDefault();
+    //make ajax call
+    $.ajax({
+        type: "POST",
+        url: "bridge.php?action=remove",
+        data: $('form').serialize(),
+        beforeSend: function(){
+            $("#message").html('<img src="img/ripple.gif" /> Executing Request');
+            $("#message").removeClass("hidden alert-danger");
+            $("#message").addClass("alert-info");
+        },
+        success: function(msg){
+            $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+            $("#message").removeClass("hidden alert-info alert-danger");
+            $("#message").addClass("alert-success");
+            setTimeout(hideModal, 1000);
+        },
+        error: function(jqXHR){
+            $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
+            $("#message").removeClass("hidden alert-info");
+            $("#message").addClass("alert-danger");
+        }
+    });
 });
 </script>

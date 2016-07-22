@@ -112,6 +112,36 @@ function update_vcenter($vc_uuid){
     }
 }
 
+function remove_vcenter($vc_uuid){
+
+    try {
+
+        // grab the pdo object declared outside of this function
+        global $pdo;
+
+        // start transaction
+        $pdo->beginTransaction();
+
+        // prepare statement to avoid sql injections
+        $stmt = $pdo->prepare('DELETE FROM vcenter WHERE id = :id');
+
+        $stmt->bindParam(':id', $vc_uuid, PDO::PARAM_STR);
+
+        // execute prepared statement
+        $stmt->execute();
+
+        // commit transaction
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        // rollback transaction on error
+        $pdo->rollback();
+        // return 500
+        http_response_code(500);
+    }
+}
+
+
 function test_vcenter_creds($host, $user, $pass){
   $curl = curl_init();
 
@@ -155,6 +185,12 @@ function test_vcenter_creds($host, $user, $pass){
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   validate_post_vars();
+
+  if ( !empty($_GET['action']) && $_GET['action'] == 'remove' && !empty($_POST['vc_uuid']) ){
+    remove_vcenter($_POST['vc_uuid']);
+    echo "REMOVED ".$_POST['vc_uuid'];
+    exit();
+  }
 
   $result = test_vcenter_creds($_POST['host'], $_POST['user'], $_POST['pass']);
 
