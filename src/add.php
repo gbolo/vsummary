@@ -80,13 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   ';
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  echo "<br /><hr />POSTED!!";
-}
-
-
-
 ?>
+
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
