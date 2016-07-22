@@ -25,41 +25,6 @@ catch (PDOException $e) {
 
 // functions required
 
-function is_valid_domain($url){
-
-    $validation = FALSE;
-    /*Parse URL*/
-    $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
-    /*Check host exist else path assign to host*/
-    if(!isset($urlparts['host'])){
-        $urlparts['host'] = $urlparts['path'];
-    }
-
-    if($urlparts['host']!=''){
-       /*Add scheme if not found*/
-        if (!isset($urlparts['scheme'])){
-            $urlparts['scheme'] = 'http';
-        }
-        /*Validation*/
-        if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){
-            $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
-            $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";
-
-            if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
-                $validation = TRUE;
-            }
-        }
-    }
-
-  if(!$validation){
-      return false;
-  }else{
-      return true;
-  }
-
-}
-
-
 function validate_post_vars(){
 
   if ( !empty($_POST['host'])
@@ -141,7 +106,6 @@ function remove_vcenter($vc_uuid){
     }
 }
 
-
 function test_vcenter_creds($host, $user, $pass){
   $curl = curl_init();
 
@@ -168,15 +132,78 @@ function test_vcenter_creds($host, $user, $pass){
     CURLOPT_SSL_VERIFYPEER => false,
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_CONNECTTIMEOUT => 5,
+    CURLOPT_TIMEOUT        => 7,
   );
 
   curl_setopt_array($curl, $opt);
   $output = curl_exec($curl);
+  $curl_errno = curl_errno($curl);
+  $curl_error = curl_error($curl);
+
+  if ($curl_errno > 0) {
+      $result['output'] = "Error ($curl_errno): $curl_error";
+  } else {
+      $result['output'] = $output;
+  }
 
   $result['status'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  $result['output'] = $output;
 
   return $result;
+
+}
+
+function poll_vcenter($host, $user, $pass){
+  $curl = curl_init();
+
+  $fields = array(
+    'user' => urlencode($user),
+    'pwd' => urlencode($pass),
+    'host' => urlencode($host),
+  );
+
+  $fields_string = "";
+  foreach($fields as $key=>$value){
+    $fields_string .= $key .'='. $value .'&';
+  }
+  rtrim($fields_string, '&');
+
+  $opt = array(
+    CURLOPT_URL            => "http://10.0.77.77:5000/poll",
+    CURLOPT_USERAGENT      => "LinuxAPI",
+    CURLOPT_CUSTOMREQUEST  => "POST",
+    CURLOPT_POST           => count($fields),
+    CURLOPT_POSTFIELDS     => $fields_string,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_SSL_VERIFYHOST => 0,
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_CONNECTTIMEOUT => 5,
+  );
+
+  curl_setopt_array($curl, $opt);
+  $output = curl_exec($curl);
+  $curl_errno = curl_errno($curl);
+  $curl_error = curl_error($curl);
+
+  if ($curl_errno > 0) {
+      $result['output'] = "Error ($curl_errno): $curl_error";
+  } else {
+      $result['output'] = $output;
+  }
+
+  $result['status'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+  return $result;
+
+}
+
+function get_vcenter_creds($vc_uuid){
+
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT * FROM vcenter WHERE id =?");
+  $stmt->bindValue(1, $vc_uuid, PDO::PARAM_STR);
+  $stmt->execute();
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 }
 
@@ -202,5 +229,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo $result['output'];
     http_response_code(500);
   }
+
+} else {
+
+  if ( !empty($_GET['action']) && $_GET['action'] == 'poll' && !empty($_GET['vc_uuid']) ){
+    echo "<pre>";
+    $vcenter_creds = get_vcenter_creds($_GET['vc_uuid']);
+    //print_r($vcenter_creds);
+    $result = poll_vcenter($vcenter_creds[0]['fqdn'], $vcenter_creds[0]['user_name'], $vcenter_creds[0]['password']);
+    print_r( json_decode($result['output']) );
+  } else {
+    echo "unknown request";
+    http_response_code(500);
+  }
+
 
 }

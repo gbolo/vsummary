@@ -36,7 +36,7 @@ $dt->edit('id', function ($data){
     $edit = '<div class="btn-group btn-group-sm" role="group" aria-label="options">';
 	  $edit .= '<a href="edit.php?id='.$data['id'].'" data-toggle="modal" data-target="#pollerModal" class="btn btn-primary btn-xs"><strong>EDIT</strong></a>';
     $edit .= '<a href="view.php?id='.$data['id'].'" class="btn btn-info btn-xs"><strong>VIEW</strong></a>';
-    $edit .= '<a href="run.php?id='.$data['id'].'" class="btn btn-success btn-xs"><strong>RUN</strong></a>';
+    $edit .= '<a href="run.php?id='.$data['id'].'" data-toggle="modal" data-target="#pollerModal" class="btn btn-success btn-xs"><strong>RUN</strong></a>';
     $edit .= '</div>';
     return $edit;
 });
