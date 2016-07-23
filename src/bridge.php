@@ -197,6 +197,67 @@ function poll_vcenter($host, $user, $pass){
 
 }
 
+function save_poll_results($vc_uuid, $result){
+
+  try {
+
+      // grab the pdo object declared outside of this function
+      global $pdo;
+
+      // start transaction
+      $pdo->beginTransaction();
+
+      // prepare statement to avoid sql injections
+      $stmt = $pdo->prepare('UPDATE vcenter ' .
+              'SET last_poll = :last_poll, ' .
+              'last_poll_status = :last_poll_status, ' .
+              'last_poll_result = :last_poll_result, ' .
+              'last_poll_output = :last_poll_output ' .
+              'WHERE id = :id');
+
+      $last_poll = date(DATE_RFC2822);
+      $last_poll_output = $result['output'];
+      $last_poll_status = 'Idle';
+      $last_poll_result = get_json_status_result($last_poll_output);
+
+
+      $stmt->bindParam(':id', $vc_uuid, PDO::PARAM_STR);
+      $stmt->bindParam(':last_poll', $last_poll, PDO::PARAM_STR);
+      $stmt->bindParam(':last_poll_output', $last_poll_output, PDO::PARAM_STR);
+      $stmt->bindParam(':last_poll_status', $last_poll_status, PDO::PARAM_STR);
+      $stmt->bindParam(':last_poll_result', $last_poll_result, PDO::PARAM_INT);
+
+      // execute prepared statement
+      $stmt->execute();
+
+      // commit transaction
+      $pdo->commit();
+
+  } catch (PDOException $e) {
+      // rollback transaction on error
+      $pdo->rollback();
+      // return 500
+      print_r( $pdo->errorInfo() );
+      echo $e->getMessage();
+      http_response_code(500);
+  }
+
+}
+
+function get_json_status_result($json){
+  $poll_result = 1;
+  $arr = json_decode($json, true);
+  foreach ($arr as $poll_type){
+    foreach ($poll_type['post'] as $post){
+      if ( $post['code'] != 200 ){
+        $poll_result++;
+      }
+    }
+  }
+
+  return $poll_result;
+}
+
 function get_vcenter_creds($vc_uuid){
 
   global $pdo;
@@ -233,11 +294,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
 
   if ( !empty($_GET['action']) && $_GET['action'] == 'poll' && !empty($_GET['vc_uuid']) ){
-    echo "<pre>";
     $vcenter_creds = get_vcenter_creds($_GET['vc_uuid']);
     //print_r($vcenter_creds);
     $result = poll_vcenter($vcenter_creds[0]['fqdn'], $vcenter_creds[0]['user_name'], $vcenter_creds[0]['password']);
-    print_r( json_decode($result['output']) );
+    if ( $result['status'] == 200 ){
+      save_poll_results($_GET['vc_uuid'], $result);
+      echo "Polling was Successful";
+    } else {
+      echo "Error Occured in poll:<br />";
+      print_r($result['output']);
+      http_response_code(500);
+    }
+
+    //print_r( json_decode($result['output']) );
   } else {
     echo "unknown request";
     http_response_code(500);

@@ -5,9 +5,7 @@
   <h4 class="modal-title" id="myModalLabel">Run vCenter Poll</h4>
 </div>
 <div class="modal-body">
-  <h3>vCenter Polling is Running...</h3>
-  <div id="message" class="alert alert-danger hidden" role="alert">
-  </div>
+
 
 <?php
 
@@ -34,9 +32,10 @@ catch (PDOException $e) {
     http_response_code(500);
 }
 
+
 // functions required
 
-function add_vcenter($pdo, $vc_uuid){
+function get_vcenter_info($pdo, $vc_uuid){
 
   $stmt = $pdo->prepare("SELECT * FROM vcenter WHERE id =?");
   $stmt->bindValue(1, $vc_uuid, PDO::PARAM_STR);
@@ -44,10 +43,31 @@ function add_vcenter($pdo, $vc_uuid){
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 }
+
+if ( isset($_GET['id']) ){
+  $rows = get_vcenter_info($pdo, $_GET['id']);
+} else {
+  exit('Error in GET VAR');
+}
+
+
+echo '
+<h3>Begin Polling of vCenter: '.$rows[0]['fqdn'].'</h3>
+<hr />
+<strong>UUID:</strong> '.$rows[0]['id'].'<br />
+<strong>Username:</strong> '.$rows[0]['user_name'].'<br />
+<hr />
+<div id="message" class="alert alert-danger hidden" role="alert">
+</div>
+';
+
+
+
+
 ?>
 </div>
 <div class="modal-footer">
-  <button type="button" id="run" class="btn btn-default">RUN NOW</button>
+  <button type="button" id="run" class="btn btn-success">RUN NOW</button>
 </div>
 
 <script>
