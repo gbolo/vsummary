@@ -40,8 +40,9 @@ if ( isset($_GET['id']) ){
   exit('Error in GET VAR');
 }
 
-
-echo '<pre>'.$rows[0]['last_poll_output'];
+echo '<h2>Polling Results</h2><hr />';
+echo '<pre>';
+print_r( json_decode($rows[0]['last_poll_output'], true) );
 
 
 
