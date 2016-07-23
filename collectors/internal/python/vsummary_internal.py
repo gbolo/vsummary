@@ -57,6 +57,8 @@ def get_vc_uuid():
             result = "Error Getting vCenter UUID!"
     except vim.fault.InvalidLogin:
         result = "Invalid Credentials"
+    except vim.fault.NoPermission:
+        result = "User Lacks Permissions"
     except Exception as e:
         result = str(e)
     finally:
@@ -93,12 +95,12 @@ def poll_vc():
             result['Cluster'] = cluster_inventory(si, vc_uuid, api_url)
             result['DVS'] = dvs_inventory(si, vc_uuid, api_url)
             result['DVSPG'] = dvs_portgroup_inventory(si, vc_uuid, api_url)
-
-
         else:
             result = "Error Getting vCenter UUID!"
     except vim.fault.InvalidLogin:
         result = "Invalid Credentials"
+    except vim.fault.NoPermission:
+        result = "User Lacks Permissions"
     except Exception as e:
         result = str(e)
     finally:
