@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-  <button type="submit" id="submit" class="btn btn-primary">Add vCenter</button>
+  <button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa fa-undo fa-fw'></i> Cancel</button>
+  <button type="submit" id="submit" class="btn btn-primary"><i class='fa fa-plus fa-fw'></i> Add vCenter</button>
 </div>
 </form>
 

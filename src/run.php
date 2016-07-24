@@ -67,7 +67,8 @@ echo '
 ?>
 </div>
 <div class="modal-footer">
-  <button type="button" id="run" class="btn btn-success">RUN NOW</button>
+  <button type="button" class="btn btn-danger" data-dismiss="modal"><i class='fa fa-times fa-fw'></i> Close</button>
+  <button type="button" id="run" class="btn btn-success"><i class='fa fa-play fa-fw'></i> RUN NOW</button>
 </div>
 
 <script>

@@ -96,9 +96,9 @@ echo '
 ?>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-  <button type="button" id="remove" class="btn btn-danger">Remove This vCenter</button>
-  <button type="submit" id="submit" class="btn btn-primary">Save changes</button>
+  <button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa fa-undo fa-fw'></i> Cancel</button>
+  <button type="button" id="remove" class="btn btn-danger"><i class='fa fa-trash fa-fw'></i> Remove This vCenter</button>
+  <button type="submit" id="submit" class="btn btn-primary"><i class='fa fa-floppy-o fa-fw'></i> Save changes</button>
 </div>
 </form>
 
