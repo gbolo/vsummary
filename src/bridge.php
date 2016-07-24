@@ -122,7 +122,7 @@ function test_vcenter_creds($host, $user, $pass){
   rtrim($fields_string, '&');
 
   $opt = array(
-    CURLOPT_URL            => "http://10.0.77.77:5000/vc_uuid",
+    CURLOPT_URL            => "http://127.0.0.1:5000/vc_uuid",
     CURLOPT_USERAGENT      => "LinuxAPI",
     CURLOPT_CUSTOMREQUEST  => "POST",
     CURLOPT_POST           => count($fields),
@@ -168,7 +168,7 @@ function poll_vcenter($host, $user, $pass){
   rtrim($fields_string, '&');
 
   $opt = array(
-    CURLOPT_URL            => "http://10.0.77.77:5000/poll",
+    CURLOPT_URL            => "http://127.0.0.1:5000/poll",
     CURLOPT_USERAGENT      => "LinuxAPI",
     CURLOPT_CUSTOMREQUEST  => "POST",
     CURLOPT_POST           => count($fields),

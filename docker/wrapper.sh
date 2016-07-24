@@ -58,7 +58,7 @@ if [ ! -d "$DATA_DIR/mysql" ]; then
 EOSQL
 
   mysql_options="$mysql_options -p${MYSQL_ROOT_PASSWORD}"
-  
+
   # create vsummary database and user
   mysql $mysql_options -e "CREATE DATABASE IF NOT EXISTS vsummary ;"
   mysql $mysql_options -e "CREATE USER 'vsummary'@'%' IDENTIFIED BY 'changeme' ;"

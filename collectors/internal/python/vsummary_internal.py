@@ -83,8 +83,7 @@ def poll_vc():
         if content.about.instanceUuid:
             vc_uuid = content.about.instanceUuid
             http_status = 200
-            #api_url = "http://vsummary.midgar.dev/api/update.php"
-            api_url = "http://127.0.0.1:7777/api/update.php"
+            api_url = "http://127.0.0.1/api/update.php"
             result = {}
             result['ESXi'] = host_inventory(si, vc_uuid, api_url)
             result['VM'] = vm_inventory(si, vc_uuid, api_url)
@@ -874,7 +873,7 @@ def send_vsummary_data(data, url):
 def get_vcenter_poller_info(vc_uuid):
   # Connect to the database
   connection = pymysql.connect(host='127.0.0.1',
-                               port=13306,
+                               port=3306,
                                user='vsummary',
                                password='changeme',
                                db='vsummary',
