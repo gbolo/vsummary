@@ -283,7 +283,7 @@ SELECT
   coalesce(COUNT(distinct vnic.id),0) AS vnics,
   coalesce(cluster.name,'n/a') AS cluster,
   coalesce(resourcepool.full_path,'n/a') AS pool,
-  datacenter.name AS datacenter,
+  (SELECT name from datacenter WHERE esxi_folder_id = cluster.datacenter_id) as datacenter,
   vcenter.fqdn AS vcenter_fqdn,
   vcenter.short_name AS vcenter_short_name
 FROM    vm
@@ -304,9 +304,6 @@ ON      vm.esxi_id = esxi.id
 LEFT JOIN
         cluster
 ON      esxi.cluster_id = cluster.id
-LEFT JOIN
-        datacenter
-ON      cluster.datacenter_id = datacenter.esxi_folder_id
 LEFT JOIN
         resourcepool
 ON      vm.resourcepool_id = resourcepool.id
