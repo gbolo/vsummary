@@ -170,7 +170,8 @@ disk_object_id VARCHAR(32),
 vm_id VARCHAR(32),
 esxi_id VARCHAR(32),
 vcenter_id VARCHAR(36),
-present TINYINT DEFAULT 1
+present TINYINT DEFAULT 1,
+KEY `vmid_ix` (`vm_id`)
 );
 
 CREATE TABLE vcenter
@@ -237,7 +238,8 @@ status VARCHAR(16),
 vm_id VARCHAR(32),
 portgroup_id VARCHAR(32),
 vcenter_id VARCHAR(36),
-present TINYINT DEFAULT 1
+present TINYINT DEFAULT 1,
+KEY `vmid_ix` (`vm_id`)
 );
 
 
@@ -271,48 +273,29 @@ CREATE VIEWS TO SIMPLIFY QUEIRES IN APPLICATION
 */
 
 
-CREATE VIEW view_vm AS
+CREATE OR REPLACE VIEW view_vm AS
 SELECT
   vm.*,
-  folder.full_path AS folder,
-  esxi.name AS esxi_name,
-  esxi.current_evc AS esxi_current_evc,
-  esxi.status AS esxi_status,
-  esxi.cpu_model AS esxi_cpu_model,
-  coalesce(COUNT(distinct vdisk.id),0) AS vdisks,
-  coalesce(COUNT(distinct vnic.id),0) AS vnics,
-  coalesce(cluster.name,'n/a') AS cluster,
-  coalesce(resourcepool.full_path,'n/a') AS pool,
-  (SELECT name from datacenter WHERE esxi_folder_id = cluster.datacenter_id) as datacenter,
-  vcenter.fqdn AS vcenter_fqdn,
-  vcenter.short_name AS vcenter_short_name
-FROM    vm
-LEFT JOIN
-        folder
-ON      vm.folder_id = folder.id
-LEFT JOIN
-        vdisk
-ON      vm.id = vdisk.vm_id
-    AND vdisk.present = 1
-LEFT JOIN
-        vnic
-ON      vm.id = vnic.vm_id
-    AND vnic.present = 1
-LEFT JOIN
-        esxi
-ON      vm.esxi_id = esxi.id
-LEFT JOIN
-        cluster
-ON      esxi.cluster_id = cluster.id
-LEFT JOIN
-        resourcepool
-ON      vm.resourcepool_id = resourcepool.id
-LEFT JOIN
-        vcenter
-ON      vm.vcenter_id = vcenter.id
-WHERE vm.present = 1
-GROUP BY
-        vm.id;
+  (SELECT full_path FROM folder WHERE id = vm.folder_id) AS folder,
+  e.name AS esxi_name,
+  e.current_evc AS esxi_current_evc,
+  e.status AS esxi_status,
+  e.cpu_model AS esxi_cpu_model,
+  (SELECT COUNT(1) FROM vdisk WHERE vm_id = vm.id and present = 1) AS vdisks,
+  (SELECT COUNT(1) FROM vnic WHERE vm_id = vm.id and present = 1) AS vnics,
+  COALESCE((SELECT name FROM cluster WHERE id = e.cluster_id), 'n/a') AS cluster,
+  COALESCE((SELECT full_path FROM resourcepool WHERE id = vm.resourcepool_id), 'n/a') AS pool,
+  (SELECT name FROM datacenter WHERE esxi_folder_id = (SELECT datacenter_id FROM cluster WHERE id = e.cluster_id)) AS datacenter,
+  vc.fqdn AS vcenter_fqdn,
+  vc.short_name AS vcenter_short_name
+FROM
+  vm,
+  esxi e,
+  vcenter vc
+WHERE
+  e.id = vm.esxi_id AND
+  vc.id = vm.vcenter_id AND
+  vm.present = 1;
 
 
 CREATE VIEW view_vnic AS
