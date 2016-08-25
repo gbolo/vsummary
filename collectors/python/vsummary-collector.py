@@ -48,8 +48,8 @@ from tools import cli
 from tools import pchelper
 
 # Version information
-build_ver = 'v1.01'
-build_date = '2016-07-17'
+build_ver = 'v1.02'
+build_date = '2016-08-25'
 
 
 START = clock()
@@ -483,9 +483,11 @@ def host_inventory(si, vc_uuid, api_url):
                     pnic_compat['name'] = pnic.device
                     pnic_compat['mac'] = pnic.mac
                     pnic_compat['driver'] = pnic.driver
-                    pnic_compat['link_speed'] = "Down"
+
                     if hasattr(pnic.linkSpeed, 'speedMb'):
                         pnic_compat['link_speed'] = pnic.linkSpeed.speedMb
+                    else:
+                        pnic_compat['link_speed'] = 0
 
                     pnic_data_compat.append(pnic_compat)
 
