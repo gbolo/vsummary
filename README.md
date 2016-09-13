@@ -1,6 +1,9 @@
 ![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/src/img/vsummary_logo.png "vSummary Logo")
 
+[![](https://images.microbadger.com/badges/image/gbolo/vsummary.svg)](http://microbadger.com/images/gbolo/vsummary "Image Badge")
+
 vSummary is an open source  tool for collecting and displaying a summary of your vSphere Environment(s).
+
 
 For a **LIVE DEMO**, please click this link: 
 **[vsummary.linuxctl.com](https://vsummary.linuxctl.com/index.php?view=vm)**
