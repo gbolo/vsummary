@@ -20,7 +20,7 @@ ENV LANG="en_US.UTF-8" \
 # -----------------------------------------------------------------------------
 RUN apk add --no-cache bash supervisor mariadb mariadb-client \
     nginx php5-fpm php5-pdo php5-json php5-curl php5-pdo_mysql \
-    python python-dev uwsgi uwsgi-python py-pip \
+    python python-dev uwsgi uwsgi-python py2-pip \
     && pip install pyvmomi flask pymysql
 
 # -----------------------------------------------------------------------------
