@@ -9,7 +9,7 @@
  - failed transactions or bad POST data will result in 500 response code
 
  **Disclaimer**
- This script currently does not do much error checking or validation. 
+ This script currently does not do much error checking or validation.
  It expects to recieve very specific post data.
  STILL UNDER HEAVY DEVELOPMENT
 
@@ -36,7 +36,7 @@ function update_vcenter($data){
         $pdo->beginTransaction();
 
         // prepare statement to avoid sql injections
-        $stmt = $pdo->prepare('INSERT INTO vcenter (id, fqdn, short_name) ' . 
+        $stmt = $pdo->prepare('INSERT INTO vcenter (id, fqdn, short_name) ' .
                 'VALUES(:id, :fqdn, :short_name) ' .
                 'ON DUPLICATE KEY UPDATE fqdn=VALUES(fqdn), short_name=VALUES(short_name)');
 
@@ -68,7 +68,7 @@ function update_vnic($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -78,7 +78,7 @@ function update_vnic($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO vnic (id, name, mac, type, connected, status, vm_id, portgroup_id, vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO vnic (id, name, mac, type, connected, status, vm_id, portgroup_id, vcenter_id) ' .
                     'VALUES(:id, :name, :mac, :type, :connected, :status, :vm_id, :portgroup_id, :vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name), mac=VALUES(mac), type=VALUES(type), connected=VALUES(connected), status=VALUES(status), vm_id=VALUES(vm_id), portgroup_id=VALUES(portgroup_id), present=1');
 
@@ -138,7 +138,7 @@ function update_esxi($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -148,7 +148,7 @@ function update_esxi($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO esxi (id,name,cluster_id,moref,max_evc,current_evc,status,power_state,in_maintenance_mode,vendor,model,uuid,memory_bytes,cpu_model,cpu_mhz,cpu_sockets,cpu_cores,cpu_threads,nics,hbas,version,build,stat_cpu_usage,stat_memory_usage,stat_uptime_sec,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO esxi (id,name,cluster_id,moref,max_evc,current_evc,status,power_state,in_maintenance_mode,vendor,model,uuid,memory_bytes,cpu_model,cpu_mhz,cpu_sockets,cpu_cores,cpu_threads,nics,hbas,version,build,stat_cpu_usage,stat_memory_usage,stat_uptime_sec,vcenter_id) ' .
                     'VALUES(:id,:name,:cluster_id,:moref,:max_evc,:current_evc,:status,:power_state,:in_maintenance_mode,:vendor,:model,:uuid,:memory_bytes,:cpu_model,:cpu_mhz,:cpu_sockets,:cpu_cores,:cpu_threads,:nics,:hbas,:version,:build,:stat_cpu_usage,:stat_memory_usage,:stat_uptime_sec,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),cluster_id=VALUES(cluster_id),moref=VALUES(moref),max_evc=VALUES(max_evc),current_evc=VALUES(current_evc),status=VALUES(status),power_state=VALUES(power_state),in_maintenance_mode=VALUES(in_maintenance_mode),vendor=VALUES(vendor),model=VALUES(model),uuid=VALUES(uuid),memory_bytes=VALUES(memory_bytes),cpu_model=VALUES(cpu_model),cpu_mhz=VALUES(cpu_mhz),cpu_sockets=VALUES(cpu_sockets),cpu_cores=VALUES(cpu_cores),cpu_threads=VALUES(cpu_threads),nics=VALUES(nics),hbas=VALUES(hbas),version=VALUES(version),build=VALUES(build),stat_cpu_usage=VALUES(stat_cpu_usage),stat_memory_usage=VALUES(stat_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),vcenter_id=VALUES(vcenter_id),present=1');
 
@@ -241,7 +241,7 @@ function update_vm($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -251,9 +251,9 @@ function update_vm($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,template,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,folder_id,vapp_id,resourcepool_id,esxi_id,vcenter_id) ' . 
-                    'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:template,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:folder_id,:vapp_id,:resourcepool_id,:esxi_id,:vcenter_id) ' .
-                    'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),template=VALUES(template),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),folder_id=VALUES(folder_id),vapp_id=VALUES(vapp_id),resourcepool_id=VALUES(resourcepool_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
+            $stmt = $pdo->prepare('INSERT INTO vm (id,name,moref,vmx_path,vcpu,memory_mb,template,config_guest_os,config_version,smbios_uuid,instance_uuid,config_change_version,guest_tools_version,guest_tools_running,guest_hostname,guest_ip,guest_os,stat_cpu_usage,stat_host_memory_usage,stat_guest_memory_usage,stat_uptime_sec,power_state,folder_id,vapp_id,resourcepool_id,esxi_id,vcenter_id) ' .
+                    'VALUES(:id,:name,:moref,:vmx_path,:vcpu,:memory_mb,:template,:config_guest_os,:config_version,:smbios_uuid,:instance_uuid,:config_change_version,:guest_tools_version,:guest_tools_running,:guest_hostname,:guest_ip,:guest_os,:stat_cpu_usage,:stat_host_memory_usage,:stat_guest_memory_usage,:stat_uptime_sec,:power_state,:folder_id,:vapp_id,:resourcepool_id,:esxi_id,:vcenter_id) ' .
+                    'ON DUPLICATE KEY UPDATE id=VALUES(id),name=VALUES(name),moref=VALUES(moref),vmx_path=VALUES(vmx_path),vcpu=VALUES(vcpu),memory_mb=VALUES(memory_mb),template=VALUES(template),config_guest_os=VALUES(config_guest_os),config_version=VALUES(config_version),smbios_uuid=VALUES(smbios_uuid),instance_uuid=VALUES(instance_uuid),config_change_version=VALUES(config_change_version),guest_tools_version=VALUES(guest_tools_version),guest_tools_running=VALUES(guest_tools_running),guest_hostname=VALUES(guest_hostname),guest_ip=VALUES(guest_ip),guest_os=VALUES(guest_os),stat_cpu_usage=VALUES(stat_cpu_usage),stat_host_memory_usage=VALUES(stat_host_memory_usage),stat_guest_memory_usage=VALUES(stat_guest_memory_usage),stat_uptime_sec=VALUES(stat_uptime_sec),power_state=VALUES(power_state),folder_id=VALUES(folder_id),vapp_id=VALUES(vapp_id),resourcepool_id=VALUES(resourcepool_id),esxi_id=VALUES(esxi_id),vcenter_id=VALUES(vcenter_id),present=1');
 
             foreach ($data as $vm) {
 
@@ -285,6 +285,7 @@ function update_vm($data){
                 $guest_tools_running = $vm['guest_tools_running'];
                 $guest_hostname = $vm['guest_hostname'];
                 $guest_ip = $vm['guest_ip'];
+                $guest_os = $vm['guest_os'];
                 $stat_cpu_usage = $vm['stat_cpu_usage'];
                 $stat_host_memory_usage = $vm['stat_host_memory_usage'];
                 $stat_guest_memory_usage = $vm['stat_guest_memory_usage'];
@@ -300,6 +301,10 @@ function update_vm($data){
                     $guest_hostname = 'n/a';
                     $guest_tools_version = 'n/a';
                     $guest_ip = 'n/a';
+                }
+
+                if ( $guest_os == '' ) {
+                  $guest_os = 'unknown';
                 }
 
                 $stmt->bindParam(':id', $id, PDO::PARAM_STR);
@@ -321,6 +326,7 @@ function update_vm($data){
                 $stmt->bindParam(':guest_tools_running', $guest_tools_running, PDO::PARAM_STR);
                 $stmt->bindParam(':guest_hostname', $guest_hostname, PDO::PARAM_STR);
                 $stmt->bindParam(':guest_ip', $guest_ip, PDO::PARAM_STR);
+                $stmt->bindParam(':guest_os', $guest_os, PDO::PARAM_STR);
                 $stmt->bindParam(':stat_cpu_usage', $stat_cpu_usage, PDO::PARAM_STR);
                 $stmt->bindParam(':stat_host_memory_usage', $stat_host_memory_usage, PDO::PARAM_STR);
                 $stmt->bindParam(':stat_guest_memory_usage', $stat_guest_memory_usage, PDO::PARAM_STR);
@@ -355,7 +361,7 @@ function update_resourcepool($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -365,7 +371,7 @@ function update_resourcepool($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO resourcepool (id,moref,name,type,status,vapp_state,parent,parent_moref,cluster_id,configured_memory_mb,cpu_reservation,cpu_limit,mem_reservation,mem_limit,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO resourcepool (id,moref,name,type,status,vapp_state,parent,parent_moref,cluster_id,configured_memory_mb,cpu_reservation,cpu_limit,mem_reservation,mem_limit,vcenter_id) ' .
                     'VALUES(:id,:moref,:name,:type,:status,:vapp_state,:parent,:parent_moref,:cluster_id,:configured_memory_mb,:cpu_reservation,:cpu_limit,:mem_reservation,:mem_limit,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),status=VALUES(status),vapp_state=VALUES(vapp_state),parent=VALUES(parent),parent_moref=VALUES(parent_moref),cluster_id=VALUES(cluster_id),configured_memory_mb=VALUES(configured_memory_mb),cpu_reservation=VALUES(cpu_reservation),cpu_limit=VALUES(cpu_limit),mem_reservation=VALUES(mem_reservation),mem_limit=VALUES(mem_limit),present=1');
 
@@ -440,7 +446,7 @@ function update_datastore($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -450,7 +456,7 @@ function update_datastore($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO datastore (id,name,moref,status,capacity_bytes,free_bytes,uncommitted_bytes,type,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO datastore (id,name,moref,status,capacity_bytes,free_bytes,uncommitted_bytes,type,vcenter_id) ' .
                     'VALUES(:id,:name,:moref,:status,:capacity_bytes,:free_bytes,:uncommitted_bytes,:type,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),status=VALUES(status),capacity_bytes=VALUES(capacity_bytes),free_bytes=VALUES(free_bytes),uncommitted_bytes=VALUES(uncommitted_bytes),type=VALUES(type),present=1');
 
@@ -501,7 +507,7 @@ function update_vdisk($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -511,7 +517,7 @@ function update_vdisk($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO vdisk (id,name,capacity_bytes,path,thin_provisioned,datastore_id,uuid,disk_object_id,vm_id,esxi_id,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO vdisk (id,name,capacity_bytes,path,thin_provisioned,datastore_id,uuid,disk_object_id,vm_id,esxi_id,vcenter_id) ' .
                     'VALUES(:id,:name,:capacity_bytes,:path,:thin_provisioned,:datastore_id,:uuid,:disk_object_id,:vm_id,:esxi_id,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),capacity_bytes=VALUES(capacity_bytes),path=VALUES(path),thin_provisioned=VALUES(thin_provisioned),datastore_id=VALUES(datastore_id),uuid=VALUES(uuid),vm_id=VALUES(vm_id),esxi_id=VALUES(esxi_id),present=1');
 
@@ -563,7 +569,7 @@ function update_vdisk($data){
 }
 
 function update_pnic($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
 
     if ( isset($data[0]['empty']) ){
@@ -571,7 +577,7 @@ function update_pnic($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -581,7 +587,7 @@ function update_pnic($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO pnic (id,name,mac,link_speed,driver,esxi_id,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO pnic (id,name,mac,link_speed,driver,esxi_id,vcenter_id) ' .
                     'VALUES(:id,:name,:mac,:link_speed,:driver,:esxi_id,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),mac=VALUES(mac),link_speed=VALUES(link_speed),driver=VALUES(driver),present=1');
 
@@ -620,7 +626,7 @@ function update_pnic($data){
 }
 
 function update_dvs($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
     $type = 'DVS';
 
@@ -639,7 +645,7 @@ function update_dvs($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,version,max_mtu,ports,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,version,max_mtu,ports,vcenter_id) ' .
                     'VALUES(:id,:name,:type,:version,:max_mtu,:ports,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),version=VALUES(version),max_mtu=VALUES(max_mtu),ports=VALUES(ports),present=1');
 
@@ -677,7 +683,7 @@ function update_dvs($data){
 }
 
 function update_svs($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
     $type = 'vSwitch';
 
@@ -696,7 +702,7 @@ function update_svs($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,esxi_id,max_mtu,ports,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO vswitch (id,name,type,esxi_id,max_mtu,ports,vcenter_id) ' .
                     'VALUES(:id,:name,:type,:esxi_id,:max_mtu,:ports,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE max_mtu=VALUES(max_mtu),ports=VALUES(ports),present=1');
 
@@ -734,7 +740,7 @@ function update_svs($data){
 }
 
 function update_dvspg($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
     $type = 'DVS';
 
@@ -743,7 +749,7 @@ function update_dvspg($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -753,7 +759,7 @@ function update_dvspg($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' .
                     'VALUES(:id,:name,:type,:vlan,:vlan_type,:vswitch_id,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),vlan=VALUES(vlan),vlan_type=VALUES(vlan_type),vswitch_id=VALUES(vswitch_id),vcenter_id=VALUES(vcenter_id),present=1');
 
@@ -797,7 +803,7 @@ function update_dvspg($data){
 }
 
 function update_svspg($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
     $type = 'vSwitch';
 
@@ -806,7 +812,7 @@ function update_svspg($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -816,7 +822,7 @@ function update_svspg($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO portgroup (id,name,type,vlan,vlan_type,vswitch_id,vcenter_id) ' .
                     'VALUES(:id,:name,:type,:vlan,:vlan_type,:vswitch_id,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),vlan=VALUES(vlan),vlan_type=VALUES(vlan_type),vswitch_id=VALUES(vswitch_id),vcenter_id=VALUES(vcenter_id),present=1');
 
@@ -855,7 +861,7 @@ function update_svspg($data){
 }
 
 function update_datacenter($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
 
     if ( isset($data[0]['empty']) ){
@@ -863,7 +869,7 @@ function update_datacenter($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -873,7 +879,7 @@ function update_datacenter($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO datacenter (id,vm_folder_id,esxi_folder_id,name,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO datacenter (id,vm_folder_id,esxi_folder_id,name,vcenter_id) ' .
                     'VALUES(:id,:vm_folder_id,:esxi_folder_id,:name,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE vm_folder_id=VALUES(vm_folder_id),esxi_folder_id=VALUES(esxi_folder_id),name=VALUES(name),present=1');
 
@@ -908,7 +914,7 @@ function update_datacenter($data){
 }
 
 function update_cluster($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
 
     if ( isset($data[0]['empty']) ){
@@ -916,7 +922,7 @@ function update_cluster($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -926,7 +932,7 @@ function update_cluster($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO cluster (id,name,datacenter_id,current_balance,target_balance,total_cpu_threads,total_cpu_mhz,total_memory_bytes,total_vmotions,num_hosts,drs_enabled,drs_behaviour,ha_enabled,status,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO cluster (id,name,datacenter_id,current_balance,target_balance,total_cpu_threads,total_cpu_mhz,total_memory_bytes,total_vmotions,num_hosts,drs_enabled,drs_behaviour,ha_enabled,status,vcenter_id) ' .
                     'VALUES(:id,:name,:datacenter_id,:current_balance,:target_balance,:total_cpu_threads,:total_cpu_mhz,:total_memory_bytes,:total_vmotions,:num_hosts,:drs_enabled,:drs_behaviour,:ha_enabled,:status,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),current_balance=VALUES(current_balance),target_balance=VALUES(target_balance),datacenter_id=VALUES(datacenter_id),total_cpu_threads=VALUES(total_cpu_threads),total_cpu_mhz=VALUES(total_cpu_mhz),total_memory_bytes=VALUES(total_memory_bytes),total_vmotions=VALUES(total_vmotions),num_hosts=VALUES(num_hosts),drs_enabled=VALUES(drs_enabled),drs_behaviour=VALUES(drs_behaviour),ha_enabled=VALUES(ha_enabled),status=VALUES(status),present=1');
 
@@ -981,7 +987,7 @@ function update_cluster($data){
 }
 
 function update_folder($data){
-    
+
     $vcenter_id = $data[0]['vcenter_id'];
 
     if ( isset($data[0]['empty']) ){
@@ -989,7 +995,7 @@ function update_folder($data){
     } else {
         $EMPTY = false;
     }
-   
+
     try {
 
         global $pdo;
@@ -999,7 +1005,7 @@ function update_folder($data){
 
         if (!$EMPTY){
 
-            $stmt = $pdo->prepare('INSERT INTO folder (id,moref,name,type,parent,parent_datacenter_id,vcenter_id) ' . 
+            $stmt = $pdo->prepare('INSERT INTO folder (id,moref,name,type,parent,parent_datacenter_id,vcenter_id) ' .
                     'VALUES(:id,:moref,:name,:type,:parent,:parent_datacenter_id,:vcenter_id) ' .
                     'ON DUPLICATE KEY UPDATE name=VALUES(name),type=VALUES(type),parent=VALUES(parent),parent_datacenter_id=VALUES(parent_datacenter_id),present=1');
 
@@ -1049,7 +1055,7 @@ function update_folder($data){
         echo "Error in transaction: ".$e->getMessage();
         http_response_code(500);
     }
-    
+
 }
 
 function update_folder_full_path($vcenter_id){
@@ -1099,7 +1105,7 @@ function update_folder_full_path($vcenter_id){
                     $continue = false;
                 }
             }
-            
+
         }
     }
 
@@ -1122,7 +1128,7 @@ function update_folder_full_path($vcenter_id){
         }
 
         $full_path .= "/".$folder['name'];
-        
+
 
         try {
 
@@ -1130,7 +1136,7 @@ function update_folder_full_path($vcenter_id){
             $pdo->beginTransaction();
 
             // prepare statement to avoid sql injections
-            $stmt = $pdo->prepare('UPDATE folder ' . 
+            $stmt = $pdo->prepare('UPDATE folder ' .
                     'SET full_path=:full_path ' .
                     'WHERE id=' . $pdo->quote($folder['id']) );
 
@@ -1196,7 +1202,7 @@ function update_resourcepool_full_path($vcenter_id){
                 $continue = false;
             } else {
                 // since we are here, check if parent is vapp for migration purposes.
-                // we can do this by checking for a v after - 
+                // we can do this by checking for a v after -
                 if ( explode("-", $search_id)[1][0] == 'v' ){
                     $res['vapp_in_path'] = 1;
                 }
@@ -1205,7 +1211,7 @@ function update_resourcepool_full_path($vcenter_id){
                 $full_path_array[] = $resourcepools[$key]['name'];
                 $search_id = $resourcepools[$key]['parent_moref'];
             }
-            
+
         }
 
         // add the cluster and datacenter name
@@ -1235,7 +1241,7 @@ function update_resourcepool_full_path($vcenter_id){
             $pdo->beginTransaction();
 
             // prepare statement to avoid sql injections
-            $stmt = $pdo->prepare('UPDATE resourcepool ' . 
+            $stmt = $pdo->prepare('UPDATE resourcepool ' .
                     'SET full_path=:full_path, vapp_in_path=:vapp_in_path ' .
                     'WHERE id=' . $pdo->quote($rp_id) );
 
@@ -1304,7 +1310,7 @@ catch (PDOException $e) {
 // Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
-// quick data validation and manipulation to support single arrays 
+// quick data validation and manipulation to support single arrays
 if ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER") == 0 ){
     update_vcenter($data);
     exit();
@@ -1383,4 +1389,3 @@ switch ($object_type) {
 
 
 ?>
-

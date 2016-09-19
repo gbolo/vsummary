@@ -1,5 +1,5 @@
 <?php
- 
+
 // Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
@@ -16,12 +16,13 @@ use Ozdemir\Datatables\DB\MySQL;
 $dt = new Datatables(new MySQL($config));
 
 // Query
-$dt->query('SELECT 
+$dt->query('SELECT
 name,
 folder,
 vcpu,
 memory_mb,
 power_state,
+guest_os,
 config_guest_os,
 config_version,
 config_change_version,

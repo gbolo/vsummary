@@ -3,22 +3,22 @@
 #
 #  Copyright (c) 2016 Frank Felhoffer, George Bolo
 #
-#  Permission is hereby granted, free of charge, to any person obtaining a 
+#  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
-#  the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-#  and/or sell copies of the Software, and to permit persons to whom the 
+#  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
 #
-#  The above copyright notice and this permission notice shall be included 
+#  The above copyright notice and this permission notice shall be included
 #  in all copies or substantial portions of the Software.
 #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 #  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 #
 
@@ -130,7 +130,7 @@ def vm_inventory(si, vc_uuid, api_url):
                      "config.hardware.device",
                      "config.guestId",
                      "config.version",
-                     "config.uuid", 
+                     "config.uuid",
                      "config.instanceUuid",
                      "config.changeVersion",
                      "config.template",
@@ -139,6 +139,7 @@ def vm_inventory(si, vc_uuid, api_url):
                      "guest.toolsRunningStatus",
                      "guest.hostName",
                      "guest.ipAddress",
+                     "guest.guestId",
                      "guest.guestState",
                      "parent",
                      "parentVApp",
@@ -191,7 +192,7 @@ def vm_inventory(si, vc_uuid, api_url):
         vm_compat['guest_tools_running'] = vm['guest.toolsRunningStatus'] if "guest.toolsRunningStatus" in vm else None
         vm_compat['guest_hostname'] = vm['guest.hostName'] if "guest.hostName" in vm else None
         vm_compat['guest_ip'] = vm['guest.ipAddress'] if "guest.ipAddress" in vm else None
-        vm_compat['config_guest_os'] = vm['config.guestId'] if "config.guestId" in vm else None
+        vm_compat['guest_os'] = vm['guest.guestId'] if "guest.guestId" in vm else None
         vm_compat['folder_moref'] = vm['parent']._moId if "parent" in vm else None
         vm_compat['vapp_moref'] = vm['parentVApp']._moId if "parentVApp" in vm else None
         vm_compat['resourcepool_moref'] = vm['resourcePool']._moId if "resourcePool" in vm else None
@@ -322,7 +323,7 @@ def vm_inventory(si, vc_uuid, api_url):
         print(json.dumps(vnic_data_compat, indent=4, sort_keys=True))
         print(json.dumps(vdisk_data_compat, indent=4, sort_keys=True))
 
-    
+
 def respool_inventory(si, vc_uuid, api_url):
 
     # TODO: vApp Support might be added
@@ -875,7 +876,7 @@ def main():
 
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
     context.verify_mode = ssl.CERT_NONE
-    
+
     si = SmartConnect(host=args.host, user=args.user, pwd=password, port=int(args.port), sslContext=context)
 
     if not si:

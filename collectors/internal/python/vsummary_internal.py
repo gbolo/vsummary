@@ -142,6 +142,7 @@ def vm_inventory(si, vc_uuid, api_url):
                      "guest.toolsRunningStatus",
                      "guest.hostName",
                      "guest.ipAddress",
+                     "guest.guestId",
                      "guest.guestState",
                      "parent",
                      "parentVApp",
@@ -194,7 +195,7 @@ def vm_inventory(si, vc_uuid, api_url):
         vm_compat['guest_tools_running'] = vm['guest.toolsRunningStatus'] if "guest.toolsRunningStatus" in vm else None
         vm_compat['guest_hostname'] = vm['guest.hostName'] if "guest.hostName" in vm else None
         vm_compat['guest_ip'] = vm['guest.ipAddress'] if "guest.ipAddress" in vm else None
-        vm_compat['config_guest_os'] = vm['config.guestId'] if "config.guestId" in vm else None
+        vm_compat['guest_os'] = vm['guest.guestId'] if "guest.guestId" in vm else None
         vm_compat['folder_moref'] = vm['parent']._moId if "parent" in vm else None
         vm_compat['vapp_moref'] = vm['parentVApp']._moId if "parentVApp" in vm else None
         vm_compat['resourcepool_moref'] = vm['resourcePool']._moId if "resourcePool" in vm else None

@@ -7,7 +7,7 @@ vSummary - https://github.com/gbolo/vSummary
 
 
 DESCRIPTION:
-    The Function of this script is to retrieve data from vcenter; 
+    The Function of this script is to retrieve data from vcenter;
     then send that data via http POST to a local/remote php server in JSON format.
 
 TODO:
@@ -24,7 +24,7 @@ function Send-VSVSummaryData($json, $url)
     # maybe add gzip and auth or api key?
     try {
         $request = Invoke-WebRequest -Uri $url -Body $json -ContentType "application/json" -Method Post -ErrorAction SilentlyContinue
-    } 
+    }
     catch [System.Net.WebException] {
         $request = $_.Exception.Response
         return 500
@@ -79,8 +79,8 @@ Function Get-VSVirtualMachine ( [string]$vc_uuid ){
         Runtime.Host | %{
             $vm = $_
             New-Object -TypeName PSobject -Property @{
-                name = $vm.Name  
-                moref = $vm.MoRef.Value              
+                name = $vm.Name
+                moref = $vm.MoRef.Value
                 vmx_path = $vm.Config.Files.VmPathName
                 vcpu = $vm.Config.Hardware.NumCPU
                 memory_mb = $vm.Config.Hardware.MemoryMB
@@ -93,6 +93,7 @@ Function Get-VSVirtualMachine ( [string]$vc_uuid ){
                 guest_tools_running = $vm.Guest.ToolsRunningStatus
                 guest_hostname = $vm.Guest.Hostname
                 guest_ip = $vm.Guest.IpAddress
+                guest_os = $vm.Guest.GuestId
                 stat_cpu_usage = $vm.Summary.Quickstats.OverallCpuUsage
                 stat_host_memory_usage = $vm.Summary.Quickstats.HostMemoryUsage
                 stat_guest_memory_usage = $vm.Summary.Quickstats.GuestMemoryUsage
@@ -135,7 +136,7 @@ Function Get-VSResourcePool ( [string]$vc_uuid ){
             }
 
             New-Object -TypeName PSobject -Property @{
-                name = $res.Name  
+                name = $res.Name
                 moref = $res.MoRef.Value
                 type = $type
                 status = $res.OverallStatus
@@ -196,7 +197,7 @@ Function Get-VSVirtualNic ( [string]$vc_uuid ){
                     $vswitch_name = $dvs_vm_obj.Name
                     $vswitch_type = if ($dvs_vm_obj) {$dvs_vm_obj.GetType().Name} else {"dvSwitch type not found"}
                     break;
-                } 
+                }
             }
 
             New-Object -TypeName PSobject -Property @{
@@ -455,7 +456,7 @@ Function Get-VSDistributedPortGroup ( [string]$vc_uuid ){
             New-Object -TypeName PSobject -Property @{
                 name = $pg.Name
                 moref = $pg.MoRef.Value
-                vlan_type  = $vlan_type 
+                vlan_type  = $vlan_type
                 vlan = $vlan
                 vlan_start = $vlan_start
                 vlan_end = $vlan_end
@@ -541,7 +542,7 @@ Function Get-VSVirtualDisk ( [string]$vc_uuid ){
                     datastore_moref = $vdisk.Backing.Datastore.Value
                     uuid = $vdisk.Backing.uuid
                     disk_object_id = $vdisk.diskObjectId
-                    vm_moref = $vm.MoRef.Value              
+                    vm_moref = $vm.MoRef.Value
                     esxi_moref = $vm.Runtime.Host.Value
                     vcenter_id = $vc_uuid
                     objecttype = $objecttype
@@ -578,7 +579,7 @@ function Invoke-VSFunctions( [string]$vc_uuid, [string]$url ){
         $strFunctionToInvoke = $hshChecksToRun[$strThisCheckTopic]
         $json = & $strFunctionToInvoke $vc_uuid
         # Check if $json is empty
-        if (!$json) { 
+        if (!$json) {
             $vc_obj = New-Object -TypeName PSobject -Property @{
                 vcenter_id = $vc_uuid
                 objecttype = $strThisCheckTopic
@@ -601,12 +602,12 @@ foreach($vc in $vcenters.Keys)
     $vc_fqdn = $vcenters.Item($vc).fqdn
     $vc_user = $vcenters.Item($vc).readonly_user
     $vc_pass = $vcenters.Item($vc).password
-    
+
     if ($global:DefaultVIServers.Count -gt 0) {
         Disconnect-VIServer -Server * -Force -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
     }
 
-    $c = Connect-VIServer $vc_fqdn -user $vc_user -password $vc_pass 
+    $c = Connect-VIServer $vc_fqdn -user $vc_user -password $vc_pass
 
     if ($c){
         $vc_uuid = $c.InstanceUuid
@@ -632,7 +633,7 @@ foreach($vc in $vcenters.Keys)
     } Else {
         Write-Host "Could not connect to $vc_fqdn"
     }
-    
+
 }
 
 if ($global:DefaultVIServers.Count -gt 0) {
