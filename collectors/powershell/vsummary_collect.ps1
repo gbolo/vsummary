@@ -68,6 +68,7 @@ Function Get-VSVirtualMachine ( [string]$vc_uuid ){
         Guest.ToolsRunningStatus,
         Guest.Hostname,
         Guest.IpAddress,
+        Guest.GuestId,
         Parent,
         ParentVApp,
         ResourcePool,
