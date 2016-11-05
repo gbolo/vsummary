@@ -1,6 +1,25 @@
 <?php
 /*
 
+  Permission is hereby granted, free of charge, to any person obtaining a
+  copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  and/or sell copies of the Software, and to permit persons to whom the
+  Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included
+  in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  DEALINGS IN THE SOFTWARE.
+
+
  Simple API (using the term API losely here) to receive the
  POST json data sent from the PowerCLI script and modify/insert it
  into the various mysql tables.
@@ -1310,18 +1329,103 @@ catch (PDOException $e) {
 // Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
+
+// If the task parameter is supplied it will be more like a query
+if (isset($data['task'])) {
+
+    // task == query
+    if (!strcasecmp($data['task'], "query")) {
+
+        if (!isset($data['type'])) {
+
+            $data = array("status" => "error", "reason" => 
+                "task == query, but type is not specified");
+            $json = json_encode($data);
+            echo $json;
+            http_response_code(500);
+            exit();
+        }
+
+        // type == dashboard
+        if (!strcasecmp($data['type'], "dashboard")) {
+
+            if (isset($data['vcenter'])) {
+
+                // Check if the vcenter exists
+                $query = "SELECT COUNT(1) as cnt FROM vcenter WHERE " .
+                    "short_name = :sn";
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array("sn" => $data['vcenter']));
+                $res = $stmt->fetchAll();
+                
+                if ($res[0]['cnt'] == 0) {
+
+                    $data = array("status" => "error", 
+                        "reason" => "vcenter not found!");
+                    $json = json_encode($data);
+                    echo $json;
+                    http_response_code(500);
+                    exit();
+                }
+            }
+
+            $query = "SELECT (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(" .
+                "full_path, '/',  2), '/', -1) FROM folder WHERE id = " .
+                "vm.folder_id) AS folder, COUNT(1) as cnt, SUM(vcpu) as " .
+                "vcpu, ROUND(SUM(memory_mb) / 1024) as ram, SUM(COALESCE(" .
+                "(SELECT ROUND(SUM(capacity_bytes) / 1024 / 1024 / 1024) " .
+                "FROM vdisk WHERE vm_id = vm.id and present = 1), 0)) AS " .
+                "vdisk FROM vm WHERE vm.present = 1 AND vcenter_id IN (" .
+                "SELECT id FROM vcenter WHERE short_name LIKE :sn) GROUP " .
+                "BY folder;";
+            
+            $short_name = isset($data['vcenter']) ? $data['vcenter'] : '%';
+
+            try {
+
+                $stmt = $pdo->prepare($query);
+                $stmt->bindValue(':sn', $short_name, PDO::PARAM_STR);
+                $stmt->execute();
+            }
+
+            catch (PDOException $e) {
+
+                echo "Database exception!";
+                http_response_code(500); 
+                exit();
+            }
+
+            $json = json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+
+            echo $json;
+            exit(); 
+        }
+    }
+}
+
 // quick data validation and manipulation to support single arrays
-if ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER") == 0 ){
+if (isset($data['objecttype']) && strcasecmp($data['objecttype'], "VCENTER") == 0) {
+
     update_vcenter($data);
     exit();
-} elseif ( isset($data['objecttype']) && strcasecmp($data['objecttype'],"VCENTER") != 0 ){
+}
+
+elseif (isset($data['objecttype']) && strcasecmp($data['objecttype'], "VCENTER") != 0) {
+
     $post_data[0] = $data;
     $object_type = $data['objecttype'];
-} elseif ( isset($data[0]['objecttype']) ){
+}
+
+elseif (isset($data[0]['objecttype'])) {
+
     $post_data = $data;
     $object_type = $data[0]['objecttype'];
-} else {
-    echo "Invalid data";
+}
+
+else {
+
+    echo "Invalid data (1)";
     http_response_code(500);
     exit();
 }
@@ -1371,7 +1475,7 @@ switch ($object_type) {
         update_cluster($post_data);
         break;
     default:
-        echo "Invalid data";
+        echo "Invalid data (2)";
         http_response_code(500);
 }
 
