@@ -1375,7 +1375,7 @@ if (isset($data['task'])) {
                 "vm.folder_id) AS folder, SUM(IF(power_state = 1, 1, 0)) " .
                 "cnt_on, SUM(IF(power_state = 0, 1, 0)) cnt_off, SUM(IF(" .
                 "power_state = 1, vcpu, 0)) vcpu, ROUND(SUM(IF(power_state ".
-                "= 0, memory_mb, 0)) / 1024) ram, SUM(COALESCE((SELECT " .
+                "= 1, memory_mb, 0)) / 1024) ram, SUM(COALESCE((SELECT " .
                 "ROUND(SUM(capacity_bytes) / 1024 / 1024 / 1024) FROM " .
                 "vdisk WHERE vm_id = vm.id and present = 1), 0)) AS vdisk " .
                 "FROM vm WHERE present = 1 AND vcenter_id IN (SELECT id " .
