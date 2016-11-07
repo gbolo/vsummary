@@ -1372,13 +1372,14 @@ if (isset($data['task'])) {
 
             $query = "SELECT (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(" .
                 "full_path, '/',  2), '/', -1) FROM folder WHERE id = " .
-                "vm.folder_id) AS folder, COUNT(1) as cnt, SUM(vcpu) as " .
-                "vcpu, ROUND(SUM(memory_mb) / 1024) as ram, SUM(COALESCE(" .
-                "(SELECT ROUND(SUM(capacity_bytes) / 1024 / 1024 / 1024) " .
-                "FROM vdisk WHERE vm_id = vm.id and present = 1), 0)) AS " .
-                "vdisk FROM vm WHERE vm.present = 1 AND vcenter_id IN (" .
-                "SELECT id FROM vcenter WHERE short_name LIKE :sn) GROUP " .
-                "BY folder;";
+                "vm.folder_id) AS folder, SUM(IF(power_state = 1, 1, 0)) " .
+                "cnt_on, SUM(IF(power_state = 0, 1, 0)) cnt_off, SUM(IF(" .
+                "power_state = 1, vcpu, 0)) vcpu, ROUND(SUM(IF(power_state ".
+                "= 0, memory_mb, 0)) / 1024) ram, SUM(COALESCE((SELECT " .
+                "ROUND(SUM(capacity_bytes) / 1024 / 1024 / 1024) FROM " .
+                "vdisk WHERE vm_id = vm.id and present = 1), 0)) AS vdisk " .
+                "FROM vm WHERE present = 1 AND vcenter_id IN (SELECT id " .
+                "FROM vcenter WHERE short_name LIKE :sn) GROUP BY folder;";
             
             $short_name = isset($data['vcenter']) ? $data['vcenter'] : '%';
 
