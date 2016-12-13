@@ -10,7 +10,7 @@
   <strong>Warning!</strong>
   <p>Please provide a user with <strong>read-only</strong> access to vcenter
     since no greater permissions are required.<br />
-    Also keep in mind that passwords are not stored securely for auto-polling purposes.</p>
+    Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
 </div>
 
 <?php
@@ -70,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         <td><input name="pass" type="password" style="width:100%"></td>
       </tr>
       <tr>
-        <td><label for="autopoll">Enable Auto Poll</label>:</td>
-        <td><input type="checkbox" name="auto_poll"></td>
+        <td><label for="autopoll">Auto Poll (not implemented yet)</label>:</td>
+        <td><input type="checkbox" name="auto_poll disabled"></td>
       </tr>
     </tbody>
   </table>
