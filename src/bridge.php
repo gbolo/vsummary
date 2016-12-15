@@ -1,5 +1,10 @@
 <?php
 
+require_once('include/functions.php');
+if ( $POLLER_ENABLED != true ){
+  exit('POLLER IS DISABLED FOR DEMO');
+}
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);

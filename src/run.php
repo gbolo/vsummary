@@ -1,3 +1,10 @@
+<?php
+require_once('include/functions.php');
+if ( $POLLER_ENABLED != true ){
+  exit('POLLER IS DISABLED FOR DEMO');
+}
+?>
+
 <div class="modal-header">
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
