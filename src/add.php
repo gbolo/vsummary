@@ -6,12 +6,12 @@
   <h4 class="modal-title" id="myModalLabel">Add vCenter Credentials</h4>
 </div>
 <div class="modal-body">
-<div class="alert alert-warning" role="alert">
-  <strong>Warning!</strong>
-  <p>Please provide a user with <strong>read-only</strong> access to vcenter
-    since no greater permissions are required.<br />
-    Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
-</div>
+  <div class="alert alert-warning" role="alert">
+    <strong>Warning!</strong>
+    <p>Please provide a user with <strong>read-only</strong> access to vcenter
+      since no greater permissions are required.<br />
+      Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
+  </div>
 
 <?php
 
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
       </tr>
       <tr>
         <td><label for="autopoll">Auto Poll (not implemented yet)</label>:</td>
-        <td><input type="checkbox" name="auto_poll disabled"></td>
+        <td><input type="checkbox" name="auto_poll" disabled> <p class="text-danger">not implemented yet</p></td>
       </tr>
     </tbody>
   </table>

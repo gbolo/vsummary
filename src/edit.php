@@ -6,12 +6,12 @@
   <h4 class="modal-title" id="editModal">Modify vCenter Credentials</h4>
 </div>
 <div class="modal-body">
-<div class="alert alert-warning" role="alert">
-  <strong>Warning!</strong>
-  <p>Please provide a user with <strong>read-only</strong> access to vcenter
-    since no greater permissions are required.<br />
-    Also keep in mind that passwords are not stored securely for auto-polling purposes.</p>
-</div>
+  <div class="alert alert-warning" role="alert">
+    <strong>Warning!</strong>
+    <p>Please provide a user with <strong>read-only</strong> access to vcenter
+      since no greater permissions are required.<br />
+      Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
+  </div>
 
 <?php
 
@@ -81,7 +81,7 @@ echo '
     </tr>
     <tr>
       <td>Enable Auto Poll:</td>
-      <td><input type="checkbox" name="autopoll"></td>
+      <td><input type="checkbox" name="auto_poll" disabled> <p class="text-danger">not implemented yet</p></td>
     </tr>
   </tbody>
 </table>
