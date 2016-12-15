@@ -1,5 +1,5 @@
 <?php
- 
+
 // Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
@@ -16,7 +16,7 @@ use Ozdemir\Datatables\DB\MySQL;
 $dt = new Datatables(new MySQL($config));
 
 // Query
-$dt->query('SELECT 
+$dt->query('SELECT
 vm_name,
 name,
 mac,
@@ -38,6 +38,14 @@ FROM view_vnic
 $dt->edit('name', function ($data){
     $hr = str_replace("Network adapter", "vNIC #", $data['name']);
     return $hr;
+});
+
+$dt->edit('connected', function ($data){
+    if ($data['connected'] === 'true'){
+        return '<span class="label label-pill label-success">true</span>';
+    }else{
+        return '<span class="label label-pill label-danger">false</span>';
+    }
 });
 
 $dt->edit('portgroup_name', function ($data){

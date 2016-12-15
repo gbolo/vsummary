@@ -58,9 +58,56 @@ $dt->edit('folder', function ($data){
     }
 });
 
+$dt->edit('power_state', function ($data){
+    if ($data['power_state'] === '1'){
+        return '<span class="label label-pill label-success">1 - ON</span>';
+    }elseif ($data['power_state'] === '0'){
+        return '<span class="label label-pill label-danger">0 - OFF</span>';
+    }else{
+        return $data['power_state'];
+    }
+});
+
+$dt->edit('guest_tools_running', function ($data){
+    if ($data['guest_tools_running'] === 'Yes'){
+        return '<span class="label label-pill label-success">Yes</span>';
+    }elseif ($data['guest_tools_running'] === 'No'){
+        return '<span class="label label-pill label-danger">No</span>';
+    }else{
+        return $data['guest_tools_running'];
+    }
+});
+
+$dt->edit('stat_host_memory_usage', function ($data){
+    $hr = $data['stat_host_memory_usage'] . ' MB';
+    return $hr;
+});
+
+$dt->edit('stat_guest_memory_usage', function ($data){
+    $hr = $data['stat_guest_memory_usage'] . ' MB';
+    return $hr;
+});
+
+$dt->edit('stat_cpu_usage', function ($data){
+    $hr = $data['stat_cpu_usage'] . ' MHZ';
+    return $hr;
+});
+
 $dt->edit('memory_mb', function ($data){
     $hr = $data['memory_mb'] . ' MB';
     return $hr;
+});
+
+$dt->edit('esxi_status', function ($data){
+    if ($data['esxi_status'] === 'green'){
+        return '<span class="label label-pill label-success">green</span>';
+    }elseif ($data['esxi_status'] === 'red'){
+        return '<span class="label label-pill label-danger">red</span>';
+    }elseif ($data['esxi_status'] === 'yellow'){
+        return '<span class="label label-pill label-warning">yellow</span>';
+    }else{
+        return $data['esxi_status'];
+    }
 });
 
 $dt->edit('stat_uptime_sec', function ($data){

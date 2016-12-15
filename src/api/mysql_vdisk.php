@@ -1,5 +1,5 @@
 <?php
- 
+
 // Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
@@ -16,7 +16,7 @@ use Ozdemir\Datatables\DB\MySQL;
 $dt = new Datatables(new MySQL($config));
 
 // Query
-$dt->query('SELECT 
+$dt->query('SELECT
 vm_name,
 name,
 capacity_bytes,
@@ -35,6 +35,16 @@ FROM view_vdisk
 $dt->edit('capacity_bytes', function ($data){
     $hr = format_size($data['capacity_bytes']);
     return $hr;
+});
+
+$dt->edit('vm_power_state', function ($data){
+    if ($data['vm_power_state'] === '1'){
+        return '<span class="label label-pill label-success">1 - ON</span>';
+    }elseif ($data['vm_power_state'] === '0'){
+        return '<span class="label label-pill label-danger">0 - OFF</span>';
+    }else{
+        return $data['vm_power_state'];
+    }
 });
 
 // Respond with results

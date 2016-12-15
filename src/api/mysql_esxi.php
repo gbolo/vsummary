@@ -1,5 +1,5 @@
 <?php
- 
+
 // Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
@@ -16,7 +16,7 @@ use Ozdemir\Datatables\DB\MySQL;
 $dt = new Datatables(new MySQL($config));
 
 // Query
-$dt->query('SELECT 
+$dt->query('SELECT
 name,
 max_evc,
 current_evc,
@@ -73,6 +73,28 @@ $dt->edit('stat_cpu_usage', function ($data){
 $dt->edit('stat_uptime_sec', function ($data){
     $hr = uptime_human_readable($data['stat_uptime_sec']);
     return $hr;
+});
+
+$dt->edit('status', function ($data){
+    if ($data['status'] === 'green'){
+        return '<span class="label label-pill label-success">green</span>';
+    }elseif ($data['status'] === 'red'){
+        return '<span class="label label-pill label-danger">red</span>';
+    }elseif ($data['status'] === 'yellow'){
+        return '<span class="label label-pill label-warning">yellow</span>';
+    }else{
+        return $data['status'];
+    }
+});
+
+$dt->edit('power_state', function ($data){
+    if ($data['power_state'] === '1'){
+        return '<span class="label label-pill label-success">1 - ON</span>';
+    }elseif ($data['power_state'] === '0'){
+        return '<span class="label label-pill label-danger">0 - OFF</span>';
+    }else{
+        return $data['power_state'];
+    }
 });
 
 // Respond with results

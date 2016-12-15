@@ -1,5 +1,5 @@
 <?php
- 
+
 // Load the library for datatables
 require_once('lib/DB/DatabaseInterface.php');
 require_once('lib/DB/MySQL.php');
@@ -16,7 +16,7 @@ use Ozdemir\Datatables\DB\MySQL;
 $dt = new Datatables(new MySQL($config));
 
 // Query
-$dt->query('SELECT 
+$dt->query('SELECT
 name,
 status,
 capacity_bytes,
@@ -42,6 +42,18 @@ $dt->edit('free_bytes', function ($data){
 $dt->edit('uncommitted_bytes', function ($data){
     $hr = format_size($data['uncommitted_bytes']);
     return $hr;
+});
+
+$dt->edit('status', function ($data){
+    if ($data['status'] === 'green'){
+        return '<span class="label label-pill label-success">green</span>';
+    }elseif ($data['status'] === 'red'){
+        return '<span class="label label-pill label-danger">red</span>';
+    }elseif ($data['status'] === 'yellow'){
+        return '<span class="label label-pill label-warning">yellow</span>';
+    }else{
+        return $data['status'];
+    }
 });
 
 // Respond with results
