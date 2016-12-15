@@ -32,8 +32,8 @@ $vc_type = strtolower( $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)] );
 $vc_fqdn = 'vca.'.$vc_type.'.sample.tld';
 
 $vm_pre_name = array(
-	"nginx", 
-	"mysql", 
+	"nginx",
+	"mysql",
 	"percona",
 	"coreos",
 	"docker",
@@ -126,19 +126,19 @@ $folder_L2 = array(
 );
 
 function vsummary_api_call($data){
-                              
-    global $api_endpoint;                                  
-	$data_string = json_encode($data);                                                                                   
-	                                                                                                                     
-	$ch = curl_init($api_endpoint);                                                                      
-	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);                                                                  
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
-	    'Content-Type: application/json',                                                                                
-	    'Content-Length: ' . strlen($data_string))                                                                       
-	);                                                                                                                   
-	                                                                                                                     
+
+    global $api_endpoint;
+	$data_string = json_encode($data);
+
+	$ch = curl_init($api_endpoint);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+	    'Content-Type: application/json',
+	    'Content-Length: ' . strlen($data_string))
+	);
+
 	curl_exec($ch);
 
 	// Check if any error occurred
@@ -150,7 +150,7 @@ function vsummary_api_call($data){
 	} else {
 		return "API REQUEST FAILED\n";
 	}
-	
+
 }
 
 function gen_mac(){
@@ -216,7 +216,7 @@ function gen_folder($dc){
 	    $arrL1[] = json_decode($json, true);
 	    $i++;
 	}
-	
+
 	foreach ($arrL1 as $folder){
 
 		$name = $folder_L2[mt_rand(0, count($folder_L2) - 1)];
@@ -323,13 +323,13 @@ function gen_esxi($num, $cl){
 		    "current_evc":  "intel-sandybridge",
 		    "cpu_model":  "Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz",
 		    "nics":  4,
-		    "power_state":  0,
+		    "power_state":  1,
 		    "in_maintenance_mode":  "false",
 		    "cpu_mhz":  1999,
 		    "hbas":  3,
 		    "stat_uptime_sec":  '.rand(2017352, 99017352).',
 		    "cpu_cores":  6,
-		    "status":  2,
+		    "status":  "green",
 		    "stat_cpu_usage":  '.rand(500, 5000).',
 		    "cluster_moref":  "'.$cl['moref'].'",
 		    "moref":  "host-'.rand(1, 1000).'",
@@ -458,7 +458,8 @@ function gen_vm($num, $esxi){
 		        "power_state":  '.$power_state.',
 		        "esxi_moref":  "'.$esxi['moref'].'",
 		        "vcenter_id":  "'.$vc_id.'",
-		        "objecttype":  "VM"
+		        "objecttype":  "VM",
+						"guest_os": "'.$guest.'"
 		    }';
 		$arr[] = json_decode($json, true);
 	}
@@ -472,6 +473,12 @@ function gen_vnic($vm){
 	$num = rand(1, 2);
 	for ($i = 1; $i <= $num; $i++) {
 		$pg = $pg_total[mt_rand(0, count($pg_total) - 1)];
+		$connected = "false";
+		$status = "untried";
+		if ( $vm['power_state'] == 1 ){
+				$connected = "true";
+				$status = "ok";
+		}
 		$json = '
 	    {
 	        "portgroup_name":  "'.$pg['name'].'",
@@ -482,10 +489,10 @@ function gen_vnic($vm){
 	        "name":  "Network adapter '.$i.'",
 	        "type":  "VirtualVmxnet3",
 	        "vswitch_type":  "VmwareDistributedVirtualSwitch",
-	        "status":  "ok",
+	        "status":  "'.$status.'",
 	        "vcenter_id":  "'.$vc_id.'",
 	        "portgroup_moref":  "'.$pg['moref'].'",
-	        "connected":  true,
+	        "connected":  '.$connected.',
 	        "vswitch_name":  "SAMPLE"
 	    }';
 		$arr[] = json_decode($json, true);
@@ -621,4 +628,3 @@ echo '[pnic] ' . vsummary_api_call($pnic_total);
 echo '[vnic] ' . vsummary_api_call($vnic_total);
 echo '[vdisk] ' . vsummary_api_call($vdisk_total);
 echo '[folder] ' . vsummary_api_call($fd_total);
-
