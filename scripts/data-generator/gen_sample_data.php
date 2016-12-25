@@ -378,7 +378,7 @@ function gen_ds($num){
 		    "name":  "DS'.$i.'-1TB",
 		    "uncommitted_bytes":  '.rand(102327252475, 302327252475).',
 		    "free_bytes":  '.rand(102327252475, 602327252475).',
-		    "status":  1
+		    "status":  "green"
 		}';
 
 		$arr[] = json_decode($json, true);
