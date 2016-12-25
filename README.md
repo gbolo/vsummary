@@ -10,6 +10,7 @@ For a **LIVE DEMO**, please click this link:
 
 ### Screenshots
 ![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_1.png "Screenshot 1")
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_2.png "Screenshot 2")
 
 ### Architecture
 vSummary is essentially a web application with both a frontend and backend. The backend accepts HTTP POST data in json format which it then normalizes and inserts/updates into various mysql tables. The frontend is where it displays this data for users to see. Here is a basic architectural diagram to visualize this:
