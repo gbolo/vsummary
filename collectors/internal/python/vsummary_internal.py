@@ -299,7 +299,10 @@ def vm_inventory(si, vc_uuid, api_url):
                     vdisk_compat['capacity_bytes'] = dev.capacityInBytes
                     vdisk_compat['capacity_kb'] = dev.capacityInKB
                     vdisk_compat['path'] = dev.backing.fileName
-                    vdisk_compat['thin_provisioned'] = dev.backing.thinProvisioned
+                    if hasattr(dev.backing, 'thinProvisioned'):
+                        vdisk_compat['thin_provisioned'] = dev.backing.thinProvisioned
+                    else:
+                        vdisk_compat['thin_provisioned'] = None
                     vdisk_compat['datastore_moref'] = dev.backing.datastore._moId
                     vdisk_compat['uuid'] = dev.backing.uuid
                     vdisk_compat['disk_object_id'] = dev.diskObjectId
