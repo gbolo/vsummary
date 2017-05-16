@@ -484,8 +484,32 @@ FROM vcenter;
 
 
 /*
-TESTING
+// TESTING - REMINDER
+
+CREATE VIEW view_cluster AS
+SELECT
+  cluster.name, cluster.num_hosts, cluster.total_memory_bytes, vcenter.short_name AS vcenter_short_name,
+  ( cluster.total_memory_bytes / cluster.num_hosts ) avg_memory_per_host,
+  ( SELECT coalesce(sum(esxi.stat_memory_usage),0)*1024*1024
+    FROM esxi
+    WHERE esxi.cluster_id = cluster.id AND esxi.present = 1 AND esxi.power_state = 1 ) total_memory_used
+FROM cluster
+LEFT JOIN
+    vcenter
+ON  cluster.vcenter_id = vcenter.id;
+
+
+CREATE VIEW view_cluster_capacity AS
+SELECT *,
+  ( total_memory_used / avg_memory_per_host ) ratio_memory,
+  ( num_hosts - CEIL( total_memory_used / avg_memory_per_host ) ) supported_failures,
+  ( total_memory_used / ( avg_memory_per_host * 0.8 ) ) ratio_memory_80,
+  ( num_hosts - CEIL( total_memory_used / ( avg_memory_per_host * 0.8 ) ) ) supported_failures_80
+FROM view_cluster;
+
 */
+
+
 
 /* portgroup non distinct */
 /*
