@@ -185,11 +185,7 @@ function update_esxi($data){
                 }
                 $status = $esxi['status'];
                 $power_state = $esxi['power_state'];
-                if ( is_null($esxi['in_maintenance_mode']) ){
-                    $in_maintenance_mode = var_export( $esxi['in_maintenance_mode'], true );
-                } else {
-                    $in_maintenance_mode = $esxi['in_maintenance_mode'];
-                }
+                $in_maintenance_mode = var_export( $esxi['in_maintenance_mode'], true );
                 $vendor = $esxi['vendor'];
                 $model = $esxi['model'];
                 $uuid = $esxi['uuid'];
@@ -1338,7 +1334,7 @@ if (isset($data['task'])) {
 
         if (!isset($data['type'])) {
 
-            $data = array("status" => "error", "reason" => 
+            $data = array("status" => "error", "reason" =>
                 "task == query, but type is not specified");
             $json = json_encode($data);
             echo $json;
@@ -1358,10 +1354,10 @@ if (isset($data['task'])) {
                 $stmt = $pdo->prepare($query);
                 $stmt->execute(array("sn" => $data['vcenter']));
                 $res = $stmt->fetchAll();
-                
+
                 if ($res[0]['cnt'] == 0) {
 
-                    $data = array("status" => "error", 
+                    $data = array("status" => "error",
                         "reason" => "vcenter not found!");
                     $json = json_encode($data);
                     echo $json;
@@ -1380,7 +1376,7 @@ if (isset($data['task'])) {
                 "vdisk WHERE vm_id = vm.id and present = 1), 0)) AS vdisk " .
                 "FROM vm WHERE present = 1 AND vcenter_id IN (SELECT id " .
                 "FROM vcenter WHERE short_name LIKE :sn) GROUP BY folder;";
-            
+
             $short_name = isset($data['vcenter']) ? $data['vcenter'] : '%';
 
             try {
@@ -1393,14 +1389,14 @@ if (isset($data['task'])) {
             catch (PDOException $e) {
 
                 echo "Database exception!";
-                http_response_code(500); 
+                http_response_code(500);
                 exit();
             }
 
             $json = json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 
             echo $json;
-            exit(); 
+            exit();
         }
     }
 }

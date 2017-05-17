@@ -38,7 +38,7 @@ stat_cpu_usage INT UNSIGNED,
 stat_host_memory_usage INT UNSIGNED,
 stat_guest_memory_usage INT UNSIGNED,
 stat_uptime_sec INT UNSIGNED,
-power_state TINYINT UNSIGNED,
+power_state VARCHAR(16),
 folder_id VARCHAR(32),
 vapp_id VARCHAR(32),
 resourcepool_id VARCHAR(32),
@@ -122,7 +122,7 @@ moref VARCHAR(16),
 max_evc VARCHAR(64),
 current_evc VARCHAR(64),
 status VARCHAR(32),
-power_state TINYINT UNSIGNED,
+power_state VARCHAR(16),
 in_maintenance_mode VARCHAR(16),
 vendor VARCHAR(64),
 model VARCHAR(64),
@@ -340,13 +340,13 @@ SELECT
   datacenter.name AS datacenter,
   ( SELECT coalesce(sum(vm.vcpu),0)
     FROM vm
-    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vcpus_powered_on,
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = "poweredOn" AND vm.present = 1) vcpus_powered_on,
   ( SELECT coalesce(sum(vm.memory_mb),0)
     FROM vm
-    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vmemory_mb_powered_on,
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = "poweredOn" AND vm.present = 1) vmemory_mb_powered_on,
   ( SELECT coalesce(count(vm.id),0)
     FROM vm
-    WHERE vm.esxi_id = esxi.id AND vm.power_state = 1 AND vm.present = 1) vms_powered_on,
+    WHERE vm.esxi_id = esxi.id AND vm.power_state = "poweredOn" AND vm.present = 1) vms_powered_on,
   ( SELECT coalesce(count(pnic.id),0)
     FROM pnic
     WHERE pnic.esxi_id = esxi.id AND pnic.present = 1) pnics
@@ -436,13 +436,13 @@ SELECT
   vcenter.*,
   ( SELECT coalesce(sum(vm.vcpu),0)
     FROM vm
-    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_vcpu_on,
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = "poweredOn" AND vm.present = 1) vms_vcpu_on,
   ( SELECT coalesce(sum(vm.memory_mb),0)
     FROM vm
-    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_memory_on,
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = "poweredOn" AND vm.present = 1) vms_memory_on,
   ( SELECT coalesce(count(vm.id),0)
     FROM vm
-    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = 1 AND vm.present = 1) vms_on,
+    WHERE vm.vcenter_id = vcenter.id AND vm.power_state = "poweredOn" AND vm.present = 1) vms_on,
   ( SELECT coalesce(count(vm.id),0)
     FROM vm
     WHERE vm.vcenter_id = vcenter.id AND vm.present = 1) vms,
@@ -492,7 +492,7 @@ SELECT
   ( cluster.total_memory_bytes / cluster.num_hosts ) avg_memory_per_host,
   ( SELECT coalesce(sum(esxi.stat_memory_usage),0)*1024*1024
     FROM esxi
-    WHERE esxi.cluster_id = cluster.id AND esxi.present = 1 AND esxi.power_state = 1 ) total_memory_used
+    WHERE esxi.cluster_id = cluster.id AND esxi.present = 1 AND esxi.power_state = "poweredOn" ) total_memory_used
 FROM cluster
 LEFT JOIN
     vcenter
@@ -549,7 +549,7 @@ LEFT JOIN
 ON      esxi.id = vm.esxi_id
     AND esxi.present = 1
     AND vm.present = 1
-    AND vm.power_state = 1
+    AND vm.power_state = "poweredOn"
 LEFT JOIN
         pnic
 ON      esxi.id = pnic.esxi_id
@@ -572,7 +572,7 @@ LEFT JOIN
 ON      esxi.id = vm.esxi_id
     AND esxi.present = 1
     AND vm.present = 1
-    AND vm.power_state = 1
+    AND vm.power_state = "poweredOn"
 LEFT JOIN
         vcenter
 ON      vm.vcenter_id = vcenter.id

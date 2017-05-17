@@ -99,7 +99,7 @@ Function Get-VSVirtualMachine ( [string]$vc_uuid ){
                 stat_host_memory_usage = $vm.Summary.Quickstats.HostMemoryUsage
                 stat_guest_memory_usage = $vm.Summary.Quickstats.GuestMemoryUsage
                 stat_uptime_sec = $vm.Summary.Quickstats.UptimeSeconds
-                power_state = $vm.Runtime.PowerState
+                power_state = [string]$vm.Runtime.PowerState
                 esxi_moref = $vm.Runtime.Host.Value
                 folder_moref = $vm.Parent.Value
                 template = $vm.Config.Template
@@ -258,8 +258,8 @@ Function Get-VSEsxi ( [string]$vc_uuid ){
                 max_evc = $esxi.Summary.MaxEVCModeKey
                 current_evc = $esxi.Summary.CurrentEVCModeKey
                 status = [string]$esxi.Summary.OverallStatus
-                power_state = $esxi.Summary.Runtime.PowerState
-                in_maintenance_mode = [string]$esxi.Summary.Runtime.InMaintenanceMode
+                power_state = [string]$esxi.Summary.Runtime.PowerState
+                in_maintenance_mode = [boolean]$esxi.Summary.Runtime.InMaintenanceMode
                 vendor = $esxi.Summary.Hardware.Vendor
                 model = $esxi.Summary.Hardware.Model
                 uuid = $esxi.Summary.Hardware.Uuid

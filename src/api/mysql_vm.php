@@ -59,10 +59,10 @@ $dt->edit('folder', function ($data){
 });
 
 $dt->edit('power_state', function ($data){
-    if ($data['power_state'] === '1'){
-        return '<span class="label label-pill label-success">1 - ON</span>';
-    }elseif ($data['power_state'] === '0'){
-        return '<span class="label label-pill label-danger">0 - OFF</span>';
+    if ($data['power_state'] == 'poweredOn'){
+        return '<span class="label label-pill label-success">poweredOn</span>';
+    }elseif ($data['power_state'] == 'poweredOff'){
+        return '<span class="label label-pill label-danger">poweredOff</span>';
     }else{
         return $data['power_state'];
     }

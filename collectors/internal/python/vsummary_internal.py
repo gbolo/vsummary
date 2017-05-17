@@ -205,11 +205,7 @@ def vm_inventory(si, vc_uuid, api_url):
         vm_compat['stat_uptime_sec'] = vm['summary.quickStats.uptimeSeconds'] if "summary.quickStats.uptimeSeconds" in vm else None
         vm_compat['esxi_moref'] = vm['runtime.host']._moId if "runtime.host" in vm else None
         vm_compat['moref'] = vm['obj']._moId if "obj" in vm else None
-
-        if "runtime.powerState" in vm:
-            vm_compat['power_state'] = 1 if vm["runtime.powerState"] == "poweredOn" else 0
-        else:
-            vm_compat['power_state'] = None
+        vm_compat['power_state'] = vm['runtime.powerState'] if "runtime.powerState" in vm else None
 
         vm_data_compat.append(vm_compat)
 
@@ -456,11 +452,7 @@ def host_inventory(si, vc_uuid, api_url):
         host_compat['stat_memory_usage'] = host['summary.quickStats.overallMemoryUsage'] if "summary.quickStats.overallMemoryUsage" in host else None
         host_compat['stat_uptime_sec'] = host['summary.quickStats.uptime'] if "summary.quickStats.uptime" in host else None
         host_compat['cluster_moref'] = host['parent']._moId if "parent" in host else None
-
-        if "summary.runtime.powerState" in host:
-            host_compat['power_state'] = 1 if host['summary.runtime.powerState'] == "poweredOn" else 0
-        else:
-            host_compat['power_state'] = None
+        host_compat['power_state'] = host['summary.runtime.powerState'] if "summary.runtime.powerState" in host else None
 
         host_data_compat.append(host_compat)
 
