@@ -51,6 +51,10 @@ if (isset($_GET['view'])){
 			$view = $_GET['view'];
 			$view_title = 'ESXi Host';
 			break;
+		case 'cluster':
+			$view = $_GET['view'];
+			$view_title = 'ESXi Cluster';
+			break;
 		case 'vdisk':
 			$view = $_GET['view'];
 			$view_title = 'Virtual Machine Disk';

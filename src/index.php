@@ -101,6 +101,9 @@
                                 <a href="index.php?view=esxi"><i class="fa fa-server fa-fw"></i> ESXi Hosts</a>
                             </li>
                             <li>
+                                <a href="index.php?view=cluster"><i class="fa fa-server fa-fw"></i> ESXi Clusters</a>
+                            </li>
+                            <li>
                                 <a href="index.php?view=portgroup"><i class="fa fa-cloud fa-fw"></i> Network Portgroups</a>
                             </li>
                             <li>

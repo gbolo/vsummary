@@ -282,6 +282,7 @@ SELECT
   e.current_evc AS esxi_current_evc,
   e.status AS esxi_status,
   e.cpu_model AS esxi_cpu_model,
+  e.cluster_id AS cluster_id,
   (SELECT COUNT(1) FROM vdisk WHERE vm_id = vm.id and present = 1) AS vdisks,
   (SELECT COUNT(1) FROM vnic WHERE vm_id = vm.id and present = 1) AS vnics,
   COALESCE((SELECT name FROM cluster WHERE id = e.cluster_id), 'n/a') AS cluster,
@@ -482,32 +483,36 @@ SELECT
 FROM vcenter;
 
 
-
-/*
-// TESTING - REMINDER
-
 CREATE VIEW view_cluster AS
 SELECT
-  cluster.name, cluster.num_hosts, cluster.total_memory_bytes, vcenter.short_name AS vcenter_short_name,
-  ( cluster.total_memory_bytes / cluster.num_hosts ) avg_memory_per_host,
+  cluster.*, vcenter.short_name AS vcenter_short_name,
+  ( cluster.total_memory_bytes / cluster.num_hosts ) AS avg_memory_per_host,
   ( SELECT coalesce(sum(esxi.stat_memory_usage),0)*1024*1024
     FROM esxi
-    WHERE esxi.cluster_id = cluster.id AND esxi.present = 1 AND esxi.power_state = "poweredOn" ) total_memory_used
+    WHERE esxi.cluster_id = cluster.id AND esxi.present = 1 AND esxi.power_state = "poweredOn" ) AS total_memory_used,
+  ( SELECT coalesce(count(view_vm.id),0)
+    FROM view_vm
+    WHERE view_vm.cluster_id = cluster.id AND view_vm.power_state = "poweredOn" AND view_vm.present = 1) AS vms_on,
+  ( SELECT coalesce(sum(view_vm.vcpu),0)
+    FROM view_vm
+    WHERE view_vm.cluster_id = cluster.id AND view_vm.power_state = "poweredOn" AND view_vm.present = 1) total_vms_vcpu_on
 FROM cluster
 LEFT JOIN
     vcenter
-ON  cluster.vcenter_id = vcenter.id;
-
+ON  cluster.vcenter_id = vcenter.id
+WHERE cluster.present = 1;
 
 CREATE VIEW view_cluster_capacity AS
-SELECT *,
-  ( total_memory_used / avg_memory_per_host ) ratio_memory,
-  ( num_hosts - CEIL( total_memory_used / avg_memory_per_host ) ) supported_failures,
-  ( total_memory_used / ( avg_memory_per_host * 0.8 ) ) ratio_memory_80,
-  ( num_hosts - CEIL( total_memory_used / ( avg_memory_per_host * 0.8 ) ) ) supported_failures_80
+SELECT view_cluster.*,
+  ( total_memory_used / vms_on ) AS avg_memory_per_vm,
+  ( total_vms_vcpu_on / vms_on ) AS avg_vcpu_per_vm,
+  ( total_memory_used / avg_memory_per_host ) AS ratio_memory,
+  ( num_hosts - CEIL( total_memory_used / avg_memory_per_host ) ) AS supported_failures,
+  ( total_memory_used / ( avg_memory_per_host * 0.8 ) ) AS ratio_memory_80,
+  ( num_hosts - CEIL( total_memory_used / ( avg_memory_per_host * 0.8 ) ) ) AS supported_failures_80
 FROM view_cluster;
 
-*/
+
 
 
 
