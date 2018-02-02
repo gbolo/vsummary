@@ -1,11 +1,11 @@
 package server
 
 import (
-"net/http"
+	"fmt"
+	"net/http"
 
-"github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
-
 
 type Route struct {
 	Name        string
@@ -32,6 +32,12 @@ var routes = Routes{
 	//	appendRequestPrefix("/stats"),
 	//	handlerStats,
 	//},
+}
+
+// appends prefix to route path
+func appendRequestPrefix(route string) string {
+
+	return fmt.Sprintf("/api/v%s%s", apiVersion, route)
 }
 
 func newRouter() *mux.Router {

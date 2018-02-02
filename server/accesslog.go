@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-
 // wrapper handler for logging purposes
 // abandon due to difficulty retrieiving status code from ResponseWriter
 func accessLog(inner http.Handler, name string) http.Handler {
@@ -25,4 +24,3 @@ func accessLog(inner http.Handler, name string) http.Handler {
 		)
 	})
 }
-
