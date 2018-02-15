@@ -11,6 +11,7 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 		schemas,
 		SqlSchema{"Vm", schemaVm},
 		SqlSchema{"Datacenter", schemaDatacenter},
+		SqlSchema{"Poller", schemaPoller},
 	)
 
 	return
@@ -61,4 +62,15 @@ CREATE TABLE IF NOT EXISTS datacenter
      vcenter_id     VARCHAR(36),
      present        TINYINT DEFAULT 1
   );`
+
+	schemaPoller = `
+CREATE TABLE IF NOT EXISTS poller
+  (
+     vcenter_id     VARCHAR(36) PRIMARY KEY,
+     enabled        TINYINT DEFAULT 1,
+     user_name		VARCHAR(128),
+	 password		VARCHAR(256),
+	 interval_min	INT UNSIGNED
+  );`
+
 )
