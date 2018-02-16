@@ -26,6 +26,12 @@ var routes = Routes{
 		appendRequestPrefix("/vm"),
 		handlerVm,
 	},
+	Route{
+		"Poller",
+		"POST",
+		appendRequestPrefix("/poller"),
+		handlerPoller,
+	},
 	//Route{
 	//	"Stats",
 	//	"GET",

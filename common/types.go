@@ -1,6 +1,5 @@
 package common
 
-
 type Vm struct {
 
 	// These are part of BOTH API request AND db record
@@ -101,6 +100,16 @@ type VSwitch struct {
 	// These are part of db record ONLY
 	Id     string `db:"id"`
 	EsxiId string `db:"esxi_id"`
+}
+
+type Poller struct {
+
+	// These are part of BOTH API request AND db record
+	VcenterId   string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Username    string `json:"user_name" db:"user_name" validate:"required"`
+	Password    string `json:"password" db:"password" validate:"required"`
+	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`
+	IntervalMin int    `json:"interval_min" db:"interval_min" validate:"required"`
 }
 
 //CREATE TABLE vswitch

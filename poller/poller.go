@@ -12,8 +12,6 @@ import (
 	"context"
 
 	"github.com/gbolo/vsummary/common"
-	//"fmt"
-	"net/http"
 	"encoding/json"
 	"time"
 	"errors"
@@ -35,7 +33,6 @@ type PollerConfig struct {
 type Poller struct {
 	VmwareClient   *govmomi.Client
 	Config         *PollerConfig
-	vSummaryClient *http.Client
 	//Ctx			*context.Context
 }
 
@@ -189,5 +186,30 @@ func (p *Poller) SendVMs() (err error) {
 
 	return
 
+
+}
+
+// testing poller loop
+func (p *Poller) Loop() {
+
+	timeout := time.After(1 * time.Minute)
+	tick := time.Tick(20 * time.Second)
+	// Keep trying until we're timed out or got a result or got an error
+	for {
+		select {
+		// Got a timeout! fail with a timeout error
+		case <-timeout:
+			return
+			// Got a tick, we should check on doSomething()
+		case <-tick:
+			log.Debug("ticker reached, polling now")
+			err := p.SendVMs()
+			if err == nil {
+				log.Info("poll completed successfully")
+			} else {
+				log.Warningf("poll was no successful: %s", err)
+			}
+		}
+	}
 
 }

@@ -92,4 +92,26 @@ ON DUPLICATE KEY UPDATE
 	esxi_id=VALUES(esxi_id),
 	vcenter_id=VALUES(vcenter_id),
 	present=1;`
+
+	insertPoller = `
+INSERT INTO poller (
+	vcenter_id,
+	enabled,
+	user_name,
+	password,
+	interval_min
+	)
+VALUES (
+	:vcenter_id,
+	:enabled,
+	:user_name,
+	:password,
+	:interval_min
+	)
+ON DUPLICATE KEY UPDATE
+	enabled=VALUES(enabled),
+	user_name=VALUES(user_name),
+	password=VALUES(password),
+	interval_min=VALUES(interval_min);`
+
 )
