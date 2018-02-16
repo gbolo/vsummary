@@ -105,7 +105,8 @@ type VSwitch struct {
 type Poller struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterId   string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	VcenterHost string `json:"vcenter_host" db:"vcenter_host" validate:"required"`
+	VcenterName string `json:"vcenter_name" db:"vcenter_name" validate:"required"`
 	Username    string `json:"user_name" db:"user_name" validate:"required"`
 	Password    string `json:"password" db:"password" validate:"required"`
 	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`

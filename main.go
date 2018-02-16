@@ -8,9 +8,10 @@ import (
 	"github.com/gbolo/vsummary/poller"
 	"github.com/gbolo/vsummary/server"
 	"github.com/gbolo/vsummary/config"
+	"github.com/gbolo/vsummary/crypto"
 
 	"context"
-	"encoding/json"
+	//"encoding/json"
 	//"fmt"
 	//"log"
 
@@ -68,29 +69,36 @@ func main() {
 
 	defer vPoller.VmwareClient.Logout(ctx)
 
-	// get list of VMs
-	vmList, err := vPoller.GetVMs()
+	//// get list of VMs
+	//vmList, err := vPoller.GetVMs()
+	//
+	//// print list of vms
+	//jsonVms, err := json.Marshal(vmList[0])
+	//if err == nil {
+	//	fmt.Println(string(jsonVms))
+	//} else {
+	//	fmt.Println("Error:", err)
+	//}
 
-	// print list of vms
-	jsonVms, err := json.Marshal(vmList[0])
-	if err == nil {
-		fmt.Println(string(jsonVms))
-	} else {
-		fmt.Println("Error:", err)
-	}
-
-	//fmt.Println("=== STARTING SERVER ===")
-	//s := server.Server{Version: "1"}
 	go server.Start()
 
-	time.Sleep(5 * time.Second)
+	enc, err := crypto.Encrypt("some sample data to encrypt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Encrypted:", enc)
 
-	fmt.Println("Doing POST")
-	//resp, err := http.Post("http://127.0.0.1:8080/api/v2/vm", "application/json", bytes.NewBuffer(jsonVms))
-	//fmt.Println(resp.Status)
+	decr, err := crypto.Decrypt("c_Ijfq9iqD_8acr2AQuxbVj9GXR17ZkJc8u8Gyn7LG84aTZZ3fGZL6tEfA==")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Decrypted:", decr)
 
-	err = vPoller.SendVMs()
-	handleErr(err)
+	time.Sleep(3 * time.Second)
+
+	fmt.Println("---------------------------------------------------------------------------------------")
+
+	vPoller.Loop()
 
 }
 
