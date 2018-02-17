@@ -1,39 +1,37 @@
 package poller
 
 import (
-
-	"github.com/vmware/govmomi/view"
-	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi"
-	"github.com/vmware/govmomi/vim25/soap"
-
-	"github.com/op/go-logging"
-	"net/url"
 	"context"
+	"encoding/json"
+	"errors"
+	"net/url"
+	"time"
 
 	"github.com/gbolo/vsummary/common"
-	"encoding/json"
-	"time"
-	"errors"
+	"github.com/op/go-logging"
+	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/view"
+	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/soap"
 )
 
 var log = logging.MustGetLogger("vsummary")
+
 const apiVersion = "2"
 
 type PollerConfig struct {
-
-	URL			string
-	UserName	string
-	Password	string
+	URL         string
+	UserName    string
+	Password    string
+	IntervalMin int
 
 	// Don't validate TLS Cert
-	Insecure	bool
+	Insecure bool
 }
 
 type Poller struct {
-	VmwareClient   *govmomi.Client
-	Config         *PollerConfig
-	//Ctx			*context.Context
+	VmwareClient *govmomi.Client
+	Config       *PollerConfig
 }
 
 func NewPoller() *Poller {
@@ -121,7 +119,7 @@ func (p *Poller) GetVMs() (vmList []common.Vm, err error) {
 			PowerState:           string(vm.Runtime.PowerState),
 			EsxiMoref:            vm.Runtime.Host.Value,
 			Template:             vm.Config.Template,
-			VcenterId:			  v.Client().ServiceContent.About.InstanceUuid,
+			VcenterId:            v.Client().ServiceContent.About.InstanceUuid,
 		}
 
 		// folder may not exist
@@ -183,33 +181,6 @@ func (p *Poller) SendVMs() (err error) {
 		return
 	}
 
-
 	return
-
-
-}
-
-// testing poller loop
-func (p *Poller) Loop() {
-
-	timeout := time.After(1 * time.Minute)
-	tick := time.Tick(20 * time.Second)
-	// Keep trying until we're timed out or got a result or got an error
-	for {
-		select {
-		// Got a timeout! fail with a timeout error
-		case <-timeout:
-			return
-			// Got a tick, we should check on doSomething()
-		case <-tick:
-			log.Debug("ticker reached, polling now")
-			err := p.SendVMs()
-			if err == nil {
-				log.Info("poll completed successfully")
-			} else {
-				log.Warningf("poll was no successful: %s", err)
-			}
-		}
-	}
 
 }

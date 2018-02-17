@@ -8,9 +8,9 @@ import (
 	"github.com/gbolo/vsummary/poller"
 	"github.com/gbolo/vsummary/server"
 	"github.com/gbolo/vsummary/config"
-	"github.com/gbolo/vsummary/crypto"
+	//"github.com/gbolo/vsummary/crypto"
 
-	"context"
+	//"context"
 	//"encoding/json"
 	//"fmt"
 	//"log"
@@ -21,7 +21,7 @@ import (
 	"fmt"
 	//"net/http"
 	"time"
-	"os"
+	//"os"
 	//"bytes"
 )
 
@@ -46,59 +46,43 @@ func main() {
 	err = b.ApplySchemas()
 	handleErr(err)
 
+	// test
+	pollers, err := b.GetPollers()
+	fmt.Println(pollers)
 
 
-	// vmware section ----------------------------------------------------------------------
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
-
-	// connect and login to ESX or vCenter
-	vPoller := poller.NewPoller()
-	vPoller.Config = &poller.PollerConfig{
-			URL: os.Getenv("VSUMMARY_TEST_URL"),
-			UserName: os.Getenv("VSUMMARY_TEST_USER"),
-			Password: os.Getenv("VSUMMARY_TEST_PASSWORD"),
-			Insecure: true,
-	}
-
-	err = vPoller.Connect(&ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer vPoller.VmwareClient.Logout(ctx)
-
-	//// get list of VMs
-	//vmList, err := vPoller.GetVMs()
+	//// vmware section ----------------------------------------------------------------------
+	//ctx, cancel := context.WithCancel(context.Background())
+	//defer cancel()
 	//
-	//// print list of vms
-	//jsonVms, err := json.Marshal(vmList[0])
-	//if err == nil {
-	//	fmt.Println(string(jsonVms))
-	//} else {
-	//	fmt.Println("Error:", err)
+	//
+	//// connect and login to ESX or vCenter
+	//vPoller := poller.NewPoller()
+	//vPoller.Config = &poller.PollerConfig{
+	//		URL: os.Getenv("VSUMMARY_TEST_URL"),
+	//		UserName: os.Getenv("VSUMMARY_TEST_USER"),
+	//		Password: os.Getenv("VSUMMARY_TEST_PASSWORD"),
+	//		Insecure: true,
 	//}
+	//
+	//err = vPoller.Connect(&ctx)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//defer vPoller.VmwareClient.Logout(ctx)
 
 	go server.Start()
 
-	enc, err := crypto.Encrypt("some sample data to encrypt")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Encrypted:", enc)
-
-	decr, err := crypto.Decrypt("c_Ijfq9iqD_8acr2AQuxbVj9GXR17ZkJc8u8Gyn7LG84aTZZ3fGZL6tEfA==")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Decrypted:", decr)
 
 	time.Sleep(3 * time.Second)
 
 	fmt.Println("---------------------------------------------------------------------------------------")
 
-	vPoller.Loop()
+	poller.LoadPollers(pollers)
+
+	time.Sleep(70 * time.Minute)
 
 }
 
