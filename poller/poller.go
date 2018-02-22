@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/url"
-	
+
 	"github.com/op/go-logging"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/vim25/soap"
@@ -54,4 +54,18 @@ func (p *Poller) Connect(ctx *context.Context) (err error) {
 	p.VmwareClient, err = govmomi.NewClient(*ctx, vUrl, p.Config.Insecure)
 	return
 
+}
+
+func (p *Poller) PollAllEndpoints() {
+
+	logPollingResult(p.SendVMs())
+	logPollingResult(p.SendDatacenters())
+}
+
+func logPollingResult(err error) {
+	if err == nil {
+		log.Info("poll completed successfully")
+	} else {
+		log.Warningf("poll was not successful: %s", err)
+	}
 }

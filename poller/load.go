@@ -64,12 +64,7 @@ func pollerLoop(p *Poller) (err error) {
 			return
 		case <-tick:
 			log.Debug("ticker reached, polling now")
-			err := p.SendVMs()
-			if err == nil {
-				log.Info("poll completed successfully")
-			} else {
-				log.Warningf("poll was no successful: %s", err)
-			}
+			p.PollAllEndpoints()
 		}
 	}
 
