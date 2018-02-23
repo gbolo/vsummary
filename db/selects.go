@@ -1,7 +1,6 @@
 package db
 
 import (
-
 	"github.com/gbolo/vsummary/common"
 )
 
@@ -23,4 +22,3 @@ func (b *Backend) GetPollers() (pollers []common.Poller, err error) {
 	return
 
 }
-

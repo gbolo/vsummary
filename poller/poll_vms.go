@@ -10,8 +10,6 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 )
 
-
-
 func (p *Poller) GetVMs() (vmList []common.Vm, err error) {
 
 	// log time on debug

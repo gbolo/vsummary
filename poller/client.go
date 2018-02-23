@@ -1,13 +1,14 @@
 package poller
 
 import (
-	"net/http"
-	"time"
-	"fmt"
-	"github.com/spf13/viper"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"time"
+
+	"github.com/spf13/viper"
 )
 
 var vSummaryClient *http.Client
@@ -52,7 +53,7 @@ func sendResults(endpoint string, jsonBody []byte) (err error) {
 	// send request
 	log.Debugf("sending results to: %s", url)
 	//log.Debugf("jsonBody: %s", string(jsonBody))
-	res, err := vSummaryClient.Post(url,"application/json", bytes.NewReader(jsonBody))
+	res, err := vSummaryClient.Post(url, "application/json", bytes.NewReader(jsonBody))
 
 	// this means the vsummary server api is unreachable
 	if err != nil {

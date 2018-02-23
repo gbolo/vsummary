@@ -2,17 +2,13 @@ package poller
 
 import (
 	"context"
-	//"encoding/json"
+	"encoding/json"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
-	//"github.com/vmware/govmomi/govc/datacenter"
-	"encoding/json"
 )
-
-
 
 func (p *Poller) GetDatacenters() (dcList []common.Datacenter, err error) {
 
@@ -48,11 +44,11 @@ func (p *Poller) GetDatacenters() (dcList []common.Datacenter, err error) {
 	for _, dc := range dcs {
 
 		dcStruct := common.Datacenter{
-			Name:                 dc.Name,
-			Moref:                dc.Self.Value,
-			EsxiFolderMoref:	  dc.HostFolder.Value,
-			VmFolderMoref:		  dc.VmFolder.Value,
-			VcenterId:            v.Client().ServiceContent.About.InstanceUuid,
+			Name:            dc.Name,
+			Moref:           dc.Self.Value,
+			EsxiFolderMoref: dc.HostFolder.Value,
+			VmFolderMoref:   dc.VmFolder.Value,
+			VcenterId:       v.Client().ServiceContent.About.InstanceUuid,
 		}
 
 		dcList = append(dcList, dcStruct)

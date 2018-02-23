@@ -92,7 +92,6 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-
 	// insert to backend
 	err = backend.InsertPoller(poller)
 	if err != nil {

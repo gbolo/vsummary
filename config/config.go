@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/spf13/viper"
-	"strings"
-	"os"
 	"fmt"
+	"os"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 func ConfigInit(cfgFile string) {
@@ -74,7 +75,7 @@ func printConfigSummary() {
 		"server.bind_port",
 		"backend.db_driver",
 		"backend.db_dsn",
-		} {
+	} {
 
 		log.Debugf("%s: %s\n", c, viper.GetString(c))
 	}
@@ -82,12 +83,12 @@ func printConfigSummary() {
 
 func sanityChecks() {
 
-	if viper.GetString("backend.db_driver") != "mysql" && viper.GetString("backend.db_driver") != ""  {
+	if viper.GetString("backend.db_driver") != "mysql" && viper.GetString("backend.db_driver") != "" {
 
 		log.Fatalf("only mysql is supported for backend_db_driver (value: %s)", viper.GetString("backend.db_driver"))
 	}
 
-	if viper.GetString("backend.db_dsn") == ""  {
+	if viper.GetString("backend.db_dsn") == "" {
 
 		log.Fatal("backend_db_dsn must be set")
 	}

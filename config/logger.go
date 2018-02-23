@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/op/go-logging"
 	"os"
+
+	"github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("vsummary")
@@ -11,7 +12,6 @@ func loggingInit(loglevel string) {
 
 	// In case of an invalid log level we default to ERROR
 	var log_level logging.Level = logging.ERROR
-
 
 	// Validating log levels
 	_, err := logging.LogLevel(loglevel)

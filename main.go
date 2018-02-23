@@ -1,13 +1,12 @@
 package main
 
 import (
-
 	_ "github.com/go-sql-driver/mysql"
 	//"github.com/jmoiron/sqlx"
+	"github.com/gbolo/vsummary/config"
 	back "github.com/gbolo/vsummary/db"
 	"github.com/gbolo/vsummary/poller"
 	"github.com/gbolo/vsummary/server"
-	"github.com/gbolo/vsummary/config"
 	//"github.com/gbolo/vsummary/crypto"
 
 	//"context"
@@ -17,8 +16,8 @@ import (
 
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/op/go-logging"
 	"fmt"
+	"github.com/op/go-logging"
 	//"net/http"
 	"time"
 	//"os"
@@ -50,8 +49,6 @@ func main() {
 	pollers, err := b.GetPollers()
 	fmt.Println(pollers)
 
-
-
 	//// vmware section ----------------------------------------------------------------------
 	//ctx, cancel := context.WithCancel(context.Background())
 	//defer cancel()
@@ -74,7 +71,6 @@ func main() {
 	//defer vPoller.VmwareClient.Logout(ctx)
 
 	go server.Start()
-
 
 	time.Sleep(3 * time.Second)
 
