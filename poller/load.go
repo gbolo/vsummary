@@ -50,6 +50,9 @@ func pollerLoop(p *Poller) (err error) {
 
 	defer p.VmwareClient.Logout(ctx)
 
+	// do a poll immediately
+	p.PollAllEndpoints()
+
 	timeout := time.After(60 * time.Minute)
 	tick := time.Tick(time.Duration(p.Config.IntervalMin) * time.Minute)
 	//tick := time.Tick(10 * time.Second)

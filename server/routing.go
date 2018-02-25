@@ -33,6 +33,12 @@ var routes = Routes{
 		handlerDatacenter,
 	},
 	Route{
+		"Cluster",
+		"POST",
+		appendRequestPrefix("/cluster"),
+		handlerCluster,
+	},
+	Route{
 		"Poller",
 		"POST",
 		appendRequestPrefix("/poller"),

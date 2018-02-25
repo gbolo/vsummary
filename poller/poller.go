@@ -60,6 +60,7 @@ func (p *Poller) PollAllEndpoints() {
 
 	logPollingResult(p.SendVMs())
 	logPollingResult(p.SendDatacenters())
+	logPollingResult(p.SendClusters())
 }
 
 func logPollingResult(err error) {

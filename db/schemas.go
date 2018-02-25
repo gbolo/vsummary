@@ -12,6 +12,7 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 		SqlSchema{"Vm", schemaVm},
 		SqlSchema{"Datacenter", schemaDatacenter},
 		SqlSchema{"Poller", schemaPoller},
+		SqlSchema{"Cluster", schemaCluster},
 	)
 
 	return
@@ -72,5 +73,26 @@ CREATE TABLE IF NOT EXISTS poller
      user_name      VARCHAR(128),
      password       VARCHAR(256),
      interval_min   INT UNSIGNED
+  );`
+
+	schemaCluster = `
+CREATE TABLE IF NOT EXISTS cluster
+  (
+     id                 VARCHAR(32) PRIMARY KEY,
+     name               VARCHAR(128),
+     datacenter_id      VARCHAR(32),
+     total_cpu_threads  INT UNSIGNED,
+     total_cpu_mhz      BIGINT UNSIGNED,
+     total_memory_bytes BIGINT UNSIGNED,
+     total_vmotions     INT UNSIGNED,
+     num_hosts          SMALLINT UNSIGNED,
+     drs_enabled        VARCHAR(16),
+     drs_behaviour      VARCHAR(64),
+     ha_enabled         VARCHAR(16),
+     current_balance    INT,
+     target_balance     INT,
+     status             VARCHAR(36),
+     vcenter_id         VARCHAR(36),
+     present            TINYINT DEFAULT 1
   );`
 )

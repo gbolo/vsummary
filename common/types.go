@@ -58,6 +58,32 @@ type Datacenter struct {
 	VmFolderId   string `db:"vm_folder_id"`
 }
 
+type Cluster struct {
+
+	// These are part of BOTH API request AND db record
+	VcenterId        string `json:"vcenter_id" db:"vcenter_id"`
+	Name             string `json:"name" db:"name"`
+	TotalCpuThreads  int16  `json:"total_cpu_threads" db:"total_cpu_threads"`
+	TotalCpuMhz      int32  `json:"total_cpu_mhz" db:"total_cpu_mhz"`
+	TotalMemoryBytes int64  `json:"total_memory_bytes" db:"total_memory_bytes"`
+	TotalVmotions    int32  `json:"total_vmotions" db:"total_vmotions"`
+	NumHosts         int32  `json:"num_hosts" db:"num_hosts"`
+	DRSEnabled       string `json:"drs_enabled" db:"drs_enabled"`
+	DRSBehaviour     string `json:"drs_behaviour" db:"drs_behaviour"`
+	HAEnabled        string `json:"ha_enabled" db:"ha_enabled"`
+	CurrentBalance   int32  `json:"current_balance" db:"current_balance"`
+	TargetBalance    int32  `json:"target_balance" db:"target_balance"`
+	Status           string `json:"status" db:"status"`
+
+	// These are part of API request ONLY
+	Moref           string `json:"moref" db:"moref"`
+	DatacenterMoref string `json:"datacenter_moref"`
+
+	// These are part of db record ONLY
+	Id           string `db:"id"`
+	DatacenterId string `db:"datacenter_id"`
+}
+
 type ResourcePool struct {
 
 	// These are part of BOTH API request AND db record
