@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -101,35 +100,6 @@ func (p *Poller) GetVMs() (vmList []common.Vm, err error) {
 	}
 
 	log.Infof("poller fetched summary of %d vms", len(vmList))
-	return
-
-}
-
-func (p *Poller) SendVMs() (err error) {
-
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "request")
-
-	// get Vms
-	vms, err := p.GetVMs()
-	if err != nil {
-		log.Debugf("failed to retrieve VM list: %s", err)
-		return
-	}
-
-	log.Infof("poller sending summary of %d vms", len(vms))
-
-	jsonVms, err := json.Marshal(vms)
-	if err != nil {
-		log.Errorf("invalid json vm: %s", err)
-		return
-	}
-
-	err = sendResults("/vm", jsonVms)
-	if err != nil {
-		return
-	}
-
 	return
 
 }

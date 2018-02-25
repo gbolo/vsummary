@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	//"github.com/gbolo/go-util/lib/debugging"
@@ -70,35 +69,6 @@ func (p *Poller) GetClusters() (clList []common.Cluster, err error) {
 	}
 
 	log.Infof("poller fetched summary of %d cluster(s)", len(clList))
-	return
-
-}
-
-func (p *Poller) SendClusters() (err error) {
-
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "requestClusters")
-
-	// get objects
-	clusters, err := p.GetClusters()
-	if err != nil {
-		log.Debugf("failed to retrieve Cluster list: %s", err)
-		return
-	}
-
-	log.Infof("poller sending summary of %d cluster(s)", len(clusters))
-
-	jsonObj, err := json.Marshal(clusters)
-	if err != nil {
-		log.Errorf("invalid json cluster: %s", err)
-		return
-	}
-
-	err = sendResults("/cluster", jsonObj)
-	if err != nil {
-		return
-	}
-
 	return
 
 }

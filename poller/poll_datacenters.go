@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -56,35 +55,6 @@ func (p *Poller) GetDatacenters() (dcList []common.Datacenter, err error) {
 	}
 
 	log.Infof("poller fetched summary of %d datacenters", len(dcList))
-	return
-
-}
-
-func (p *Poller) SendDatacenters() (err error) {
-
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "requestDatacenters")
-
-	// get objects
-	datacenters, err := p.GetDatacenters()
-	if err != nil {
-		log.Debugf("failed to retrieve Datacenter list: %s", err)
-		return
-	}
-
-	log.Infof("poller sending summary of %d datacenter(s)", len(datacenters))
-
-	jsonObj, err := json.Marshal(datacenters)
-	if err != nil {
-		log.Errorf("invalid json datacenter: %s", err)
-		return
-	}
-
-	err = sendResults("/datacenter", jsonObj)
-	if err != nil {
-		return
-	}
-
 	return
 
 }

@@ -22,7 +22,7 @@ var (
 	vSummaryEndpoints = map[string]string{
 		"vms":        "/vm",
 		"clusters":   "/cluster",
-		"datacenter": "/datacenter",
+		"datacenters": "/datacenter",
 	}
 )
 
