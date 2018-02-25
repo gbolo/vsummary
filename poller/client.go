@@ -20,8 +20,8 @@ var (
 
 	// object types and thier endpoints
 	vSummaryEndpoints = map[string]string{
-		"vms":        "/vm",
-		"clusters":   "/cluster",
+		"vms":         "/vm",
+		"clusters":    "/cluster",
 		"datacenters": "/datacenter",
 	}
 )

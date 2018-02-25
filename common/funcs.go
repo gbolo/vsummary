@@ -3,12 +3,12 @@ package common
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"time"
-	"strconv"
-
-	"github.com/op/go-logging"
-	"github.com/buger/jsonparser"
 	"encoding/json"
+	"strconv"
+	"time"
+
+	"github.com/buger/jsonparser"
+	"github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("vsummary")
@@ -30,7 +30,7 @@ func BoolToString(b bool) string {
 
 // When working with dynamic json
 // ignore errors, but log them
-func GetInt(o interface{}, keys ...string) (i int64){
+func GetInt(o interface{}, keys ...string) (i int64) {
 
 	b, _ := json.Marshal(o)
 
@@ -42,4 +42,3 @@ func GetInt(o interface{}, keys ...string) (i int64){
 	return
 
 }
-
