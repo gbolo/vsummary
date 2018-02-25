@@ -58,9 +58,9 @@ func (p *Poller) Connect(ctx *context.Context) (err error) {
 
 func (p *Poller) PollAllEndpoints() {
 
-	logPollingResult(p.SendVMs())
-	logPollingResult(p.SendDatacenters())
-	logPollingResult(p.SendClusters())
+	for k, _ := range vSummaryEndpoints {
+		logPollingResult(p.PollThenSend(k))
+	}
 }
 
 func logPollingResult(err error) {

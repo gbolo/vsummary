@@ -2,18 +2,32 @@ package poller
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
 
+	"github.com/gbolo/vsummary/common"
 	"github.com/spf13/viper"
 )
 
-var vSummaryClient *http.Client
+var (
+
+	// global http client for calls to vsummary server api
+	vSummaryClient *http.Client
+
+	// object types and thier endpoints
+	vSummaryEndpoints = map[string]string{
+		"vms":        "/vm",
+		"clusters":   "/cluster",
+		"datacenter": "/datacenter",
+	}
+)
 
 // Initializes the shared vSummaryClient
+// TODO: add error conditions
 func initHttpClient() (err error) {
 
 	// return right away if not nil
@@ -39,6 +53,12 @@ func initHttpClient() (err error) {
 
 // sends an api request to vsummary server api
 func sendResults(endpoint string, jsonBody []byte) (err error) {
+
+	// endpoint can't be empty
+	if endpoint == "" {
+		err = fmt.Errorf("endpoint is not defined")
+		return
+	}
 
 	// init client (no error for now)
 	initHttpClient()
@@ -74,5 +94,52 @@ func sendResults(endpoint string, jsonBody []byte) (err error) {
 	res.Body.Close()
 
 	log.Infof("api call successful: %d %s", res.StatusCode, url)
+	return
+}
+
+// does a poll then sends the results to the vsummary server api
+func (p *Poller) PollThenSend(objectType string) (err error) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), fmt.Sprintf("pollThenSend: %s", objectType))
+
+	// poll the object type
+	var o interface{}
+
+	switch objectType {
+
+	case "vms":
+		o, err = p.GetVMs()
+	case "datacenters":
+		o, err = p.GetDatacenters()
+	case "clusters":
+		o, err = p.GetClusters()
+
+	default:
+		err = fmt.Errorf("invalid endpoint: %s", objectType)
+		return
+
+	}
+
+	if err != nil {
+		log.Debugf("failed to poll %s: %s", objectType, err)
+		return
+	}
+
+	// marshal, then send the results
+	log.Infof("poller sending summary of %s", objectType)
+
+	jsonObj, err := json.Marshal(o)
+	if err != nil {
+		log.Errorf("invalid json %s: %s", objectType, err)
+		return
+	}
+
+	err = sendResults(vSummaryEndpoints[objectType], jsonObj)
+	if err != nil {
+		log.Errorf("error sending %s: %s", objectType, err)
+		return
+	}
+
 	return
 }
