@@ -56,7 +56,7 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 }
 
 // InsertVMs inserts a vm into database
-func (b *Backend) InsertVMs(vms []common.Vm) (err error) {
+func (b *Backend) InsertVMs(vms []common.VirtualMachine) (err error) {
 
 	// exit if there is no database connection
 	err = b.checkDB()

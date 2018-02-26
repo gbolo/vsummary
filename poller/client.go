@@ -20,9 +20,9 @@ var (
 
 	// object types and thier endpoints
 	vSummaryEndpoints = map[string]string{
-		"vms":         "/vm",
-		"clusters":    "/cluster",
-		"datacenters": "/datacenter",
+		"virtualmachines": "/virtualmachine",
+		"clusters":        "/cluster",
+		"datacenters":     "/datacenter",
 	}
 )
 
@@ -108,8 +108,8 @@ func (p *Poller) PollThenSend(objectType string) (err error) {
 
 	switch objectType {
 
-	case "vms":
-		o, err = p.GetVMs()
+	case "virtualmachines":
+		o, err = p.GetVirtualMachines()
 	case "datacenters":
 		o, err = p.GetDatacenters()
 	case "clusters":

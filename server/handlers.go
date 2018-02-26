@@ -27,7 +27,7 @@ func handlerVm(w http.ResponseWriter, req *http.Request) {
 	req.Body.Close()
 
 	// decode json body
-	var VmReq []common.Vm
+	var VmReq []common.VirtualMachine
 	err = json.Unmarshal(reqBody, &VmReq)
 	if err != nil {
 		log.Errorf("failed to decode body: %s", err)

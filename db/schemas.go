@@ -9,7 +9,7 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 
 	schemas = append(
 		schemas,
-		SqlSchema{"Vm", schemaVm},
+		SqlSchema{"VirtualMachine", schemaVm},
 		SqlSchema{"Datacenter", schemaDatacenter},
 		SqlSchema{"Poller", schemaPoller},
 		SqlSchema{"Cluster", schemaCluster},

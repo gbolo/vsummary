@@ -21,9 +21,9 @@ type Routes []Route
 // all defined api routes
 var routes = Routes{
 	Route{
-		"Vm",
+		"VirtualMachine",
 		"POST",
-		appendRequestPrefix("/vm"),
+		appendRequestPrefix("/virtualmachine"),
 		handlerVm,
 	},
 	Route{

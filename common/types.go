@@ -1,6 +1,6 @@
 package common
 
-type Vm struct {
+type VirtualMachine struct {
 
 	// These are part of BOTH API request AND db record
 	VcenterId            string `json:"vcenter_id" db:"vcenter_id" validate:"required"`

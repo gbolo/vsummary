@@ -9,7 +9,7 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 )
 
-func (p *Poller) GetVMs() (vmList []common.Vm, err error) {
+func (p *Poller) GetVirtualMachines() (vmList []common.VirtualMachine, err error) {
 
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "poll")
@@ -44,7 +44,7 @@ func (p *Poller) GetVMs() (vmList []common.Vm, err error) {
 	for _, vm := range vms {
 
 		// create vm struct
-		vmStruct := common.Vm{
+		vmStruct := common.VirtualMachine{
 			Name:                 vm.Summary.Config.Name,
 			Moref:                vm.Summary.Vm.Value,
 			VmxPath:              vm.Config.Files.VmPathName,
