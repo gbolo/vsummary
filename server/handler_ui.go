@@ -1,8 +1,11 @@
 package server
 
 import (
-	"text/template"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strings"
+	"text/template"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -19,17 +22,49 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 
 	ui := UiView{"IndexPage"}
 
-	templates, err := template.ParseFiles("www/templates/header.gohtml", "www/templates/navigation.gohtml", "www/templates/index.gohtml")
+	// read in all templates
+	templateFiles, err := findAllTemplates()
+
+	if err != nil {
+		fmt.Fprintf(w, "Error reading template(s). See logs")
+		log.Errorf("error geting template files: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	// parse then execute/render templates
+	templates, err := template.ParseFiles(templateFiles...)
 	if err == nil {
 		execErr := templates.ExecuteTemplate(w, "index", ui)
 		if execErr != nil {
-			log.Errorf("exec template error: %s", execErr)
+			fmt.Fprintf(w, "Error executing template(s). See logs")
+			log.Errorf("template execute error: %s", err)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
 		}
 
 	} else {
-		log.Errorf("template error: %s", err)
+		fmt.Fprintf(w, "Error parsing template(s). See logs")
+		log.Errorf("template parse error: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
 	}
 
+	return
+}
+
+func findAllTemplates() (templateFiles []string, err error) {
+
+	files, err := ioutil.ReadDir("./www/templates")
+	if err != nil {
+		return
+	}
+	for _, file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, ".gohtml") {
+			templateFiles = append(templateFiles, "./www/templates/"+filename)
+		}
+	}
 
 	return
 }
