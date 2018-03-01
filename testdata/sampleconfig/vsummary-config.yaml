@@ -5,7 +5,7 @@ server:
 
   # location of static files directory
   # used to serve static files such as css, js, exc.
-  static_files_dir: ./static
+  static_files_dir: ./www/static
 
   # local interface to bind to
   bind_address: 0.0.0.0

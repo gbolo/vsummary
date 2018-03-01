@@ -21,6 +21,8 @@ type Routes []Route
 
 // all defined api routes
 var routes = Routes{
+
+	// vSummary API endpoints
 	Route{
 		"VirtualMachine",
 		"POST",
@@ -44,6 +46,14 @@ var routes = Routes{
 		"POST",
 		appendRequestPrefix("/poller"),
 		handlerPoller,
+	},
+
+	// vSummary UI endpoints
+	Route{
+		"IndexView",
+		"GET",
+		"/index",
+		handlerUiView,
 	},
 	//Route{
 	//	"Stats",
