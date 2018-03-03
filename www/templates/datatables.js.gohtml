@@ -1,0 +1,86 @@
+{{ define "vsummaryDatatables" }}
+<!-- vSummary Datatables Load Javascript -->
+<script>
+
+    $(document).ready(function() {
+
+        // Setup - add a text input to each footer cell
+        $('#dt-vsummary-{{ .Title }} tfoot th').each( function (i) {
+            var title = $('#dt-vsummary-{{ .Title }} thead th').eq( $(this).index() ).text();
+            $(this).html( '<input type="text" placeholder="Search '+title+'" data-index="'+i+'" />' );
+        } );
+
+        // Load Datatables
+        var table = $('#dt-vsummary-{{ .Title }}').DataTable({
+            //dom: 'Blrtip',
+            dom: "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
+            scrollY: '60vh',
+            /*
+            responsive: {
+                details: false
+            },
+            */
+            /*
+            fixedColumns: {
+                leftColumns: 1
+            },
+            */
+            fixedColumns: true,
+            scrollX: true,
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                // Loop through all columns and delete the search
+                for (var i = 0;i < data.columns.length; i++){
+                    delete data.columns[i].search;
+                }
+            },
+            paging: true,
+            pageLength: 15,
+            lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]],
+            scrollCollapse: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ .AjaxEndpoint }}',
+                type: 'POST'
+            },
+            select: true,
+            buttons: [
+                'copy',
+                'csv',
+                { extend: 'colvis',
+                    className: 'colvis',
+                    text: 'Custom View'
+                }
+            ]
+        });
+
+        // Apply the footer search
+        $( table.table().container() ).on( 'keyup', 'tfoot input', function () {
+            table
+                    .column( $(this).data('index') )
+                    .search( this.value )
+                    .draw();
+        });
+
+    });
+
+</script>
+
+<!-- Sidebar Toggle Javascript -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+
+            $("#wrapper").toggleClass("toggled");
+
+            $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
+
+            // Redraw the datatables vsummary table
+            $('#dt-vsummary-{{ .Title }}').DataTable().draw();
+
+        });
+    });
+</script>
+{{ end }}

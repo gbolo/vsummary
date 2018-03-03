@@ -12,7 +12,9 @@ import (
 )
 
 type UiView struct {
-	Title string
+	Title        string
+	AjaxEndpoint string
+	TableHeaders []string
 }
 
 func handlerUiView(w http.ResponseWriter, req *http.Request) {
@@ -20,7 +22,40 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handleUiView")
 
-	ui := UiView{"IndexPage"}
+	ui := UiView{
+		"Virtualmachines",
+		"/api/dt/virtualmachines",
+		[]string{
+			"Folder",
+			"vCPU",
+			"Memory",
+			"PowerState",
+			"Real GuestOS",
+			"Config GuestOS",
+			"Version",
+			"ConfigChange",
+			"ToolsVersion",
+			"ToolRunning",
+			"Hostname",
+			"IP",
+			"Cluster",
+			"Pool",
+			"Datacenter",
+			"CpuUsed",
+			"HostMemUsed",
+			"GuestMemUsed",
+			"Uptime",
+			"ESXi",
+			"ESXiEVC",
+			"ESXiStatus",
+			"ESXiCPU",
+			"vDisks",
+			"vNICs",
+			"VMX",
+			"vCenter",
+			"VC-ENV",
+		},
+	}
 
 	// read in all templates
 	templateFiles, err := findAllTemplates()
