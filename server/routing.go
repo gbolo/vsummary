@@ -55,6 +55,13 @@ var routes = Routes{
 		"/index",
 		handlerUiView,
 	},
+	Route{
+		"UiDatacenters",
+		"GET",
+		"/datacenters",
+		handlerUiDatacenters,
+	},
+
 	//Route{
 	//	"Stats",
 	//	"GET",

@@ -22,7 +22,7 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handleUiView")
 
-	ui := UiView{
+	uiview := UiView{
 		"Virtualmachines",
 		"/api/dt/virtualmachines",
 		[]string{
@@ -57,6 +57,53 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 		},
 	}
 
+	// output the page
+	writeSummaryPage(w, &uiview)
+
+	return
+}
+
+func handlerUiDatacenters(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handleUiDatacenters")
+
+	// page details
+	uiview := UiView{
+		"Datacenters",
+		"/api/dt/datacenters",
+		[]string{
+			"Name",
+			"EsxiFolderId",
+		},
+	}
+
+	// output the page
+	writeSummaryPage(w, &uiview)
+
+	return
+}
+
+// return list of all template filenames
+func findAllTemplates() (templateFiles []string, err error) {
+
+	files, err := ioutil.ReadDir("./www/templates")
+	if err != nil {
+		return
+	}
+	for _, file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, ".gohtml") {
+			templateFiles = append(templateFiles, "./www/templates/"+filename)
+		}
+	}
+
+	return
+}
+
+// write generic vsummary table page
+func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
+
 	// read in all templates
 	templateFiles, err := findAllTemplates()
 
@@ -70,7 +117,7 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 	// parse then execute/render templates
 	templates, err := template.ParseFiles(templateFiles...)
 	if err == nil {
-		execErr := templates.ExecuteTemplate(w, "index", ui)
+		execErr := templates.ExecuteTemplate(w, "index", uiview)
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", err)
@@ -83,22 +130,6 @@ func handlerUiView(w http.ResponseWriter, req *http.Request) {
 		log.Errorf("template parse error: %s", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
-	}
-
-	return
-}
-
-func findAllTemplates() (templateFiles []string, err error) {
-
-	files, err := ioutil.ReadDir("./www/templates")
-	if err != nil {
-		return
-	}
-	for _, file := range files {
-		filename := file.Name()
-		if strings.HasSuffix(filename, ".gohtml") {
-			templateFiles = append(templateFiles, "./www/templates/"+filename)
-		}
 	}
 
 	return
