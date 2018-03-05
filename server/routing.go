@@ -50,10 +50,16 @@ var routes = Routes{
 
 	// vSummary UI endpoints
 	Route{
-		"IndexView",
+		"UiIndex",
 		"GET",
-		"/index",
-		handlerUiView,
+		"/",
+		handlerUiIndex,
+	},
+	Route{
+		"UiVirtualmachines",
+		"GET",
+		"/virtualmachines",
+		handlerUiVirtualmachines,
 	},
 	Route{
 		"UiDatacenters",

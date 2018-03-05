@@ -17,10 +17,20 @@ type UiView struct {
 	TableHeaders []string
 }
 
-func handlerUiView(w http.ResponseWriter, req *http.Request) {
+// default handler for landing page
+func handlerUiIndex(w http.ResponseWriter, req *http.Request) {
 
 	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handleUiView")
+	defer common.ExecutionTime(time.Now(), "handleUiIndex")
+
+	// for now just return a 302 to the VM endpoint
+	http.Redirect(w, req, "/virtualmachines", http.StatusTemporaryRedirect)
+}
+
+func handlerUiVirtualmachines(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiVirtualmachines")
 
 	uiview := UiView{
 		"Virtualmachines",
