@@ -58,13 +58,13 @@ var routes = Routes{
 	Route{
 		"UiVirtualmachines",
 		"GET",
-		"/virtualmachines",
+		"/ui/virtualmachines",
 		handlerUiVirtualmachines,
 	},
 	Route{
 		"UiDatacenters",
 		"GET",
-		"/datacenters",
+		"/ui/datacenters",
 		handlerUiDatacenters,
 	},
 

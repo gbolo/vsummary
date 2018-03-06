@@ -24,7 +24,7 @@ func handlerUiIndex(w http.ResponseWriter, req *http.Request) {
 	defer common.ExecutionTime(time.Now(), "handleUiIndex")
 
 	// for now just return a 302 to the VM endpoint
-	http.Redirect(w, req, "/virtualmachines", http.StatusTemporaryRedirect)
+	http.Redirect(w, req, "/ui/virtualmachines", http.StatusTemporaryRedirect)
 }
 
 func handlerUiVirtualmachines(w http.ResponseWriter, req *http.Request) {
