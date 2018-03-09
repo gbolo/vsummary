@@ -27,7 +27,7 @@ var routes = Routes{
 		"VirtualMachine",
 		"POST",
 		appendRequestPrefix("/virtualmachine"),
-		handlerVm,
+		handlerVirtualmachine,
 	},
 	Route{
 		"Datacenter",
