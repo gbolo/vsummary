@@ -94,6 +94,54 @@ func handlerUiDatacenters(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
+func handlerUiEsxi(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiEsxi")
+
+	// page details
+	uiview := UiView{
+		"ESXi",
+		"/api/dt/esxi",
+		[]string{
+			"Name",
+			"MaxEVC",
+			"EVC",
+			"Status",
+			"PowerState",
+			"Maintenance",
+			"Vendor",
+			"Model",
+			"Memory",
+			"CPU",
+			"CpuMHZ",
+			"CpuSockets",
+			"CpuCores",
+			"CpuThreads",
+			"NICs",
+			"HBAs",
+			"Version",
+			"Build",
+			"CpuUsed",
+			"MemUsed",
+			"Uptime",
+			"VMsOn",
+			"vCPUs",
+			"vRAM",
+			"pNICS",
+			"Cluster",
+			"Datacenter",
+			"vCenter",
+			"VC-ENV",
+		},
+	}
+
+	// output the page
+	writeSummaryPage(w, &uiview)
+
+	return
+}
+
 // return list of all template filenames
 func findAllTemplates() (templateFiles []string, err error) {
 

@@ -42,6 +42,12 @@ var routes = Routes{
 		handlerCluster,
 	},
 	Route{
+		"Esxi",
+		"POST",
+		appendRequestPrefix("/esxi"),
+		handlerEsxi,
+	},
+	Route{
 		"Poller",
 		"POST",
 		appendRequestPrefix("/poller"),
@@ -66,6 +72,12 @@ var routes = Routes{
 		"GET",
 		"/ui/datacenters",
 		handlerUiDatacenters,
+	},
+	Route{
+		"UiESXi",
+		"GET",
+		"/ui/esxi",
+		handlerUiEsxi,
 	},
 
 	//Route{

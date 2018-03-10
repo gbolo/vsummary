@@ -23,6 +23,7 @@ var (
 		"virtualmachines": "/virtualmachine",
 		"clusters":        "/cluster",
 		"datacenters":     "/datacenter",
+		"esxi":            "/esxi",
 	}
 )
 
@@ -114,6 +115,8 @@ func (p *Poller) PollThenSend(objectType string) (err error) {
 		o, err = p.GetDatacenters()
 	case "clusters":
 		o, err = p.GetClusters()
+	case "esxi":
+		o, err = p.GetEsxi()
 
 	default:
 		err = fmt.Errorf("invalid endpoint: %s", objectType)

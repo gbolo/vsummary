@@ -139,18 +139,41 @@ type Poller struct {
 	IntervalMin int    `json:"interval_min" db:"interval_min" validate:"required"`
 }
 
-//CREATE TABLE vswitch
-//(
-//id VARCHAR(32) PRIMARY KEY,
-//name VARCHAR(128),
-//type VARCHAR(64),
-//version VARCHAR(32) DEFAULT null,
-//max_mtu SMALLINT UNSIGNED DEFAULT 0,
-//ports SMALLINT UNSIGNED DEFAULT 0,
-//esxi_id VARCHAR(32) DEFAULT null,
-//vcenter_id VARCHAR(36),
-//present TINYINT DEFAULT 1
-//);
+type Esxi struct {
+
+	// These are part of BOTH API request AND db record
+	VcenterId         string `json:"vcenter_id" db:"vcenter_id"`
+	Name              string `json:"name" db:"name"`
+	MaxEvc            string `json:"max_evc" db:"max_evc"`
+	CurrentEvc        string `json:"current_evc" db:"current_evc"`
+	PowerState        string `json:"power_state" db:"power_state"`
+	InMaintenanceMode string `json:"in_maintenance_mode" db:"in_maintenance_mode"`
+	Vendor            string `json:"vendor" db:"vendor"`
+	Model             string `json:"model" db:"model"`
+	Uuid              string `json:"uuid" db:"uuid"`
+	MemoryBytes       int64  `json:"memory_bytes" db:"memory_bytes"`
+	CpuModel          string `json:"cpu_model" db:"cpu_model"`
+	CpuMhz            int32  `json:"cpu_mhz" db:"cpu_mhz"`
+	CpuSockets        int16  `json:"cpu_sockets" db:"cpu_sockets"`
+	CpuThreads        int16  `json:"cpu_threads" db:"cpu_threads"`
+	CpuCores          int16  `json:"cpu_cores" db:"cpu_cores"`
+	Nics              int32  `json:"nics" db:"nics"`
+	Hbas              int32  `json:"hbas" db:"hbas"`
+	Version           string `json:"version" db:"version"`
+	Build             string `json:"build" db:"build"`
+	StatCpuUsage      int32  `json:"stat_cpu_usage" db:"stat_cpu_usage"`
+	StatMemoryUsage   int32  `json:"stat_memory_usage" db:"stat_memory_usage"`
+	StatUptimeSec     int32  `json:"stat_uptime_sec" db:"stat_uptime_sec"`
+	Status            string `json:"status" db:"status"`
+
+	// These are part of API request ONLY
+	Moref        string `json:"moref" db:"moref"`
+	ClusterMoref string `json:"cluster_moref"`
+
+	// These are part of db record ONLY
+	Id        string `db:"id"`
+	ClusterId string `db:"cluster_id"`
+}
 
 //Function Get-VSDistributedVswitch ( [string]$vc_uuid ){
 //

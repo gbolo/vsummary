@@ -13,6 +13,7 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 		SqlSchema{"Datacenter", schemaDatacenter},
 		SqlSchema{"Poller", schemaPoller},
 		SqlSchema{"Cluster", schemaCluster},
+		SqlSchema{"Esxi", schemaEsxi},
 	)
 
 	return
@@ -94,5 +95,36 @@ CREATE TABLE IF NOT EXISTS cluster
      status             VARCHAR(36),
      vcenter_id         VARCHAR(36),
      present            TINYINT DEFAULT 1
+  );`
+
+	schemaEsxi = `
+CREATE TABLE IF NOT EXISTS esxi
+  (
+     id                  VARCHAR(32) PRIMARY KEY,
+     name                VARCHAR(128),
+     cluster_id          VARCHAR(32),
+     max_evc             VARCHAR(64),
+     current_evc         VARCHAR(64),
+     power_state         VARCHAR(16),
+     in_maintenance_mode VARCHAR(16),
+     vendor              VARCHAR(64),
+     model               VARCHAR(64),
+     uuid                VARCHAR(36),
+     memory_bytes        BIGINT UNSIGNED,
+     cpu_model           VARCHAR(64),
+     cpu_mhz             INT UNSIGNED,
+     cpu_sockets         SMALLINT UNSIGNED,
+     cpu_cores           SMALLINT UNSIGNED,
+     cpu_threads         SMALLINT UNSIGNED,
+     nics                SMALLINT UNSIGNED,
+     hbas                SMALLINT UNSIGNED,
+     version             VARCHAR(32),
+     build               VARCHAR(32),
+     stat_cpu_usage      INT UNSIGNED,
+     stat_memory_usage   BIGINT UNSIGNED,
+     stat_uptime_sec     INT UNSIGNED,
+     status              VARCHAR(36),
+     vcenter_id          VARCHAR(36),
+     present             TINYINT DEFAULT 1
   );`
 )
