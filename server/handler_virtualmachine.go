@@ -47,7 +47,7 @@ func handlerVirtualmachine(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// insert to backend
-	err = backend.InsertVMs(VmReq)
+	err = backend.InsertVirtualmachines(VmReq)
 	if err != nil {
 		log.Errorf("failed to insert vm: %s", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
