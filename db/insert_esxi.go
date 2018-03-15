@@ -107,6 +107,10 @@ func (b *Backend) InsertEsxi(esxis []common.Esxi) (err error) {
 		esxi.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.Moref))
 		esxi.ClusterId = common.GetMD5Hash(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.ClusterMoref))
 
+		if esxi.CurrentEvc == "" {
+			esxi.CurrentEvc = "NULL"
+		}
+
 		// Store the record in the DB
 		res, err := tx.NamedExec(insertEsxi, &esxi)
 
