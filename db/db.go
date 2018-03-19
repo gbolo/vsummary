@@ -50,8 +50,16 @@ func (b *Backend) checkDB() error {
 // SetDB changes the underlying sql.DB object Accessor is manipulating.
 func (b *Backend) SetDB(db *sqlx.DB) {
 	b.db = db
+	return
 }
 
+// return DB instance for datatables (for now)
+func (b *Backend) GetDB() (db *sqlx.DB) {
+	db = b.db
+	return
+}
+
+// Apply database schemas
 func (b *Backend) ApplySchemas() (err error) {
 
 	// check if db connection is available
