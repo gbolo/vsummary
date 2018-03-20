@@ -14,7 +14,12 @@ import (
 type UiView struct {
 	Title        string
 	AjaxEndpoint string
-	TableHeaders []string
+	Table        map[string]string
+
+	// <tr> values in template
+	TplTr []string
+	// sql column name for datatatbles
+	TplColNames []string
 }
 
 // default handler for landing page
@@ -33,37 +38,11 @@ func handlerUiVirtualmachines(w http.ResponseWriter, req *http.Request) {
 	defer common.ExecutionTime(time.Now(), "handlerUiVirtualmachines")
 
 	uiview := UiView{
-		"Virtualmachines",
-		"/api/dt/virtualmachines",
-		[]string{
-			"Folder",
-			"vCPU",
-			"Memory",
-			"PowerState",
-			"Real GuestOS",
-			"Config GuestOS",
-			"Version",
-			"ConfigChange",
-			"ToolsVersion",
-			"ToolRunning",
-			"Hostname",
-			"IP",
-			"Cluster",
-			"Pool",
-			"Datacenter",
-			"CpuUsed",
-			"HostMemUsed",
-			"GuestMemUsed",
-			"Uptime",
-			"ESXi",
-			"ESXiEVC",
-			"ESXiStatus",
-			"ESXiCPU",
-			"vDisks",
-			"vNICs",
-			"VMX",
-			"vCenter",
-			"VC-ENV",
+		Title:        "Virtualmachines",
+		AjaxEndpoint: "/api/dt/virtualmachines",
+		Table: map[string]string{
+			"name":       "Name",
+			"vcenter_id": "vCenter Id",
 		},
 	}
 
@@ -80,11 +59,11 @@ func handlerUiDatacenters(w http.ResponseWriter, req *http.Request) {
 
 	// page details
 	uiview := UiView{
-		"Datacenters",
-		"/api/dt/datacenters",
-		[]string{
-			"Name",
-			"EsxiFolderId",
+		Title:        "Datacenters",
+		AjaxEndpoint: "/api/dt/datacenters",
+		Table: map[string]string{
+			"name":       "Name",
+			"vcenter_id": "vCenter Id",
 		},
 	}
 
@@ -101,38 +80,10 @@ func handlerUiEsxi(w http.ResponseWriter, req *http.Request) {
 
 	// page details
 	uiview := UiView{
-		"ESXi",
-		"/api/dt/esxi",
-		[]string{
-			"Name",
-			"MaxEVC",
-			"EVC",
-			"Status",
-			"PowerState",
-			"Maintenance",
-			"Vendor",
-			"Model",
-			"Memory",
-			"CPU",
-			"CpuMHZ",
-			"CpuSockets",
-			"CpuCores",
-			"CpuThreads",
-			"NICs",
-			"HBAs",
-			"Version",
-			"Build",
-			"CpuUsed",
-			"MemUsed",
-			"Uptime",
-			"VMsOn",
-			"vCPUs",
-			"vRAM",
-			"pNICS",
-			"Cluster",
-			"Datacenter",
-			"vCenter",
-			"VC-ENV",
+		Title:        "ESXi",
+		AjaxEndpoint: "/api/dt/esxi",
+		Table: map[string]string{
+			"name": "Name",
 		},
 	}
 
@@ -172,13 +123,26 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 		return
 	}
 
-	// parse then execute/render templates
-	templates, err := template.ParseFiles(templateFiles...)
+	// prepare slices for templates
+	for colName, trName := range uiview.Table {
+		uiview.TplColNames = append(uiview.TplColNames, fmt.Sprintf(
+			"{ \"data\": \"%s\", \"name\": \"%s\" }",
+			colName,
+			colName,
+		))
+		uiview.TplTr = append(uiview.TplTr, trName)
+	}
+
+	// parse and add function to templates
+	templates, err := template.New("index").
+		Funcs(template.FuncMap{"StringsJoin": strings.Join}).
+		ParseFiles(templateFiles...)
+
 	if err == nil {
 		execErr := templates.ExecuteTemplate(w, "index", uiview)
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
-			log.Errorf("template execute error: %s", err)
+			log.Errorf("template execute error: %s", execErr)
 			w.WriteHeader(http.StatusServiceUnavailable)
 			return
 		}

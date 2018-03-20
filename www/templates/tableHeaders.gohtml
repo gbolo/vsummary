@@ -1,16 +1,16 @@
 {{ define "table" }}
 <thead>
     <tr>
-    {{- range .TableHeaders }}
-        <th>{{ . }}</th>
+    {{- range $colName, $tableHeader := .Table }}
+        <th>{{ $tableHeader }}</th>
     {{- end -}}
     </tr>
 </thead>
 
 <tfoot>
     <tr>
-    {{- range .TableHeaders }}
-        <th>{{ . }}</th>
+    {{- range $colName, $tableHeader := .Table }}
+        <th>{{ $tableHeader }}</th>
     {{- end -}}
     </tr>
 </tfoot>
