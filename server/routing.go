@@ -80,6 +80,14 @@ var routes = Routes{
 		handlerUiEsxi,
 	},
 
+	// Datatables API endpoints
+	Route{
+		"DtVirtualMachines",
+		"POST",
+		"/api/dt/virtualmachines",
+		handlerDtVirtualMachine,
+	},
+
 	//Route{
 	//	"Stats",
 	//	"GET",
