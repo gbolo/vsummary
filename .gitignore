@@ -16,3 +16,4 @@ vsummary
 
 ### some testing stuff
 testdata/scripts/vmware.sh
+testdata/*.go
