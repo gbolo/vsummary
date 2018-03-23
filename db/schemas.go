@@ -9,11 +9,16 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 
 	schemas = append(
 		schemas,
+
+		// tables
 		SqlSchema{"VirtualMachine", schemaVm},
 		SqlSchema{"Datacenter", schemaDatacenter},
 		SqlSchema{"Poller", schemaPoller},
 		SqlSchema{"Cluster", schemaCluster},
 		SqlSchema{"Esxi", schemaEsxi},
+		SqlSchema{"vCenter", schemaVcenter},
+
+		// TODO: add views
 	)
 
 	return
@@ -74,6 +79,14 @@ CREATE TABLE IF NOT EXISTS poller
      user_name      VARCHAR(128),
      password       VARCHAR(256),
      interval_min   INT UNSIGNED
+  );`
+
+	schemaVcenter = `
+CREATE TABLE IF NOT EXISTS vcenter
+  (
+     id     VARCHAR(36) PRIMARY KEY,
+     name   VARCHAR(64),
+     host   VARCHAR(64)
   );`
 
 	schemaCluster = `

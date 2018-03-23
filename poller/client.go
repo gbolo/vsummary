@@ -24,6 +24,7 @@ var (
 		"clusters":        "/cluster",
 		"datacenters":     "/datacenter",
 		"esxi":            "/esxi",
+		"vcenter": "/vcenter",
 	}
 )
 
@@ -117,6 +118,8 @@ func (p *Poller) PollThenSend(objectType string) (err error) {
 		o, err = p.GetClusters()
 	case "esxi":
 		o, err = p.GetEsxi()
+	case "vcenter":
+		o, err = p.GetVcenter()
 
 	default:
 		err = fmt.Errorf("invalid endpoint: %s", objectType)

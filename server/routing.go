@@ -48,6 +48,12 @@ var routes = Routes{
 		handlerEsxi,
 	},
 	Route{
+		"vCenter",
+		"POST",
+		appendRequestPrefix("/vcenter"),
+		handlerVcenter,
+	},
+	Route{
 		"Poller",
 		"POST",
 		appendRequestPrefix("/poller"),

@@ -175,80 +175,10 @@ type Esxi struct {
 	ClusterId string `db:"cluster_id"`
 }
 
-//Function Get-VSDistributedVswitch ( [string]$vc_uuid ){
-//
-//$objecttype = "DVS"
-//
-//&{Get-View -ViewType DistributedVirtualSwitch -Property Name,
-//Summary.ProductInfo.Version,
-//Config | %{
-//$dvs = $_
-//New-Object -TypeName PSobject -Property @{
-//name = $dvs.Name
-//moref = $dvs.MoRef.Value
-//version = $dvs.Summary.ProductInfo.Version
-//max_mtu = $dvs.Config.MaxMtu
-//ports = $dvs.Config.NumPorts
-//vcenter_id = $vc_uuid
-//objecttype = $objecttype
-//} ## end new-object
-//} ## end foreach-object
-//} | ConvertTo-Json
-//}
+type VCenter struct {
 
-//$objecttype = "SVS"
-//
-//&{Get-View -ViewType HostSystem -Property Name,
-//Config.Network.Vswitch | %{
-//$esxi = $_
-//$esxi.Config.Network.Vswitch | %{
-//$vswitch = $_
-//New-Object -TypeName PSobject -Property @{
-//name = $vswitch.Name
-//ports = $vswitch.Spec.NumPorts
-//max_mtu = $vswitch.Mtu
-//esxi_moref = $esxi.MoRef.Value
-//vcenter_id = $vc_uuid
-//objecttype = $objecttype
-//} ## end new-object
-//} ## end foreach-object
-//} ## end foreach-object
-//} | ConvertTo-Json
-
-//New-Object -TypeName PSobject -Property @{
-//name = $res.Name
-//moref = $res.MoRef.Value
-//type = $type
-//status = $res.OverallStatus
-//vapp_state = $vapp_state
-//parent_moref = $res.Parent.Value
-//cluster_moref = $res.Owner.Value
-//configured_memory_mb = $res.Summary.ConfiguredMemoryMB
-//cpu_reservation =  $res.summary.Config.CpuAllocation.Reservation
-//cpu_limit = $res.summary.Config.CpuAllocation.Limit
-//mem_reservation =  $res.summary.Config.MemoryAllocation.Reservation
-//mem_limit = $res.summary.Config.MemoryAllocation.Limit
-//vcenter_id = $vc_uuid
-//objecttype = $objecttype
-
-//CREATE TABLE resourcepool
-//(
-//id VARCHAR(32) PRIMARY KEY,
-//moref VARCHAR(16),
-//full_path VARCHAR(512),
-//name VARCHAR(128),
-//type VARCHAR(64),
-//status VARCHAR(64),
-//vapp_state VARCHAR(64),
-//vapp_in_path TINYINT DEFAULT 0,
-//configured_memory_mb BIGINT UNSIGNED,
-//cpu_reservation BIGINT UNSIGNED,
-//cpu_limit BIGINT,
-//mem_reservation BIGINT UNSIGNED,
-//mem_limit BIGINT,
-//parent VARCHAR(32),
-//parent_moref VARCHAR(16),
-//cluster_id VARCHAR(32),
-//vcenter_id VARCHAR(36),
-//present TINYINT DEFAULT 1
-//);
+	// These are part of BOTH API request AND db record
+	Id   string `json:"id" db:"id" validate:"required"`
+	Host string `json:"host" db:"host" validate:"required"`
+	Name string `json:"name" db:"name"`
+}
