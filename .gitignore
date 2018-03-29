@@ -1,12 +1,19 @@
-### mysql config details ###
-src/api/lib/mysql_config.php
+### editors
+.idea
 
 ### powershell config
-collectors/powershell/vsummary_config.ps1
+#contrib/collectors/powershell/vsummary_config.ps1
 
 ### scripts and testing
-scripts/testing/*
-scripts/vcenter-migrator/output/*
+contrib/scripts/testing/*
+contrib/scripts/vcenter-migrator/output/*
 
 ### Python bytecode
 *.pyc
+
+### binaries
+vsummary
+
+### some testing stuff
+testdata/scripts/vmware.sh
+testdata/*.go

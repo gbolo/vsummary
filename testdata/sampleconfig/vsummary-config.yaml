@@ -1,0 +1,63 @@
+---
+
+# http server settings -------------------------------------------------------------------------------------------------
+server:
+
+  # location of static files directory
+  # used to serve static files such as css, js, exc.
+  static_files_dir: ./www/static
+
+  # local interface to bind to
+  bind_address: 0.0.0.0
+
+  # port to listen on
+  bind_port: 8080
+
+  # enable access log on stdout
+  access_log: true
+
+  # TLS options
+  tls:
+
+    # enabled TLS
+    enabled: false
+
+    # path to pem encoded x509 certificate chain
+    # should include the following x509 certs: server > intermediate CA 1 > ... > intermediate CA X
+    cert_chain: /path/to/server-cert-chain.pem
+
+    # path to pem encoded pkcs1/8 private key
+    private_key: /path/to/server-key.pem
+
+
+# backend database settings --------------------------------------------------------------------------------------------
+backend:
+
+  # type of database
+  db_driver: mysql
+
+  # data source name (DSN)
+  # format: <username>:<password>@<host>:<port>/<database>
+  db_dsn: "vsummary:secret@(localhost:3306)/vsummary"
+
+
+# poller settings ------------------------------------------------------------------------------------------------------
+poller:
+
+  # vsummary server URL to submit results to
+  url: http://localhost:8080
+
+  # interval in minutes on how often we should poll
+  interval: 60
+
+  # HTTP client options for connection to vsummary server
+  client:
+
+    # proxy host
+
+
+# misc settings --------------------------------------------------------------------------------------------------------
+log_level: DEBUG
+
+# symetric aes key used to encrypt/decrypt passwords.
+aes_key: K6DW7J6D47BCZ57F5BCV8PCA2C95KM7Q
