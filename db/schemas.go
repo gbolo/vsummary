@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS folder
   (
      id                   VARCHAR(32) PRIMARY KEY,
      moref                VARCHAR(32),
-     NAME                 VARCHAR(128),
+     name                 VARCHAR(128),
      type                 VARCHAR(64),
      full_path            VARCHAR(512),
      parent               VARCHAR(32),
