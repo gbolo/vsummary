@@ -23,6 +23,9 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 		SqlSchema{"vDisk", schemaVdisk},
 		SqlSchema{"vNic", schemaVnic},
 		SqlSchema{"pNic", schemaPnic},
+		SqlSchema{"vmkNic", schemaVmknic},
+		SqlSchema{"Portgroup", schmeaPortgroup},
+		SqlSchema{"Datastore", schemaDatastore},
 
 		// TODO: add views
 	)
@@ -244,5 +247,48 @@ CREATE TABLE IF NOT EXISTS vswitch
      esxi_id    VARCHAR(32) DEFAULT NULL,
      vcenter_id VARCHAR(36),
      present    TINYINT DEFAULT 1
+  );`
+
+	schmeaPortgroup = `
+CREATE TABLE IF NOT EXISTS portgroup
+  (
+     id         VARCHAR(32) PRIMARY KEY,
+     name       VARCHAR(128),
+     type       VARCHAR(32),
+     vlan       VARCHAR(128),
+     vlan_type  VARCHAR(64),
+     vswitch_id VARCHAR(32),
+     vcenter_id VARCHAR(36),
+     present    TINYINT DEFAULT 1
+  );`
+
+	schemaVmknic = `
+CREATE TABLE IF NOT EXISTS vmknic
+  (
+     id           VARCHAR(32) PRIMARY KEY,
+     name         VARCHAR(128),
+     mac          VARCHAR(17),
+     mtu          SMALLINT UNSIGNED,
+     ip           VARCHAR(45),
+     netmask      VARCHAR(32),
+     portgroup_id VARCHAR(32),
+     esxi_id      VARCHAR(32),
+     vcenter_id   VARCHAR(36),
+     present      TINYINT DEFAULT 1
+  );`
+
+	schemaDatastore = `
+CREATE TABLE IF NOT EXISTS datastore
+  (
+     id                VARCHAR(32) PRIMARY KEY,
+     name              VARCHAR(128),
+     moref             VARCHAR(16),
+     status            VARCHAR(32),
+     capacity_bytes    BIGINT UNSIGNED,
+     free_bytes        BIGINT UNSIGNED,
+     uncommitted_bytes BIGINT UNSIGNED,
+     type              VARCHAR(32),
+     vcenter_id        VARCHAR(36),
+     present           TINYINT DEFAULT 1
   );`
 )
