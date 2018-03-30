@@ -17,6 +17,12 @@ func generateSqlSchemas() (schemas []SqlSchema) {
 		SqlSchema{"Cluster", schemaCluster},
 		SqlSchema{"Esxi", schemaEsxi},
 		SqlSchema{"vCenter", schemaVcenter},
+		SqlSchema{"Cluster", schemaResourcepool},
+		SqlSchema{"Folder", schemaFolder},
+		SqlSchema{"vSwitch", schemaVswitch},
+		SqlSchema{"vDisk", schemaVdisk},
+		SqlSchema{"vNic", schemaVnic},
+		SqlSchema{"pNic", schemaPnic},
 
 		// TODO: add views
 	)
@@ -139,5 +145,104 @@ CREATE TABLE IF NOT EXISTS esxi
      status              VARCHAR(36),
      vcenter_id          VARCHAR(36),
      present             TINYINT DEFAULT 1
+  );`
+
+	schemaResourcepool = `
+CREATE TABLE IF NOT EXISTS resourcepool
+  (
+     id                   VARCHAR(32) PRIMARY KEY,
+     moref                VARCHAR(16),
+     full_path            VARCHAR(512),
+     name                 VARCHAR(128),
+     type                 VARCHAR(64),
+     status               VARCHAR(64),
+     vapp_state           VARCHAR(64),
+     vapp_in_path         TINYINT DEFAULT 0,
+     configured_memory_mb BIGINT UNSIGNED,
+     cpu_reservation      BIGINT UNSIGNED,
+     cpu_limit            BIGINT,
+     mem_reservation      BIGINT UNSIGNED,
+     mem_limit            BIGINT,
+     parent               VARCHAR(32),
+     parent_moref         VARCHAR(16),
+     cluster_id           VARCHAR(32),
+     vcenter_id           VARCHAR(36),
+     present              TINYINT DEFAULT 1
+  );`
+
+	schemaFolder = `
+CREATE TABLE IF NOT EXISTS folder
+  (
+     id                   VARCHAR(32) PRIMARY KEY,
+     moref                VARCHAR(32),
+     NAME                 VARCHAR(128),
+     type                 VARCHAR(64),
+     full_path            VARCHAR(512),
+     parent               VARCHAR(32),
+     parent_datacenter_id VARCHAR(32),
+     vcenter_id           VARCHAR(36),
+     present              TINYINT DEFAULT 1
+  );`
+
+	schemaVdisk = `
+CREATE TABLE IF NOT EXISTS vdisk
+  (
+     id               VARCHAR(32) PRIMARY KEY,
+     name             VARCHAR(128),
+     capacity_bytes   BIGINT UNSIGNED,
+     path             VARCHAR(255),
+     thin_provisioned VARCHAR(16),
+     datastore_id     VARCHAR(32),
+     uuid             VARCHAR(128),
+     disk_object_id   VARCHAR(32),
+     vm_id            VARCHAR(32),
+     esxi_id          VARCHAR(32),
+     vcenter_id       VARCHAR(36),
+     present          TINYINT DEFAULT 1,
+     KEY 'vmid_ix' ('vm_id')
+  );`
+
+	schemaPnic = `
+CREATE TABLE IF NOT EXISTS pnic
+  (
+     id         VARCHAR(32) PRIMARY KEY,
+     name       VARCHAR(128),
+     mac        VARCHAR(17),
+     link_speed SMALLINT UNSIGNED,
+     driver     VARCHAR(45),
+     esxi_id    VARCHAR(32),
+     vswitch_id VARCHAR(32) DEFAULT NULL,
+     vcenter_id VARCHAR(36),
+     present    TINYINT DEFAULT 1
+  );`
+
+	schemaVnic = `
+CREATE TABLE IF NOT EXISTS vnic
+  (
+     id           VARCHAR(32) PRIMARY KEY,
+     name         VARCHAR(64),
+     mac          VARCHAR(17),
+     type         VARCHAR(45),
+     connected    VARCHAR(16),
+     status       VARCHAR(16),
+     vm_id        VARCHAR(32),
+     portgroup_id VARCHAR(32),
+     vcenter_id   VARCHAR(36),
+     present      TINYINT DEFAULT 1,
+     KEY 'vmid_ix' ('vm_id')
+  );`
+
+	schemaVswitch = `
+CREATE TABLE IF NOT EXISTS vswitch
+  (
+     id         VARCHAR(32) PRIMARY KEY,
+     name       VARCHAR(128),
+     type       VARCHAR(64),
+     version    VARCHAR(32) DEFAULT NULL,
+     max_mtu    SMALLINT UNSIGNED DEFAULT 0,
+     ports      SMALLINT UNSIGNED DEFAULT 0,
+     esxi_id    VARCHAR(32) DEFAULT NULL,
+     vcenter_id VARCHAR(36),
+     present    TINYINT DEFAULT 1
   );`
 )
