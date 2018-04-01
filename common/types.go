@@ -182,3 +182,159 @@ type VCenter struct {
 	Host string `json:"host" db:"host" validate:"required"`
 	Name string `json:"name" db:"name"`
 }
+
+type Folder struct {
+	// These are part of BOTH API request AND db record
+	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
+	Name      string `json:"name" db:"name"`
+	Type      string `json:"type" db:"type"`
+
+	// These are part of API request ONLY
+	Moref       string `json:"moref"`
+	ParentMoref string `json:"parent_moref"`
+
+	// These are part of db record ONLY
+	Id                 string `db:"id"`
+	FullPath           string `db:"full_path"`
+	Parent             string `db:"parent"`
+	ParentDatacenterId string `db:"parent_datacenter_id"`
+}
+
+type Vdisk struct {
+	// These are part of BOTH API request AND db record
+	VcenterId       string `json:"vcenter_id" db:"vcenter_id"`
+	Name            string `json:"name" db:"name"`
+	CapacityBytes   int64  `json:"capacity_bytes" db:"capacity_bytes"`
+	Path            string `json:"path" db:"path"`
+	ThinProvisioned string `json:"thin_provisioned" db:"thin_provisioned"`
+	Uuid            string `json:"uuid" db:"uuid"`
+	DiskObjectId    string `json:"disk_object_id" db:"disk_object_id"`
+
+	// These are part of API request ONLY
+	Moref               string `json:"moref"`
+	CapacityKb          string `json:"capacity_kb"`
+	DatacenterMoref     string `json:"datastore_moref"`
+	VirtualmachineMoref string `json:"vm_moref"`
+	EsxiMoref           string `json:"esxi_moref"`
+
+	// These are part of db record ONLY
+	Id               string `db:"id"`
+	DatacenterId     string `db:"datastore_id"`
+	VirtualMachineId string `db:"vm_id"`
+	EsxiId           string `db:"esxi_id"`
+}
+
+type PNic struct {
+	// These are part of BOTH API request AND db record
+	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
+	Name       string `json:"name" db:"name"`
+	MacAddress string `json:"mac" db:"mac"`
+	LinkSpeed  string `json:"link_speed" db:"link_speed"`
+	Driver     string `json:"driver" db:"driver"`
+
+	// These are part of API request ONLY
+	Moref     string `json:"moref"`
+	EsxiMoref string `json:"esxi_moref"`
+
+	// These are part of db record ONLY
+	Id     string `db:"id"`
+	EsxiId string `db:"esxi_id"`
+
+	// TODO: unused for now
+	VswicthId string `db:"vswitch_id"`
+}
+
+type VNic struct {
+	// These are part of BOTH API request AND db record
+	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
+	Name       string `json:"name" db:"name"`
+	MacAddress string `json:"mac" db:"mac"`
+	Connected  string `json:"connected" db:"connected"`
+	Status     string `json:"status" db:"status"`
+	Type       string `json:"type" db:"type"`
+
+	// These are part of API request ONLY
+	Moref               string `json:"moref"`
+	PortgroupMoref      string `json:"portgroup_moref"`
+	PortgroupName       string `json:"portgroup_name"`
+	VirtualmachineMoref string `json:"vm_moref"`
+	EsxiMoref           string `json:"esxi_moref"`
+	VswitchType         string `json:"vswitch_type"`
+	VswitchName         string `json:"vswitch_name"`
+
+	// These are part of db record ONLY
+	Id               string `db:"id"`
+	VirtualmachineId string `db:"vm_id"`
+	PortgroupId      string `db:"portgroup_id"`
+}
+
+type Vswitch struct {
+	// These are part of BOTH API request AND db record
+	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
+	Name      string `json:"name" db:"name"`
+	MaxMtu    int    `json:"max_mtu" db:"max_mtu"`
+	Ports     int    `json:"ports" db:"ports"`
+	Version   string `json:"version" db:"version"`
+
+	// These are part of API request ONLY
+	Moref     string `json:"moref"`
+	EsxiMoref string `json:"esxi_moref"`
+	Type      string `json:"type"`
+
+	// These are part of db record ONLY
+	Id     string `db:"id"`
+	EsxiId string `db:"esxi_id"`
+}
+
+type Portgroup struct {
+	// These are part of BOTH API request AND db record
+	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
+	Name      string `json:"name" db:"name"`
+	Type      string `json:"type" db:"type"`
+	VlanType  string `json:"vlan_type" db:"vlan_type"`
+
+	// These are part of API request ONLY
+	Moref        string `json:"moref"`
+	VswitchMoref string `json:"vswitch_moref"`
+	VlanStart    int    `json:"vlan_start"`
+	VlanEnd      int    `json:"vlan_end"`
+
+	// These are part of db record ONLY
+	Id        string `db:"id"`
+	VswitchId string `db:"vswitch_id"`
+}
+
+type Datastore struct {
+	// These are part of BOTH API request AND db record
+	VcenterId        string `json:"vcenter_id" db:"vcenter_id"`
+	Name             string `json:"name" db:"name"`
+	Moref            string `json:"moref"`
+	Status           string `json:"status" db:"status"`
+	CapacityBytes    int64  `json:"capacity_bytes" db:"capacity_bytes"`
+	FreeBytes        int64  `json:"free_bytes" db:"free_bytes"`
+	UncommittedBytes int64  `json:"uncommitted_bytes" db:"uncommitted_bytes"`
+	Type             string `json:"type" db:"type"`
+
+	// These are part of db record ONLY
+	Id string `db:"id"`
+}
+
+// TODO: unused right now
+type VmkNic struct {
+	// These are part of BOTH API request AND db record
+	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
+	Name       string `json:"name" db:"name"`
+	MacAddress string `json:"mac" db:"mac"`
+	IP         string `json:"ip" db:"ip"`
+	Netmask    string `json:"netmask" db:"netmask"`
+
+	// These are part of API request ONLY
+	Moref          string `json:"moref"`
+	PortgroupMoref string `json:"portgroup_moref"`
+	EsxiMoref      string `json:"esxi_moref"`
+
+	// These are part of db record ONLY
+	Id          string `db:"id"`
+	PortgroupId string `db:"portgrouo_id"`
+	EsxiId      string `db:"esxi_id"`
+}
