@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS vdisk
      esxi_id          VARCHAR(32),
      vcenter_id       VARCHAR(36),
      present          TINYINT DEFAULT 1,
-     KEY 'vmid_ix' ('vm_id')
+     INDEX vmid_ix (vm_id)
   );`
 
 	schemaPnic = `
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS vnic
      portgroup_id VARCHAR(32),
      vcenter_id   VARCHAR(36),
      present      TINYINT DEFAULT 1,
-     KEY 'vmid_ix' ('vm_id')
+     INDEX vmid_ix (vm_id)
   );`
 
 	schemaVswitch = `
