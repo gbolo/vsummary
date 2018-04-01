@@ -110,24 +110,6 @@ type ResourcePool struct {
 	VappInPath int    `db:"vapp_in_path"`
 }
 
-type VSwitch struct {
-
-	// These are part of BOTH API request AND db record
-	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
-	Name      string `json:"name" db:"name"`
-	Type      string `json:"type" db:"type"`
-	Version   string `json:"version" db:"version"`
-	Ports     int    `json:"ports" db:"ports"`
-	MaxMTU    int    `json:"max_mtu" db:"max_mtu"`
-
-	// These are part of API request ONLY
-	Moref string `json:"moref" db:"moref"` // only distributed switch has this
-
-	// These are part of db record ONLY
-	Id     string `db:"id"`
-	EsxiId string `db:"esxi_id"`
-}
-
 type Poller struct {
 
 	// These are part of BOTH API request AND db record
@@ -200,7 +182,7 @@ type Folder struct {
 	ParentDatacenterId string `db:"parent_datacenter_id"`
 }
 
-type Vdisk struct {
+type VDisk struct {
 	// These are part of BOTH API request AND db record
 	VcenterId       string `json:"vcenter_id" db:"vcenter_id"`
 	Name            string `json:"name" db:"name"`
@@ -268,7 +250,7 @@ type VNic struct {
 	PortgroupId      string `db:"portgroup_id"`
 }
 
-type Vswitch struct {
+type VSwitch struct {
 	// These are part of BOTH API request AND db record
 	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
 	Name      string `json:"name" db:"name"`
