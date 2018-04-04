@@ -193,8 +193,7 @@ type VDisk struct {
 	DiskObjectId    string `json:"disk_object_id" db:"disk_object_id"`
 
 	// These are part of API request ONLY
-	Moref               string `json:"moref"`
-	CapacityKb          string `json:"capacity_kb"`
+	CapacityKb          int64  `json:"capacity_kb"`
 	DatacenterMoref     string `json:"datastore_moref"`
 	VirtualmachineMoref string `json:"vm_moref"`
 	EsxiMoref           string `json:"esxi_moref"`
