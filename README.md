@@ -1,4 +1,4 @@
-![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/src/img/vsummary_logo.png "vSummary Logo")
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/php/src/img/vsummary_logo.png "vSummary Logo")
 
 [![](https://images.microbadger.com/badges/image/gbolo/vsummary.svg)](http://microbadger.com/images/gbolo/vsummary "Image Badge")
 
@@ -9,13 +9,13 @@ For a **LIVE DEMO**, please click this link:
 **[vsummary.linuxctl.com](https://vsummary.linuxctl.com/index.php?view=vm)**
 
 ### Screenshots
-![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_1.png "Screenshot 1")
-![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/screenshot_2.png "Screenshot 2")
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/php/screenshots/screenshot_1.png "Screenshot 1")
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/php/screenshots/screenshot_2.png "Screenshot 2")
 
 ### Architecture
 vSummary is essentially a web application with both a frontend and backend. The backend accepts HTTP POST data in json format which it then normalizes and inserts/updates into various mysql tables. The frontend is where it displays this data for users to see. Here is a basic architectural diagram to visualize this:
 
-![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/master/screenshots/vsummary-components.png "Architecture")
+![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/php/screenshots/vsummary-components.png "Architecture")
 
 ### Quick start - Docker
 
