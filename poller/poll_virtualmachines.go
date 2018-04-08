@@ -9,7 +9,6 @@ import (
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	//"github.com/vmware/govmomi/vim25/types"
-	"github.com/gbolo/go-util/lib/debugging"
 )
 
 // this function returns VMs vDisks vNICs since they are all part of VirtualMachine managedObject
@@ -140,7 +139,14 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 					VcenterId:           v.Client().ServiceContent.About.InstanceUuid,
 				}
 
-				// TODO: add DVS related keys by checking is Backing.Port exists
+				// if Backing.Port exists, then this is a DVS, or else its a vswitch
+				if common.CheckIfKeyExists(device, "Backing", "Port") {
+					vnic.VswitchType = "VmwareDistributedVirtualSwitch"
+					vnic.PortgroupMoref = common.GetString(device, "Backing", "Port", "PortgroupKey")
+				} else {
+					vnic.VswitchType = "HostVirtualSwitch"
+					vnic.PortgroupName = common.GetString(device, "Backing", "DeviceName")
+				}
 
 				vNICs = append(vNICs, vnic)
 			}
