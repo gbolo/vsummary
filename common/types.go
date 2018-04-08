@@ -210,11 +210,10 @@ type PNic struct {
 	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
 	Name       string `json:"name" db:"name"`
 	MacAddress string `json:"mac" db:"mac"`
-	LinkSpeed  string `json:"link_speed" db:"link_speed"`
+	LinkSpeed  int32  `json:"link_speed" db:"link_speed"`
 	Driver     string `json:"driver" db:"driver"`
 
 	// These are part of API request ONLY
-	Moref     string `json:"moref"`
 	EsxiMoref string `json:"esxi_moref"`
 
 	// These are part of db record ONLY
@@ -253,8 +252,8 @@ type VSwitch struct {
 	// These are part of BOTH API request AND db record
 	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
 	Name      string `json:"name" db:"name"`
-	MaxMtu    int    `json:"max_mtu" db:"max_mtu"`
-	Ports     int    `json:"ports" db:"ports"`
+	MaxMtu    int32  `json:"max_mtu" db:"max_mtu"`
+	Ports     int32  `json:"ports" db:"ports"`
 	Version   string `json:"version" db:"version"`
 
 	// These are part of API request ONLY
@@ -276,9 +275,12 @@ type Portgroup struct {
 
 	// These are part of API request ONLY
 	Moref        string `json:"moref"`
+	EsxiMoref    string `json:"esxi_moref"`
 	VswitchMoref string `json:"vswitch_moref"`
+	VswitchName  string `json:"vswitch_name"`
 	VlanStart    int    `json:"vlan_start"`
 	VlanEnd      int    `json:"vlan_end"`
+	Vlan         int32  `json:"vlan"`
 
 	// These are part of db record ONLY
 	Id        string `db:"id"`

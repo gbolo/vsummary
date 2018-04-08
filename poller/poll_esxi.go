@@ -2,15 +2,15 @@ package poller
 
 import (
 	"context"
+	"reflect"
 	"time"
 
-	//"github.com/gbolo/go-util/lib/debugging"
 	"github.com/gbolo/vsummary/common"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 )
 
-func (p *Poller) GetEsxi() (clList []common.Esxi, err error) {
+func (p *Poller) GetEsxi() (esxiList []common.Esxi, pNics []common.PNic, vSwitches []common.VSwitch, vSwitchPortgroups []common.Portgroup, err error) {
 
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "pollEsxi")
@@ -34,7 +34,7 @@ func (p *Poller) GetEsxi() (clList []common.Esxi, err error) {
 	err = v.Retrieve(
 		ctx,
 		[]string{"HostSystem"},
-		[]string{"name", "parent", "summary"},
+		[]string{"name", "parent", "summary", "config"},
 		&esxis,
 	)
 	if err != nil {
@@ -72,11 +72,67 @@ func (p *Poller) GetEsxi() (clList []common.Esxi, err error) {
 			ClusterMoref:      esxi.Parent.Value,
 		}
 
-		clList = append(clList, clStruct)
+		esxiList = append(esxiList, clStruct)
+
+		// Get Physical Network Cards
+		for _, pnic := range esxi.Config.Network.Pnic {
+
+			if reflect.TypeOf(pnic).String() == "types.PhysicalNic" {
+
+				pNics = append(pNics, common.PNic{
+					Name:       pnic.Device,
+					MacAddress: pnic.Mac,
+					Driver:     pnic.Driver,
+					LinkSpeed:  pnic.LinkSpeed.SpeedMb,
+					EsxiMoref:  esxi.Self.Value,
+					VcenterId:  v.Client().ServiceContent.About.InstanceUuid,
+				})
+			}
+		}
+
+		// Get Standard vSwitches
+		for _, svswitch := range esxi.Config.Network.Vswitch {
+
+			if reflect.TypeOf(svswitch).String() == "types.HostVirtualSwitch" {
+
+				vSwitches = append(vSwitches, common.VSwitch{
+					Type:      "SVS",
+					Name:      svswitch.Name,
+					Ports:     svswitch.Spec.NumPorts,
+					MaxMtu:    svswitch.Mtu,
+					EsxiMoref: esxi.Self.Value,
+					VcenterId: v.Client().ServiceContent.About.InstanceUuid,
+				})
+			}
+
+		}
+
+		// Get Standard vSwitch Portgroups
+		for _, spg := range esxi.Config.Network.Portgroup {
+
+			if reflect.TypeOf(spg).String() == "types.HostPortGroup" {
+
+				vSwitchPortgroups = append(vSwitchPortgroups, common.Portgroup{
+					Type:        "vSwitch",
+					Name:        spg.Spec.Name,
+					VswitchName: spg.Spec.VswitchName,
+					Vlan:        spg.Spec.VlanId,
+					EsxiMoref:   esxi.Self.Value,
+					VcenterId:   v.Client().ServiceContent.About.InstanceUuid,
+				})
+			}
+		}
 
 	}
 
-	log.Infof("poller fetched summary of %d esxi(s)", len(clList))
+	log.Infof(
+		"poller fetched summary of %d esxi hosts, %d pNICS, %d standard vswitches, %d standard portgroups",
+		len(esxiList),
+		len(pNics),
+		len(vSwitches),
+		len(vSwitchPortgroups),
+	)
+
 	return
 
 }

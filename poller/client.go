@@ -119,7 +119,8 @@ func (p *Poller) PollThenSend(objectType string) (err error) {
 	case "clusters":
 		o, err = p.GetClusters()
 	case "esxi":
-		o, err = p.GetEsxi()
+		//TODO: send missing returns
+		o, _, _, _, err = p.GetEsxi()
 	case "vcenter":
 		o, err = p.GetVcenter()
 	case "datastores":
