@@ -26,6 +26,7 @@ var (
 		"esxi":            "/esxi",
 		"vcenter":         "/vcenter",
 		"datastores":      "/datastore",
+		"dvs":             "/vswitch",
 	}
 )
 
@@ -125,6 +126,8 @@ func (p *Poller) PollThenSend(objectType string) (err error) {
 		o, err = p.GetVcenter()
 	case "datastores":
 		o, err = p.GetDatastores()
+	case "dvs":
+		o, err = p.GetDVS()
 
 	default:
 		err = fmt.Errorf("invalid endpoint: %s", objectType)
