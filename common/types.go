@@ -93,18 +93,19 @@ type ResourcePool struct {
 	Type               string `json:"type" db:"type"`
 	Status             string `json:"status" db:"status"`
 	VappState          string `json:"vapp_state" db:"vapp_state"`
-	ConfiguredMemoryMb string `json:"configured_memory_mb" db:"configured_memory_mb"`
-	CpuReservation     string `json:"cpu_reservation" db:"cpu_reservation"`
-	CpuLimit           string `json:"cpu_limit" db:"cpu_limit"`
-	MemoryReservation  string `json:"mem_reservation" db:"mem_reservation"`
-	MemoryLimit        string `json:"mem_limit" db:"mem_limit"`
+	ConfiguredMemoryMb int64  `json:"configured_memory_mb" db:"configured_memory_mb"`
+	CpuReservation     int64  `json:"cpu_reservation" db:"cpu_reservation"`
+	CpuLimit           int64  `json:"cpu_limit" db:"cpu_limit"`
+	MemoryReservation  int64  `json:"mem_reservation" db:"mem_reservation"`
+	MemoryLimit        int64  `json:"mem_limit" db:"mem_limit"`
+	ParentMoref        string `json:"parent_moref" db:"parent_moref"`
 
 	// These are part of API request ONLY
-	ParentMoref  string `json:"parent_moref"`
 	ClusterMoref string `json:"cluster_moref"`
 
 	// These are part of db record ONLY
 	Id         string `db:"id"`
+	Parent     string `db:"parent"`
 	ClusterId  string `db:"cluster_id"`
 	FullPath   string `db:"full_path"`
 	VappInPath int    `db:"vapp_in_path"`
