@@ -48,6 +48,12 @@ var routes = Routes{
 		handlerEsxi,
 	},
 	Route{
+		"ResourcePool",
+		"POST",
+		appendRequestPrefix("/resourcepool"),
+		handlerResourcepool,
+	},
+	Route{
 		"vCenter",
 		"POST",
 		appendRequestPrefix("/vcenter"),
