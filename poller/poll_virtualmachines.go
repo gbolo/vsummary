@@ -108,7 +108,7 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 					CapacityBytes:       common.GetInt(device, "CapacityInBytes"),
 					CapacityKb:          common.GetInt(device, "CapacityInKB"),
 					ThinProvisioned:     common.BoolToString(common.GetBool(device, "Backing", "ThinProvisioned")),
-					DatacenterMoref:     common.GetString(device, "Backing", "Datastore", "Value"),
+					DatastoreMoref:      common.GetString(device, "Backing", "Datastore", "Value"),
 					Uuid:                common.GetString(device, "Backing", "Uuid"),
 					DiskObjectId:        common.GetString(device, "DiskObjectId"),
 					Path:                common.GetString(device, "Backing", "FileName"),

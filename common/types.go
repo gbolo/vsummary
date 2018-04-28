@@ -195,13 +195,13 @@ type VDisk struct {
 
 	// These are part of API request ONLY
 	CapacityKb          int64  `json:"capacity_kb"`
-	DatacenterMoref     string `json:"datastore_moref"`
+	DatastoreMoref      string `json:"datastore_moref"`
 	VirtualmachineMoref string `json:"vm_moref"`
 	EsxiMoref           string `json:"esxi_moref"`
 
 	// These are part of db record ONLY
 	Id               string `db:"id"`
-	DatacenterId     string `db:"datastore_id"`
+	DatastoreId      string `db:"datastore_id"`
 	VirtualMachineId string `db:"vm_id"`
 	EsxiId           string `db:"esxi_id"`
 }
