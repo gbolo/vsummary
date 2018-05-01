@@ -54,6 +54,12 @@ var routes = Routes{
 		handlerResourcepool,
 	},
 	Route{
+		"VDisks",
+		"POST",
+		appendRequestPrefix("/vdisk"),
+		handlerVDisks,
+	},
+	Route{
 		"vCenter",
 		"POST",
 		appendRequestPrefix("/vcenter"),
