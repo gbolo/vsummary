@@ -60,6 +60,12 @@ var routes = Routes{
 		handlerVDisks,
 	},
 	Route{
+		"VNics",
+		"POST",
+		appendRequestPrefix("/vnic"),
+		handlerVNics,
+	},
+	Route{
 		"vCenter",
 		"POST",
 		appendRequestPrefix("/vcenter"),
