@@ -1,0 +1,4 @@
+# ignore these dirs before determining language
+www/* linguist-vendored
+contrib/* linguist-vendored
+testdata/* linguist-vendored
