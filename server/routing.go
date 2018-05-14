@@ -66,6 +66,12 @@ var routes = Routes{
 		handlerVNics,
 	},
 	Route{
+		"Folders",
+		"POST",
+		appendRequestPrefix("/folder"),
+		handlerFolders,
+	},
+	Route{
 		"vCenter",
 		"POST",
 		appendRequestPrefix("/vcenter"),
