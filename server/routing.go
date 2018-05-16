@@ -72,6 +72,12 @@ var routes = Routes{
 		handlerFolders,
 	},
 	Route{
+		"VSwitch",
+		"POST",
+		appendRequestPrefix("/vswitch"),
+		handlerVswitch,
+	},
+	Route{
 		"vCenter",
 		"POST",
 		appendRequestPrefix("/vcenter"),
