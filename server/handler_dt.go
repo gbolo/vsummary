@@ -12,9 +12,13 @@ import (
 )
 
 func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
+	handlerDatatables(w, req, "view_vm")
+}
+
+func handlerDatatables(w http.ResponseWriter, req *http.Request, dbTable string) {
 
 	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handleDt")
+	defer common.ExecutionTime(time.Now(), "dt api " + dbTable)
 
 	// test
 	di, err := ParseDatatablesRequest(req)
@@ -27,7 +31,7 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 
 	di.SetDbX(backend.GetDB())
 
-	response, err := di.fetchDataForResponse("vm")
+	response, err := di.fetchDataForResponse(dbTable)
 	if err != nil {
 		log.Errorf("error getting datatables response: %v", err)
 		return
