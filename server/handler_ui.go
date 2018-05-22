@@ -11,17 +11,6 @@ import (
 	"github.com/gbolo/vsummary/common"
 )
 
-type UiView struct {
-	Title        string
-	AjaxEndpoint string
-	Table        map[string]string
-
-	// <tr> values in template
-	TplTr []string
-	// sql column name for datatatbles
-	TplColNames []string
-}
-
 // default handler for landing page
 func handlerUiIndex(w http.ResponseWriter, req *http.Request) {
 
@@ -37,19 +26,8 @@ func handlerUiVirtualmachines(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handlerUiVirtualmachines")
 
-	uiview := UiView{
-		Title:        "Virtualmachines",
-		AjaxEndpoint: "/api/dt/virtualmachines",
-		Table: map[string]string{
-			"name":       "Name",
-			"vcenter_id": "vCenter Id",
-		},
-	}
-
 	// output the page
-	writeSummaryPage(w, &uiview)
-
-	return
+	writeSummaryPage(w, &virtualMachineView)
 }
 
 func handlerUiDatacenters(w http.ResponseWriter, req *http.Request) {
@@ -123,16 +101,6 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 		return
 	}
 
-	// prepare slices for templates
-	for colName, trName := range uiview.Table {
-		uiview.TplColNames = append(uiview.TplColNames, fmt.Sprintf(
-			"{ \"data\": \"%s\", \"name\": \"%s\" }",
-			colName,
-			colName,
-		))
-		uiview.TplTr = append(uiview.TplTr, trName)
-	}
-
 	// parse and add function to templates
 	templates, err := template.New("index").
 		Funcs(template.FuncMap{"StringsJoin": strings.Join}).
@@ -155,4 +123,19 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 	}
 
 	return
+}
+
+
+// sets the values of datatables json columns definition
+func setDtColumns(uiview *UiView) {
+
+	// prepare slices for templates
+	for colName, trName := range uiview.Table {
+		uiview.DtColumns = append(uiview.DtColumns, fmt.Sprintf(
+			"{ \"data\": \"%s\", \"name\": \"%s\", \"title\": \"%s\" }",
+			colName,
+			colName,
+			trName,
+		))
+	}
 }
