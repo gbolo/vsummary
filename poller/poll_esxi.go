@@ -74,52 +74,63 @@ func (p *Poller) GetEsxi() (esxiList []common.Esxi, pNics []common.PNic, vSwitch
 
 		esxiList = append(esxiList, clStruct)
 
-		// Get Physical Network Cards
-		for _, pnic := range esxi.Config.Network.Pnic {
+		// avoid nil pointers!
+		if esxi.Config != nil && esxi.Config.Network.Pnic != nil {
 
-			if reflect.TypeOf(pnic).String() == "types.PhysicalNic" {
+			// Get Physical Network Cards
+			for _, pnic := range esxi.Config.Network.Pnic {
 
-				pNics = append(pNics, common.PNic{
-					Name:       pnic.Device,
-					MacAddress: pnic.Mac,
-					Driver:     pnic.Driver,
-					LinkSpeed:  pnic.LinkSpeed.SpeedMb,
-					EsxiMoref:  esxi.Self.Value,
-					VcenterId:  v.Client().ServiceContent.About.InstanceUuid,
-				})
+				if reflect.TypeOf(pnic).String() == "types.PhysicalNic" {
+
+					pNics = append(pNics, common.PNic{
+						Name:       pnic.Device,
+						MacAddress: pnic.Mac,
+						Driver:     pnic.Driver,
+						LinkSpeed:  pnic.LinkSpeed.SpeedMb,
+						EsxiMoref:  esxi.Self.Value,
+						VcenterId:  v.Client().ServiceContent.About.InstanceUuid,
+					})
+				}
 			}
 		}
 
-		// Get Standard vSwitches
-		for _, svswitch := range esxi.Config.Network.Vswitch {
+		// avoid nil pointers!
+		if esxi.Config != nil && esxi.Config.Network.Vswitch != nil {
 
-			if reflect.TypeOf(svswitch).String() == "types.HostVirtualSwitch" {
+			// Get Standard vSwitches
+			for _, svswitch := range esxi.Config.Network.Vswitch {
 
-				vSwitches = append(vSwitches, common.VSwitch{
-					Type:      "SVS",
-					Name:      svswitch.Name,
-					Ports:     svswitch.Spec.NumPorts,
-					MaxMtu:    svswitch.Mtu,
-					EsxiMoref: esxi.Self.Value,
-					VcenterId: v.Client().ServiceContent.About.InstanceUuid,
-				})
+				if reflect.TypeOf(svswitch).String() == "types.HostVirtualSwitch" {
+
+					vSwitches = append(vSwitches, common.VSwitch{
+						Type:      "SVS",
+						Name:      svswitch.Name,
+						Ports:     svswitch.Spec.NumPorts,
+						MaxMtu:    svswitch.Mtu,
+						EsxiMoref: esxi.Self.Value,
+						VcenterId: v.Client().ServiceContent.About.InstanceUuid,
+					})
+				}
 			}
-
 		}
 
-		// Get Standard vSwitch Portgroups
-		for _, spg := range esxi.Config.Network.Portgroup {
+		// avoid nil pointers!
+		if esxi.Config != nil && esxi.Config.Network.Portgroup != nil {
 
-			if reflect.TypeOf(spg).String() == "types.HostPortGroup" {
+			// Get Standard vSwitch Portgroups
+			for _, spg := range esxi.Config.Network.Portgroup {
 
-				vSwitchPortgroups = append(vSwitchPortgroups, common.Portgroup{
-					Type:        "vSwitch",
-					Name:        spg.Spec.Name,
-					VswitchName: spg.Spec.VswitchName,
-					Vlan:        spg.Spec.VlanId,
-					EsxiMoref:   esxi.Self.Value,
-					VcenterId:   v.Client().ServiceContent.About.InstanceUuid,
-				})
+				if reflect.TypeOf(spg).String() == "types.HostPortGroup" {
+
+					vSwitchPortgroups = append(vSwitchPortgroups, common.Portgroup{
+						Type:        "vSwitch",
+						Name:        spg.Spec.Name,
+						VswitchName: spg.Spec.VswitchName,
+						Vlan:        spg.Spec.VlanId,
+						EsxiMoref:   esxi.Self.Value,
+						VcenterId:   v.Client().ServiceContent.About.InstanceUuid,
+					})
+				}
 			}
 		}
 
