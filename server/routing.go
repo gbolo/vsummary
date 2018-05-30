@@ -104,12 +104,6 @@ var routes = Routes{
 		handlerUiVirtualmachines,
 	},
 	Route{
-		"UiDatacenters",
-		"GET",
-		"/ui/datacenters",
-		handlerUiDatacenters,
-	},
-	Route{
 		"UiESXi",
 		"GET",
 		"/ui/esxi",
@@ -124,6 +118,12 @@ var routes = Routes{
 		handlerDtVirtualMachine,
 	},
 
+	Route{
+		"DtESXi",
+		"POST",
+		"/api/dt/esxi",
+		handlerDtEsxi,
+	},
 	//Route{
 	//	"Stats",
 	//	"GET",

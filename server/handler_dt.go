@@ -15,6 +15,10 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 	handlerDatatables(w, req, "view_vm")
 }
 
+func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
+	handlerDatatables(w, req, "view_esxi")
+}
+
 func handlerDatatables(w http.ResponseWriter, req *http.Request, dbTable string) {
 
 	// log time on debug

@@ -47,8 +47,45 @@ var virtualMachineView = UiView{
 	},
 }
 
+var esxiView = UiView{
+	Title:        "ESXi",
+	AjaxEndpoint: "/api/dt/esxi",
+	Table: map[string]string{
+		"name":                  "Name",
+		"max_evc":               "MaxEVC",
+		"current_evc":           "EVC",
+		"status":                "Status",
+		"power_state":           "PowerState",
+		"in_maintenance_mode":   "Maintenance",
+		"vendor":                "Vendor",
+		"model":                 "Model",
+		"memory_bytes":          "Memory",
+		"cpu_model":             "CPU",
+		"cpu_mhz":               "CpuMHZ",
+		"cpu_sockets":           "CpuSockets",
+		"cpu_cores":             "CpuCores",
+		"cpu_threads":           "CpuThreads",
+		"nics":                  "NICs",
+		"hbas":                  "HBAs",
+		"version":               "Version",
+		"build":                 "Build",
+		"stat_cpu_usage":        "CpuUsed",
+		"stat_memory_usage":     "MemUsed",
+		"stat_uptime_sec":       "Uptime",
+		"vms_powered_on":        "VMsOn",
+		"vcpus_powered_on":      "vCPUs",
+		"vmemory_mb_powered_on": "vRAM",
+		"pnics":                 "pNICS",
+		"cluster":               "Cluster",
+		"datacenter":            "Datacenter",
+		"vcenter_fqdn":          "vCenter",
+		"vcenter_short_name":    "VC-ENV",
+	},
+}
+
 func init() {
 
 	// set the DtColumns for all uiviews
 	setDtColumns(&virtualMachineView)
+	setDtColumns(&esxiView)
 }

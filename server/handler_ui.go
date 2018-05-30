@@ -30,43 +30,13 @@ func handlerUiVirtualmachines(w http.ResponseWriter, req *http.Request) {
 	writeSummaryPage(w, &virtualMachineView)
 }
 
-func handlerUiDatacenters(w http.ResponseWriter, req *http.Request) {
-
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handleUiDatacenters")
-
-	// page details
-	uiview := UiView{
-		Title:        "Datacenters",
-		AjaxEndpoint: "/api/dt/datacenters",
-		Table: map[string]string{
-			"name":       "Name",
-			"vcenter_id": "vCenter Id",
-		},
-	}
-
-	// output the page
-	writeSummaryPage(w, &uiview)
-
-	return
-}
-
 func handlerUiEsxi(w http.ResponseWriter, req *http.Request) {
 
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handlerUiEsxi")
 
-	// page details
-	uiview := UiView{
-		Title:        "ESXi",
-		AjaxEndpoint: "/api/dt/esxi",
-		Table: map[string]string{
-			"name": "Name",
-		},
-	}
-
 	// output the page
-	writeSummaryPage(w, &uiview)
+	writeSummaryPage(w, &esxiView)
 
 	return
 }
