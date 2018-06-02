@@ -83,9 +83,27 @@ var esxiView = UiView{
 	},
 }
 
+var portgroupView = UiView{
+	Title:        "PortGroup",
+	AjaxEndpoint: "/api/dt/portgroups",
+	Table: map[string]string{
+		"name":               "Name",
+		"type":               "Type",
+		"vlan":               "Vlan",
+		"vlan_type":          "VlanType",
+		"vswitch_name":       "vSwitch",
+		"vswitch_type":       "vSwitchType",
+		"vswitch_max_mtu":    "vSwitchMTU",
+		"vnics":              "vNics",
+		"vcenter_fqdn":       "vCenter",
+		"vcenter_short_name": "VC-ENV",
+	},
+}
+
 func init() {
 
 	// set the DtColumns for all uiviews
 	setDtColumns(&virtualMachineView)
 	setDtColumns(&esxiView)
+	setDtColumns(&portgroupView)
 }

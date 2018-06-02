@@ -470,6 +470,13 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 		"SELECT COUNT(present) AS count FROM %s WHERE present=1",
 		tableName,
 	)
+	// view_portgroup doesnt have "present" column
+	if tableName == "view_portgroup" {
+		queryTotal = fmt.Sprintf(
+			"SELECT COUNT(*) AS count FROM %s",
+			tableName,
+		)
+	}
 
 	// query to find return all filtered data
 	queryFiltered := fmt.Sprintf(
@@ -538,11 +545,11 @@ func (di *DataTablesInfo) generateWhereClause() (whereClause string, err error) 
 			}
 		}
 	}
-	if whereClause != "" {
-		whereClause += " AND present=1)"
-	} else {
-		whereClause = "WHERE present=1"
-	}
+	//if whereClause != "" {
+	//	whereClause += " AND present=1)"
+	//} else {
+	//	whereClause = "WHERE present=1"
+	//}
 
 	return
 }

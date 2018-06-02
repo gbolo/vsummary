@@ -109,6 +109,12 @@ var routes = Routes{
 		"/ui/esxi",
 		handlerUiEsxi,
 	},
+	Route{
+		"UiPortgroups",
+		"GET",
+		"/ui/portgroups",
+		handlerUiPortgroup,
+	},
 
 	// Datatables API endpoints
 	Route{
@@ -117,12 +123,17 @@ var routes = Routes{
 		"/api/dt/virtualmachines",
 		handlerDtVirtualMachine,
 	},
-
 	Route{
 		"DtESXi",
 		"POST",
 		"/api/dt/esxi",
 		handlerDtEsxi,
+	},
+	Route{
+		"DtPortgroups",
+		"POST",
+		"/api/dt/portgroups",
+		handlerDtPortgroup,
 	},
 	//Route{
 	//	"Stats",

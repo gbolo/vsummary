@@ -19,6 +19,10 @@ func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
 	handlerDatatables(w, req, "view_esxi")
 }
 
+func handlerDtPortgroup(w http.ResponseWriter, req *http.Request) {
+	handlerDatatables(w, req, "view_portgroup")
+}
+
 func handlerDatatables(w http.ResponseWriter, req *http.Request, dbTable string) {
 
 	// log time on debug
