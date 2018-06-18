@@ -23,10 +23,14 @@ func handlerDtPortgroup(w http.ResponseWriter, req *http.Request) {
 	handlerDatatables(w, req, "view_portgroup")
 }
 
+func handlerDtDatastore(w http.ResponseWriter, req *http.Request) {
+	handlerDatatables(w, req, "view_datastore")
+}
+
 func handlerDatatables(w http.ResponseWriter, req *http.Request, dbTable string) {
 
 	// log time on debug
-	defer common.ExecutionTime(time.Now(), "dt api " + dbTable)
+	defer common.ExecutionTime(time.Now(), "dt api "+dbTable)
 
 	// test
 	di, err := ParseDatatablesRequest(req)
@@ -46,7 +50,7 @@ func handlerDatatables(w http.ResponseWriter, req *http.Request, dbTable string)
 	}
 
 	b, _ := json.MarshalIndent(response, "", "  ")
-	fmt.Fprintf(w,string(b))
+	fmt.Fprintf(w, string(b))
 
 	return
 }
