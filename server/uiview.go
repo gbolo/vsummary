@@ -100,10 +100,23 @@ var portgroupView = UiView{
 	},
 }
 
+var datastoreView = UiView{
+	Title:        "Datastore",
+	AjaxEndpoint: "/api/dt/datastores",
+	Table: map[string]string{
+		"name":           "Name",
+		"type":           "Type",
+		"status":         "Status",
+		"capacity_bytes": "Capacity",
+		"free_bytes":     "Free",
+	},
+}
+
 func init() {
 
 	// set the DtColumns for all uiviews
 	setDtColumns(&virtualMachineView)
 	setDtColumns(&esxiView)
 	setDtColumns(&portgroupView)
+	setDtColumns(&datastoreView)
 }

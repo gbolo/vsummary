@@ -52,6 +52,17 @@ func handlerUiPortgroup(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
+func handlerUiDatastore(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiDatastore")
+
+	// output the page
+	writeSummaryPage(w, &datastoreView)
+
+	return
+}
+
 // return list of all template filenames
 func findAllTemplates() (templateFiles []string, err error) {
 
@@ -105,7 +116,6 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 
 	return
 }
-
 
 // sets the values of datatables json columns definition
 func setDtColumns(uiview *UiView) {

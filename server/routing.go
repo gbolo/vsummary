@@ -54,6 +54,12 @@ var routes = Routes{
 		handlerResourcepool,
 	},
 	Route{
+		"Datastore",
+		"POST",
+		appendRequestPrefix("/datastore"),
+		handlerDatastore,
+	},
+	Route{
 		"VDisks",
 		"POST",
 		appendRequestPrefix("/vdisk"),
@@ -115,6 +121,12 @@ var routes = Routes{
 		"/ui/portgroups",
 		handlerUiPortgroup,
 	},
+	Route{
+		"UiDatastores",
+		"GET",
+		"/ui/datastores",
+		handlerUiDatastore,
+	},
 
 	// Datatables API endpoints
 	Route{
@@ -134,6 +146,12 @@ var routes = Routes{
 		"POST",
 		"/api/dt/portgroups",
 		handlerDtPortgroup,
+	},
+	Route{
+		"DtDatastores",
+		"POST",
+		"/api/dt/datastores",
+		handlerDtDatastore,
 	},
 	//Route{
 	//	"Stats",
