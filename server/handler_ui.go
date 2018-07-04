@@ -121,12 +121,12 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 func setDtColumns(uiview *UiView) {
 
 	// prepare slices for templates
-	for colName, trName := range uiview.Table {
+	for _, column := range uiview.TableHeaders {
 		uiview.DtColumns = append(uiview.DtColumns, fmt.Sprintf(
 			"{ \"data\": \"%s\", \"name\": \"%s\", \"title\": \"%s\" }",
-			colName,
-			colName,
-			trName,
+			column.DbColumnName,
+			column.DbColumnName,
+			column.FriendlyName,
 		))
 	}
 }
