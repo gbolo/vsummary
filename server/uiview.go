@@ -7,13 +7,10 @@ type UiView struct {
 
 	// using a slice, will preserve the column order when ranging through it
 	TableHeaders []tableColumnMap
-
-	// json column names for datatatbles
-	DtColumns []string
 }
 
 // maps db columns to friendly names
-// to be used by html table column titles
+// to be used by html table column titles and datatables json columns
 type tableColumnMap struct {
 	DbColumnName string
 	FriendlyName string
@@ -119,13 +116,4 @@ var datastoreView = UiView{
 		{"capacity_bytes", "Capacity"},
 		{"free_bytes", "Free"},
 	},
-}
-
-func init() {
-
-	// set the DtColumns for all uiviews
-	setDtColumns(&virtualMachineView)
-	setDtColumns(&esxiView)
-	setDtColumns(&portgroupView)
-	setDtColumns(&datastoreView)
 }

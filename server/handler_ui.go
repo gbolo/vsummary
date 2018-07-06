@@ -8,6 +8,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Masterminds/sprig"
 	"github.com/gbolo/vsummary/common"
 )
 
@@ -95,7 +96,7 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 
 	// parse and add function to templates
 	templates, err := template.New("index").
-		Funcs(template.FuncMap{"StringsJoin": strings.Join}).
+		Funcs(sprig.TxtFuncMap()).
 		ParseFiles(templateFiles...)
 
 	if err == nil {
@@ -115,18 +116,4 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 	}
 
 	return
-}
-
-// sets the values of datatables json columns definition
-func setDtColumns(uiview *UiView) {
-
-	// prepare slices for templates
-	for _, column := range uiview.TableHeaders {
-		uiview.DtColumns = append(uiview.DtColumns, fmt.Sprintf(
-			"{ \"data\": \"%s\", \"name\": \"%s\", \"title\": \"%s\" }",
-			column.DbColumnName,
-			column.DbColumnName,
-			column.FriendlyName,
-		))
-	}
 }
