@@ -3,6 +3,24 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "TgO9gc7JIrSnT/T/VVzihTVPtvU=",
+			"path": "github.com/Masterminds/semver",
+			"revision": "c84ddcca87bf5a941b138dde832a7e20b0159ad8",
+			"revisionTime": "2018-08-07T14:24:31Z"
+		},
+		{
+			"checksumSHA1": "TUE1bHal3tni6do6Kb6HVN64dPk=",
+			"path": "github.com/Masterminds/sprig",
+			"revision": "77bb58b7f5e10889a1195c21b9e7a96ee166f199",
+			"revisionTime": "2018-07-25T21:21:58Z"
+		},
+		{
+			"checksumSHA1": "X0xGt0e0IkZeviF+pFRlpHP+xkE=",
+			"path": "github.com/aokoli/goutils",
+			"revision": "3391d3790d23d03408670993e957e8f408993c34",
+			"revisionTime": "2017-05-31T11:00:25Z"
+		},
+		{
 			"checksumSHA1": "aoxx8YjlpunfhKBTyZKjOH55G10=",
 			"path": "github.com/buger/jsonparser",
 			"revision": "4be68c93a24430ddf9c33d1380b7042fd3a13424",
@@ -13,6 +31,12 @@
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
 			"revisionTime": "2017-03-29T04:21:07Z"
+		},
+		{
+			"checksumSHA1": "Z+EeiqfVIlKygK0KNwb3MgvjwIo=",
+			"path": "github.com/gbolo/go-util/lib/debugging",
+			"revision": "cdf583b02e0af7ddcb3976922cf52e9f8205621f",
+			"revisionTime": "2018-04-17T13:51:45Z"
 		},
 		{
 			"checksumSHA1": "uC0/YlX5RUmxgBWUtR8J2QBWEIo=",
@@ -37,6 +61,12 @@
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "bc14601d1bd56421dd60f561e6052c9ed77f9daf",
 			"revisionTime": "2018-01-25T05:47:45Z"
+		},
+		{
+			"checksumSHA1": "uFNLkTxk8BkHTk0Jcub2lj2BX4M=",
+			"path": "github.com/google/uuid",
+			"revision": "dec09d789f3dba190787f8b4454c7d3c936fed9e",
+			"revisionTime": "2017-11-29T19:10:14Z"
 		},
 		{
 			"checksumSHA1": "t1nayUUugNoJWht7p4cbKyWuk8Q=",
@@ -103,6 +133,18 @@
 			"path": "github.com/hashicorp/hcl/json/token",
 			"revision": "8f6b1344a92ff8877cf24a5de9177bf7d0a2a187",
 			"revisionTime": "2017-04-17T18:02:14Z"
+		},
+		{
+			"checksumSHA1": "FRNU2AKclBxglExha5kDiQmGtxc=",
+			"path": "github.com/huandu/xstrings",
+			"revision": "7bb0250b58e5c15670406e6f93ffda43281305b1",
+			"revisionTime": "2018-06-16T15:27:07Z"
+		},
+		{
+			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
+			"path": "github.com/imdario/mergo",
+			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
+			"revisionTime": "2018-07-30T21:26:40Z"
 		},
 		{
 			"checksumSHA1": "QmAzbypFddS3Tl/HDca0X0zXZ/M=",
@@ -265,6 +307,18 @@
 			"path": "github.com/vmware/govmomi/vim25/xml",
 			"revision": "81743157fb5ccf548d6bd5088c25ee6156a359ee",
 			"revisionTime": "2018-01-30T17:41:34Z"
+		},
+		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "56440b844dfe139a8ac053f4ecac0b20b79058f4",
+			"revisionTime": "2018-08-02T22:11:18Z"
+		},
+		{
+			"checksumSHA1": "sx1nQShs40UKtcJZNJuvYtGesaI=",
+			"path": "golang.org/x/crypto/scrypt",
+			"revision": "56440b844dfe139a8ac053f4ecac0b20b79058f4",
+			"revisionTime": "2018-08-02T22:11:18Z"
 		},
 		{
 			"checksumSHA1": "d3L/wOcfgZeGD7qCsX+W13QyXjc=",
