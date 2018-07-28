@@ -3,15 +3,42 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
 )
 
 func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
-	handlerDatatables(w, req, "view_vm")
+	dtResponse, err := getDatatablesResponse(req, "view_vm")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		log.Errorf("error parsing datatables request: %v", err)
+	}
+
+	// loop through data and make modifications
+	data := dtResponse.Data[:0]
+	for _, row := range dtResponse.Data {
+		row["status"] = decorateCell(row["status"])
+		row["esxi_status"] = decorateCell(row["esxi_status"])
+		row["power_state"] = decorateCell(row["power_state"])
+		row["guest_tools_running"] = decorateCell(row["guest_tools_running"])
+		row["memory_bytes"] = bytesHumanReadable(row["memory_bytes"])
+		row["memory_mb"] = megaBytesHumanReadable(row["memory_mb"])
+		row["stat_guest_memory_usage"] = megaBytesHumanReadable(row["stat_guest_memory_usage"])
+		row["stat_host_memory_usage"] = megaBytesHumanReadable(row["stat_host_memory_usage"])
+		row["stat_cpu_usage"] = row["stat_cpu_usage"] + " MHz"
+		row["stat_uptime_sec"] = secondsToHuman(row["stat_uptime_sec"])
+		data = append(data, row)
+	}
+
+	// write a response
+	dtResponse.Data = data
+	b, _ := json.MarshalIndent(dtResponse, "", "  ")
+	fmt.Fprintf(w, string(b))
 }
 
 func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
@@ -108,4 +135,52 @@ func bytesHumanReadable(bytes string) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+// returns a human readable string from any number of megabytes
+func megaBytesHumanReadable(megaBytes string) string {
+	b, _ := strconv.ParseInt(megaBytes, 10, 64)
+	return bytesHumanReadable(fmt.Sprintf("%d", (b * 1000 * 1000)))
+}
+
+// this will add some html styling to string
+func decorateCell(value string) string {
+	switch strings.ToLower(value) {
+	case "green":
+		return "<span class=\"label label-pill label-success\">green</span>"
+	case "yellow":
+		return "<span class=\"label label-pill label-warning\">yellow</span>"
+	case "red":
+		return "<span class=\"label label-pill label-danger\">red</span>"
+	case "poweredon":
+		return "<span class=\"label label-pill label-success\">poweredOn</span>"
+	case "poweredoff":
+		return "<span class=\"label label-pill label-danger\">poweredOff</span>"
+	case "yes":
+		return "<span class=\"label label-pill label-success\">Yes</span>"
+	case "no":
+		return "<span class=\"label label-pill label-danger\">No</span>"
+	case "guesttoolsrunning":
+		return "<span class=\"label label-pill label-success\">Yes</span>"
+	case "guesttoolsnotrunning":
+		return "<span class=\"label label-pill label-danger\">No</span>"
+	default:
+		return value
+	}
+}
+
+// converts seconds to days
+func secondsToHuman(secondsString string) string {
+	seconds, _ := strconv.ParseInt(secondsString, 10, 64)
+	days := math.Floor(float64(seconds) / 86400)
+	hours := math.Floor(float64(seconds%86400) / 3600)
+	minutes := math.Floor(float64(seconds%86400%3600) / 60)
+
+	if seconds == 0 {
+		return "nil"
+	} else if days < 1 {
+		return fmt.Sprintf("%dh, %dm", hours, minutes)
+	} else {
+		return fmt.Sprintf("%v days", days)
+	}
 }
