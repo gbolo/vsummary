@@ -127,6 +127,12 @@ var routes = Routes{
 		"/ui/datastores",
 		handlerUiDatastore,
 	},
+	Route{
+		"UiVNics",
+		"GET",
+		"/ui/vnics",
+		handlerUiVNic,
+	},
 
 	// Datatables API endpoints
 	Route{
@@ -152,6 +158,12 @@ var routes = Routes{
 		"POST",
 		"/api/dt/datastores",
 		handlerDtDatastore,
+	},
+	Route{
+		"DtVNics",
+		"POST",
+		"/api/dt/vnics",
+		handlerDtVNic,
 	},
 	//Route{
 	//	"Stats",

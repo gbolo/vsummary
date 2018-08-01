@@ -156,14 +156,12 @@ func decorateCell(value string) string {
 		return "<span class=\"label label-pill label-success\">poweredOn</span>"
 	case "poweredoff":
 		return "<span class=\"label label-pill label-danger\">poweredOff</span>"
-	case "yes":
+	case "yes", "true", "guesttoolsrunning":
 		return "<span class=\"label label-pill label-success\">Yes</span>"
-	case "no":
+	case "no", "false", "guesttoolsnotrunning":
 		return "<span class=\"label label-pill label-danger\">No</span>"
-	case "guesttoolsrunning":
-		return "<span class=\"label label-pill label-success\">Yes</span>"
-	case "guesttoolsnotrunning":
-		return "<span class=\"label label-pill label-danger\">No</span>"
+	case "ok":
+		return "<span class=\"label label-pill label-success\">OK</span>"
 	default:
 		return value
 	}

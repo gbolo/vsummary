@@ -115,5 +115,7 @@ var datastoreView = UiView{
 		{"status", "Status"},
 		{"capacity_bytes", "Capacity"},
 		{"free_bytes", "Free"},
+		{"vcenter_fqdn", "vCenter"},
+		{"vcenter_short_name", "VC-ENV"},
 	},
 }
