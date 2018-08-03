@@ -133,6 +133,12 @@ var routes = Routes{
 		"/ui/vnics",
 		handlerUiVNic,
 	},
+	Route{
+		"UiVDisks",
+		"GET",
+		"/ui/vdisks",
+		handlerUiVDisk,
+	},
 
 	// Datatables API endpoints
 	Route{
@@ -164,6 +170,12 @@ var routes = Routes{
 		"POST",
 		"/api/dt/vnics",
 		handlerDtVNic,
+	},
+	Route{
+		"DtVDisks",
+		"POST",
+		"/api/dt/vdisks",
+		handlerDtVDisk,
 	},
 	//Route{
 	//	"Stats",

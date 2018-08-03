@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -9,6 +10,55 @@ import (
 	"github.com/gbolo/vsummary/common"
 	"gopkg.in/go-playground/validator.v9"
 )
+
+var vDiskView = UiView{
+	Title:        "vDisks",
+	AjaxEndpoint: "/api/dt/vdisks",
+	TableHeaders: []tableColumnMap{
+		{"vm_name", "VM"},
+		{"name", "Disk"},
+		{"capacity_bytes", "Capacity"},
+		{"path", "Path"},
+		{"thin_provisioned", "ThinProvisioned"},
+		{"vm_power_state", "VMpowerstate"},
+		{"datastore_name", "Datastore"},
+		{"datastore_type", "DatastoreType"},
+		{"esxi_name", "ESXi"},
+		{"vcenter_fqdn", "vCenter"},
+	},
+}
+
+func handlerUiVDisk(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiVDisk")
+
+	// output the page
+	writeSummaryPage(w, &vDiskView)
+
+	return
+}
+
+func handlerDtVDisk(w http.ResponseWriter, req *http.Request) {
+	dtResponse, err := getDatatablesResponse(req, "view_vdisk")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		log.Errorf("error parsing datatables request: %v", err)
+	}
+
+	// loop through data and make modifications
+	data := dtResponse.Data[:0]
+	for _, row := range dtResponse.Data {
+		row["capacity_bytes"] = bytesHumanReadable(row["capacity_bytes"])
+		row["vm_power_state"] = decorateCell(row["vm_power_state"])
+		data = append(data, row)
+	}
+
+	// write a response
+	dtResponse.Data = data
+	b, _ := json.MarshalIndent(dtResponse, "", "  ")
+	fmt.Fprintf(w, string(b))
+}
 
 func handlerVDisks(w http.ResponseWriter, req *http.Request) {
 
