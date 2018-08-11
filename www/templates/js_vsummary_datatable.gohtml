@@ -1,4 +1,4 @@
-{{ define "vsummaryDatatables" }}
+{{ define "js_vsummary_datatable" }}
 <!-- vSummary Datatables Load Javascript -->
 <script>
 
@@ -80,22 +80,5 @@
 
     });
 
-</script>
-
-<!-- Sidebar Toggle Javascript -->
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#menu-toggle").click(function(e) {
-            e.preventDefault();
-
-            $("#wrapper").toggleClass("toggled");
-
-            $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
-
-            // Redraw the datatables vsummary table
-            $('#dt-vsummary-{{ .Title }}').DataTable().draw();
-
-        });
-    });
 </script>
 {{ end }}
