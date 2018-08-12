@@ -117,3 +117,40 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 
 	return
 }
+
+// TODO: consolidate this with writeSummaryPage
+func writePollerPage(w http.ResponseWriter) {
+
+	// read in all templates
+	templateFiles, err := findAllTemplates()
+
+	if err != nil {
+		fmt.Fprintf(w, "Error reading template(s). See logs")
+		log.Errorf("error geting template files: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	// parse and add function to templates
+	templates, err := template.New("pollers").
+		Funcs(sprig.TxtFuncMap()).
+		ParseFiles(templateFiles...)
+
+	if err == nil {
+		execErr := templates.ExecuteTemplate(w, "pollers", UiView{Title:"vCenter Pollers"})
+		if execErr != nil {
+			fmt.Fprintf(w, "Error executing template(s). See logs")
+			log.Errorf("template execute error: %s", execErr)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+
+	} else {
+		fmt.Fprintf(w, "Error parsing template(s). See logs")
+		log.Errorf("template parse error: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	return
+}

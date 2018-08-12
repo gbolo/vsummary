@@ -7,10 +7,23 @@ import (
 	"time"
 
 	"github.com/gbolo/vsummary/common"
+	"github.com/gbolo/vsummary/poller"
 	"gopkg.in/go-playground/validator.v9"
 	//"github.com/thoas/stats"
 	//"github.com/codegangsta/negroni"
+	"fmt"
 )
+
+func handlerUiPoller(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiPoller")
+
+	// output the page
+	writePollerPage(w)
+
+	return
+}
 
 func handlerPoller(w http.ResponseWriter, req *http.Request) {
 
@@ -55,4 +68,29 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusAccepted)
 	return
+}
+
+
+func handlerPutVcenter(w http.ResponseWriter, req *http.Request) {
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerPutVcenter")
+
+	// parse the form
+	req.ParseForm()
+
+	if err := poller.TestConnection(poller.PollerConfig{
+		URL: req.FormValue("host"),
+		UserName: req.FormValue("user"),
+		Password: req.FormValue("pass"),
+		Insecure: true,
+	}); err != nil {
+		log.Errorf("failed to add poller: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, fmt.Sprintf("failed to add poller: %s", err))
+		return
+	}
+
+	fmt.Fprint(w, "Successfuly tested and added connection")
+
+
 }

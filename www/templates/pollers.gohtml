@@ -1,0 +1,88 @@
+{{ define "pollers" }}
+<!DOCTYPE html>
+<html lang="en">
+
+{{ template "header" }}
+
+<body>
+
+    <div id="wrapper">
+
+        {{ template "navigation" }}
+
+        <div id="page-wrapper" >
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">{{ .Title }}</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+
+                    TODO: POLLERS
+
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    {{ template "js_imports_theme" . }}
+
+    <!-- Modal -->
+    <div class="modal fade" id="pollerModal" tabindex="-1" role="dialog" aria-labelledby="Poller" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div> <!-- /.modal-content -->
+        </div> <!-- /.modal-dialog -->
+    </div> <!-- /.modal -->
+
+    <script>
+    /* reload modal content when canceling */
+    $('#pollerModal').on('hidden.bs.modal', function () {
+      $(this).removeData('bs.modal');
+      location.reload();
+    });
+    </script>
+
+    <!-- ajax call to add a new poller -->
+    <script>
+        function hideModal(){
+            $("#pollerModal").modal('hide');
+        }
+        $("#submit").click(function(e){
+            e.preventDefault();
+            //make ajax call
+            $.ajax({
+                type: "PUT",
+                url: "/api/vcenter",
+                data: $('form').serialize(),
+                beforeSend: function(){
+                    $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
+                    $("#message").removeClass("hidden alert-danger");
+                    $("#message").addClass("alert-info");
+                },
+                success: function(msg){
+                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+                    $("#message").removeClass("hidden alert-info alert-danger");
+                    $("#message").addClass("alert-success");
+                    setTimeout(hideModal, 1000);
+                },
+                error: function(jqXHR){
+                    $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
+                    $("#message").removeClass("hidden alert-info");
+                    $("#message").addClass("alert-danger");
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+{{ end }}

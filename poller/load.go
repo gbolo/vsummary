@@ -72,3 +72,19 @@ func pollerLoop(p *Poller) (err error) {
 	}
 
 }
+
+// TestConnection will test if we can successfully log into the provided vcenter server
+func TestConnection(p PollerConfig) (err error) {
+	poller := NewPoller()
+	poller.Config = &p
+
+	// create context and connect to vsphere
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err = poller.Connect(&ctx); err != nil {
+		log.Errorf("failed to connect to: %s %s ", poller.Config.URL, err)
+		return
+	}
+	return
+}

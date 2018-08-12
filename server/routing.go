@@ -139,6 +139,12 @@ var routes = Routes{
 		"/ui/vdisks",
 		handlerUiVDisk,
 	},
+	Route{
+		"UiPoller",
+		"GET",
+		"/ui/pollers",
+		handlerUiPoller,
+	},
 
 	// Datatables API endpoints
 	Route{
@@ -176,6 +182,13 @@ var routes = Routes{
 		"POST",
 		"/api/dt/vdisks",
 		handlerDtVDisk,
+	},
+
+	Route{
+		"AddVcenter",
+		"PUT",
+		"/api/vcenter",
+		handlerPutVcenter,
 	},
 	//Route{
 	//	"Stats",
