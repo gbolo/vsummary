@@ -20,11 +20,38 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-
-                    TODO: POLLERS
-
+                    <button type="button" class="btn btn-success pull-left" onclick="addPoller()"><strong>Add vCenter Poller</strong></button>
                 </div>
-                <!-- /.col-lg-12 -->
+                <br /><br /><br />
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="thead-light">
+                        <tr >
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Username</th>
+                            <th>Enabled</th>
+                            <th>Interval</th>
+                            <th>Last Successful Poll</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{- range .Pollers }}
+                        <tr>
+                            <td>{{ .VcenterName }}</td>
+                            <td>{{ .VcenterHost }}</td>
+                            <td>{{ .Username }}</td>
+                            <td>{{ .Enabled }}</td>
+                            <td>{{ .IntervalMin }}</td>
+                            <td>Never</td>
+                        </tr>
+                        {{- end -}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <!-- /#page-wrapper -->
@@ -43,43 +70,18 @@
     </div> <!-- /.modal -->
 
     <script>
-    /* reload modal content when canceling */
-    $('#pollerModal').on('hidden.bs.modal', function () {
-      $(this).removeData('bs.modal');
-      location.reload();
-    });
+        /* reload modal content when canceling */
+        $('#pollerModal').on('hidden.bs.modal', function () {
+          $(this).removeData('bs.modal');
+          location.reload();
+        });
     </script>
 
-    <!-- ajax call to add a new poller -->
     <script>
-        function hideModal(){
-            $("#pollerModal").modal('hide');
+        function addPoller() {
+            $("#pollerModal").find(".modal-content").load("/ui/form/poller");
+            $("#pollerModal").modal() ;
         }
-        $("#submit").click(function(e){
-            e.preventDefault();
-            //make ajax call
-            $.ajax({
-                type: "PUT",
-                url: "/api/vcenter",
-                data: $('form').serialize(),
-                beforeSend: function(){
-                    $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
-                    $("#message").removeClass("hidden alert-danger");
-                    $("#message").addClass("alert-info");
-                },
-                success: function(msg){
-                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
-                    $("#message").removeClass("hidden alert-info alert-danger");
-                    $("#message").addClass("alert-success");
-                    setTimeout(hideModal, 1000);
-                },
-                error: function(jqXHR){
-                    $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
-                    $("#message").removeClass("hidden alert-info");
-                    $("#message").addClass("alert-danger");
-                }
-            });
-        });
     </script>
 
 </body>

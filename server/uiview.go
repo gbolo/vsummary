@@ -1,5 +1,7 @@
 package server
 
+import "github.com/gbolo/vsummary/common"
+
 // Helper struct that defines the UI view
 type UiView struct {
 	Title        string
@@ -7,6 +9,9 @@ type UiView struct {
 
 	// using a slice, will preserve the column order when ranging through it
 	TableHeaders []tableColumnMap
+
+	// this is only used to generate poller list
+	Pollers []common.Poller
 }
 
 // maps db columns to friendly names

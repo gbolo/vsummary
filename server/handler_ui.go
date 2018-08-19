@@ -119,7 +119,7 @@ func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 }
 
 // TODO: consolidate this with writeSummaryPage
-func writePollerPage(w http.ResponseWriter) {
+func writePollerPage(w http.ResponseWriter, t string) {
 
 	// read in all templates
 	templateFiles, err := findAllTemplates()
@@ -132,12 +132,13 @@ func writePollerPage(w http.ResponseWriter) {
 	}
 
 	// parse and add function to templates
-	templates, err := template.New("pollers").
+	templates, err := template.New(t).
 		Funcs(sprig.TxtFuncMap()).
 		ParseFiles(templateFiles...)
 
 	if err == nil {
-		execErr := templates.ExecuteTemplate(w, "pollers", UiView{Title:"vCenter Pollers"})
+		pollers, _ := backend.GetPollers()
+		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)

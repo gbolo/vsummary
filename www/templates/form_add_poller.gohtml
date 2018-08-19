@@ -48,4 +48,37 @@
                             <button type="submit" id="submit" class="btn btn-primary"><i class='fa fa-plus fa-fw'></i> Add vCenter</button>
                         </div>
                     </form>
+
+
+                    <!-- ajax call to add a new poller -->
+                    <script>
+                        function hideModal(){
+                            $("#pollerModal").modal('hide');
+                        }
+                        $("#submit").click(function(e){
+                            e.preventDefault();
+                            //make ajax call
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/vcenter",
+                                data: $('form').serialize(),
+                                beforeSend: function(){
+                                    $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
+                                    $("#message").removeClass("hidden alert-danger");
+                                    $("#message").addClass("alert-info");
+                                },
+                                success: function(msg){
+                                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+                                    $("#message").removeClass("hidden alert-info alert-danger");
+                                    $("#message").addClass("alert-success");
+                                    setTimeout(hideModal, 1000);
+                                },
+                                error: function(jqXHR){
+                                    $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
+                                    $("#message").removeClass("hidden alert-info");
+                                    $("#message").addClass("alert-danger");
+                                }
+                            });
+                        });
+                    </script>
 {{ end }}

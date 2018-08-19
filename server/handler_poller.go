@@ -20,7 +20,18 @@ func handlerUiPoller(w http.ResponseWriter, req *http.Request) {
 	defer common.ExecutionTime(time.Now(), "handlerUiPoller")
 
 	// output the page
-	writePollerPage(w)
+	writePollerPage(w, "pollers")
+
+	return
+}
+
+func handlerUiFormPoller(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiFormPoller")
+
+	// output the page
+	writePollerPage(w, "form_add_poller")
 
 	return
 }
@@ -84,9 +95,21 @@ func handlerPutVcenter(w http.ResponseWriter, req *http.Request) {
 		Password: req.FormValue("pass"),
 		Insecure: true,
 	}); err != nil {
-		log.Errorf("failed to add poller: %s", err)
+		log.Errorf("could not connect to vCenter: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, fmt.Sprintf("failed to add poller: %s", err))
+		fmt.Fprint(w, fmt.Sprintf("Could not connect to vCenter: %s", err))
+		return
+	}
+
+	if err := backend.InsertPoller(common.Poller{
+		VcenterHost: req.FormValue("host"),
+		VcenterName: req.FormValue("short_name"),
+		Username: req.FormValue("user"),
+		Password: req.FormValue("pass"),
+	}); err != nil {
+		log.Errorf("could not add poller: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, fmt.Sprintf("Could not add poller: %s", err))
 		return
 	}
 
