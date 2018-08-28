@@ -76,8 +76,9 @@ func main() {
 
 	fmt.Println("---------------------------------------------------------------------------------------")
 
-	poller.LoadPollers(pollers)
+	//poller.LoadPollers(pollers)
 
+	poller.RunInternalPoller(*b)
 	time.Sleep(70 * time.Minute)
 
 }
