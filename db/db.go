@@ -39,12 +39,13 @@ func NewBackend() *Backend {
 	return &Backend{}
 }
 
-// Check DB connection
-func (b *Backend) checkDB() error {
+// Test DB connection
+func (b *Backend) checkDB() (err error) {
 	if b.db == nil {
 		return errors.New("Database connection is not set up")
 	}
-	return nil
+	err = b.db.Ping()
+	return
 }
 
 // SetDB changes the underlying sql.DB object Accessor is manipulating.
