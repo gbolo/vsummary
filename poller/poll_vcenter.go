@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
+	"net/url"
+
 	"github.com/gbolo/vsummary/common"
 	"github.com/vmware/govmomi/view"
-	"net/url"
 )
 
 func (p *Poller) GetVcenter() (vcenter common.VCenter, err error) {
