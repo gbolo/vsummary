@@ -88,39 +88,3 @@ func TestConnection(p PollerConfig) (err error) {
 	}
 	return
 }
-
-// does full poll from a common.Poller
-func DoPoll(p common.Poller) (err error) {
-
-	decryptedPassword, err := crypto.Decrypt(p.Password)
-	if err != nil {
-		log.Warningf("failed to decrypt password for: %s", p.VcenterHost)
-		return
-	}
-
-	poller := NewPoller()
-	poller.Config = &PollerConfig{
-		URL:         fmt.Sprintf("https://%s/sdk", p.VcenterHost),
-		UserName:    p.Username,
-		Password:    decryptedPassword,
-		IntervalMin: p.IntervalMin,
-		Insecure:    true,
-	}
-
-	// create context and connect to vsphere
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	err = poller.Connect(&ctx)
-	if err != nil {
-		log.Errorf("failed to connect to: %s %s ", poller.Config.URL, err)
-		return
-	}
-
-	defer poller.VmwareClient.Logout(ctx)
-
-	// do a poll
-	poller.PollAllEndpoints()
-
-	return
-}
