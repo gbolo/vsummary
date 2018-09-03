@@ -3,11 +3,10 @@ package poller
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/url"
 	"time"
-
-	"fmt"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/crypto"

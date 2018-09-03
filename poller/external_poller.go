@@ -34,14 +34,14 @@ type ExternalPoller struct {
 	vSummaryServerEndpoint string
 }
 
-// NewEmptyExternalPoller returns a empty InternalPoller
+// NewEmptyExternalPoller returns a empty ExternalPoller
 func NewEmptyExternalPoller() *ExternalPoller {
 	return &ExternalPoller{
 		stopSignal: make(chan bool),
 	}
 }
 
-// NewExternalPoller returns a InternalPoller based from a common.Poller
+// NewExternalPoller returns a ExternalPoller based from a common.Poller
 func NewExternalPoller(c common.Poller) (e *ExternalPoller) {
 	e = NewEmptyExternalPoller()
 	e.Configure(c)
