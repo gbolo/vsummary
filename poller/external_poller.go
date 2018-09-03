@@ -2,6 +2,7 @@ package poller
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -30,8 +31,8 @@ func init() {
 // sending results to a vSummary API server over http(s).
 type ExternalPoller struct {
 	Poller
-	stopSignal             chan bool
-	vSummaryServerEndpoint string
+	stopSignal     chan bool
+	vSummaryApiUrl string
 }
 
 // NewEmptyExternalPoller returns a empty ExternalPoller
@@ -48,7 +49,11 @@ func NewExternalPoller(c common.Poller) (e *ExternalPoller) {
 	return
 }
 
-// SetEndpoint sets the vSummary API server endpoint
-func (e *ExternalPoller) SetEndpoint(endpoint string) {
-	e.vSummaryServerEndpoint = endpoint
+// SetEndpoint sets the vSummary API server url unless it's invalid
+func (e *ExternalPoller) SetApiUrl(u string) (err error) {
+	_, err = url.ParseRequestURI(u)
+	if err != nil {
+		e.vSummaryApiUrl = u
+	}
+	return
 }
