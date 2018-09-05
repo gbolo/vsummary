@@ -58,6 +58,7 @@ func (i *InternalPoller) StopPolling() {
 	i.stopSignal <- true
 }
 
+// PollThenStore will poll all endpoints then store results to backend db
 func (i *InternalPoller) PollThenStore() {
 	r, errs := i.GetPollResults()
 	if len(errs) > 0 {

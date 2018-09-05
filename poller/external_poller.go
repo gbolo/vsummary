@@ -57,7 +57,7 @@ func NewExternalPoller(c common.Poller) (e *ExternalPoller) {
 // SetEndpoint sets the vSummary API server url unless it's invalid
 func (e *ExternalPoller) SetApiUrl(u string) (err error) {
 	_, err = url.ParseRequestURI(u)
-	if err != nil {
+	if err == nil {
 		e.vSummaryApiUrl = u
 	}
 	return
@@ -68,7 +68,7 @@ func (e *ExternalPoller) constructUrl(endpoint string) (urlEndpont string, err e
 	if e.vSummaryApiUrl != "" && endpoint != "" {
 		urlEndpont = fmt.Sprintf("%s%s", e.vSummaryApiUrl, endpoint)
 	} else {
-		err = fmt.Errorf("vSummaryApiUrl or endpoint is empty")
+		err = fmt.Errorf("vSummaryApiUrl or endpoint is empty: [%s] [%s]", e.vSummaryApiUrl, endpoint)
 		return
 	}
 	_, err = url.ParseRequestURI(urlEndpont)
@@ -133,4 +133,26 @@ func (e *ExternalPoller) SendPollResults(r pollResults) (err []error) {
 	appendIfError(&err, e.sendResult(common.EndpointCluster, r.Cluster))
 
 	return
+}
+
+// PollThenSend will poll all endpoints then send results to vSummary API server
+func (e *ExternalPoller) PollThenSend() {
+	r, errs := e.GetPollResults()
+	if len(errs) > 0 {
+		log.Warningf(
+			"will not send poll results since %d error(s) occurred during polling of: %s",
+			len(errs),
+			e.Config.URL,
+		)
+		return
+	}
+	errs = e.SendPollResults(r)
+	if len(errs) > 0 {
+		log.Warningf(
+			"there were %d errors during sending polling results of: %s",
+			len(errs),
+			e.Config.URL,
+		)
+		log.Debugf("polling errors: %v", errs)
+	}
 }
