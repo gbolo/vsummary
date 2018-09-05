@@ -2,6 +2,7 @@ package poller
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -74,8 +75,15 @@ func (e *ExternalPoller) constructUrl(endpoint string) (urlEndpont string, err e
 	return
 }
 
-// sendResult does an http post request to the vsummary api server to proccess the poll result
-func (e *ExternalPoller) sendResult(endpoint string, jsonBody []byte) (err error) {
+// sendResult does an http post request to the vsummary api server to process the poll result
+func (e *ExternalPoller) sendResult(endpoint string, o interface{}) (err error) {
+	// convertproccess object to json bytes
+	jsonBody, err := json.Marshal(o)
+	if err != nil {
+		log.Errorf("invalid json %s", err)
+		return
+	}
+
 	// determine url
 	url, err := e.constructUrl(endpoint)
 	if err != nil {
@@ -105,5 +113,24 @@ func (e *ExternalPoller) sendResult(endpoint string, jsonBody []byte) (err error
 	res.Body.Close()
 
 	log.Infof("api call successful: %d %s", res.StatusCode, url)
+	return
+}
+
+// SendPollResults will attempt to send the polling results to the vSummary API server
+func (e *ExternalPoller) SendPollResults(r pollResults) (err []error) {
+	appendIfError(&err, e.sendResult(common.EndpointVCenter, r.Vcenter))
+	appendIfError(&err, e.sendResult(common.EndpointESXi, r.Esxi))
+	appendIfError(&err, e.sendResult(common.EndpointDatastore, r.Datastore))
+	appendIfError(&err, e.sendResult(common.EndpointVirtualMachine, r.Virtualmachine))
+	appendIfError(&err, e.sendResult(common.EndpointVSwitch, r.VSwitch))
+	appendIfError(&err, e.sendResult(common.EndpointVSwitch, r.Dvs))
+	// need to insert portgroups here...
+	appendIfError(&err, e.sendResult(common.EndpointVNIC, r.Vnic))
+	appendIfError(&err, e.sendResult(common.EndpointVDisk, r.VDisk))
+	appendIfError(&err, e.sendResult(common.EndpointResourcepool, r.ResourcePool))
+	appendIfError(&err, e.sendResult(common.EndpointDatacenter, r.Datacenter))
+	appendIfError(&err, e.sendResult(common.EndpointFolder, r.Folder))
+	appendIfError(&err, e.sendResult(common.EndpointCluster, r.Cluster))
+
 	return
 }
