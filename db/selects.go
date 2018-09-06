@@ -4,7 +4,7 @@ import (
 	"github.com/gbolo/vsummary/common"
 )
 
-// IGets a list of pollers
+// GetPollers returns a list of pollers
 func (b *Backend) GetPollers() (pollers []common.Poller, err error) {
 
 	// exit if there is no database connection

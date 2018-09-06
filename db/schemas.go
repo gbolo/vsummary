@@ -91,12 +91,15 @@ CREATE TABLE IF NOT EXISTS datacenter
 	schemaPoller = `
 CREATE TABLE IF NOT EXISTS poller
   (
-     vcenter_host   VARCHAR(64) PRIMARY KEY,
+     id             VARCHAR(12) PRIMARY KEY,
+     vcenter_host   VARCHAR(64),
      vcenter_name   VARCHAR(64),
      enabled        TINYINT DEFAULT 1,
      user_name      VARCHAR(128),
      password       VARCHAR(256),
-     interval_min   INT UNSIGNED
+     interval_min   INT UNSIGNED,
+     internal       TINYINT DEFAULT 0,
+     last_poll      VARCHAR(128) DEFAULT 'never'
   );`
 
 	schemaVcenter = `

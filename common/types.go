@@ -120,6 +120,11 @@ type Poller struct {
 	Password    string `json:"password" db:"password" validate:"required"`
 	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`
 	IntervalMin int    `json:"interval_min" db:"interval_min" validate:"required"`
+
+	// These are part of db record ONLY
+	Id       string `db:"id"`
+	Internal bool   `db:"internal"`
+	LastPoll string `db:"last_poll"`
 }
 
 type Esxi struct {

@@ -64,7 +64,9 @@ func (i *InternalCollector) addIfUnique(p InternalPoller) {
 // then populates internalPoller list of ActivePollers with it.
 func (i *InternalCollector) RefreshPollers() {
 	pollers, err := i.backend.GetPollers()
+	log.Debugf("found %d pollers", len(pollers))
 	if err != nil {
+		log.Errorf("error getting pollers: %v", err)
 		return
 	}
 

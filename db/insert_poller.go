@@ -7,6 +7,7 @@ import (
 
 const insertPoller = `
 	INSERT INTO poller (
+		id,
 		vcenter_host,
 		vcenter_name,
 		enabled,
@@ -15,6 +16,7 @@ const insertPoller = `
 		interval_min
 		)
 	VALUES (
+		:id,
 		:vcenter_host,
 		:vcenter_name,
 		:enabled,
@@ -47,6 +49,9 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 	}
 
 	poller.Password = encryptedPassword
+
+	// Create an Id
+	poller.Id = common.ComputeId(poller.VcenterHost)
 
 	// begin a transaction, set all related objects to absent
 	tx := b.db.MustBegin()
