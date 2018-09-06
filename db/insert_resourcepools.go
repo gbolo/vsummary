@@ -79,14 +79,14 @@ func (b *Backend) InsertResourcepools(resourcepools []common.ResourcePool) (err 
 	for _, resourcepool := range resourcepools {
 
 		// Fill in some required Ids
-		resourcepool.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.Moref))
-		resourcepool.ClusterId = common.GetMD5Hash(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.ClusterMoref))
+		resourcepool.Id = common.ComputeId(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.Moref))
+		resourcepool.ClusterId = common.ComputeId(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.ClusterMoref))
 
 		// parent information
 		if strings.HasPrefix(resourcepool.ParentMoref, "domain-") {
 			resourcepool.Parent = "cluster"
 		} else {
-			resourcepool.Parent = common.GetMD5Hash(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.ParentMoref))
+			resourcepool.Parent = common.ComputeId(fmt.Sprintf("%s%s", resourcepool.VcenterId, resourcepool.ParentMoref))
 		}
 
 		// Store the record in the DB

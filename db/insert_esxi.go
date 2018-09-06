@@ -104,8 +104,8 @@ func (b *Backend) InsertEsxi(esxis []common.Esxi) (err error) {
 	for _, esxi := range esxis {
 
 		// Fill in some required Ids
-		esxi.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.Moref))
-		esxi.ClusterId = common.GetMD5Hash(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.ClusterMoref))
+		esxi.Id = common.ComputeId(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.Moref))
+		esxi.ClusterId = common.ComputeId(fmt.Sprintf("%s%s", esxi.VcenterId, esxi.ClusterMoref))
 
 		if esxi.CurrentEvc == "" {
 			esxi.CurrentEvc = "NULL"

@@ -54,7 +54,7 @@ func (b *Backend) InsertFolders(folders []common.Folder) (err error) {
 	for _, folder := range folders {
 
 		// Fill in some required Ids
-		folder.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", folder.VcenterId, folder.Moref))
+		folder.Id = common.ComputeId(fmt.Sprintf("%s%s", folder.VcenterId, folder.Moref))
 
 		// type information
 		if strings.Contains(folder.Type, "VirtualMachine") {
@@ -67,9 +67,9 @@ func (b *Backend) InsertFolders(folders []common.Folder) (err error) {
 		// parent information
 		if strings.HasPrefix(folder.ParentMoref, "datacenter-") {
 			folder.Parent = "datacenter"
-			folder.ParentDatacenterId = common.GetMD5Hash(fmt.Sprintf("%s%s", folder.VcenterId, folder.ParentMoref))
+			folder.ParentDatacenterId = common.ComputeId(fmt.Sprintf("%s%s", folder.VcenterId, folder.ParentMoref))
 		} else {
-			folder.Parent = common.GetMD5Hash(fmt.Sprintf("%s%s", folder.VcenterId, folder.ParentMoref))
+			folder.Parent = common.ComputeId(fmt.Sprintf("%s%s", folder.VcenterId, folder.ParentMoref))
 			folder.ParentDatacenterId = "n/a"
 		}
 

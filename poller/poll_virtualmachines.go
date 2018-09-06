@@ -76,13 +76,11 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 		// folder may not exist
 		if mo.Parent != nil {
 			vm.FolderMoref = mo.Parent.Value
-			//vm.FolderId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.FolderMoref))
 		}
 
 		// vapps may not exist
 		if mo.ParentVApp != nil {
 			vm.VappMoref = mo.ParentVApp.Value
-			//vm.VappId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.VappMoref))
 			vm.FolderId = "vapp"
 		} else {
 			vm.VappId = "none"
@@ -91,7 +89,6 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 		// resourcepool may not exist
 		if mo.ResourcePool != nil {
 			vm.ResourcePoolMoref = mo.ResourcePool.Value
-			//vm.ResourcePoolId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.ResourcePoolId))
 		}
 
 		VMs = append(VMs, vm)

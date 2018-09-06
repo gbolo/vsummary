@@ -1,9 +1,9 @@
 package common
 
 import (
-	"crypto/md5"
-	"encoding/hex"
+	"crypto/sha1"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -11,13 +11,14 @@ import (
 	"github.com/op/go-logging"
 )
 
-var log = logging.MustGetLogger("vsummary")
+var (
+	log = logging.MustGetLogger("vsummary")
+)
 
-// return md5 hash of string
-func GetMD5Hash(text string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(text))
-	return hex.EncodeToString(hasher.Sum(nil))
+// ComputeId returns the first 12 characters from a SHA1 hash of the input text
+func ComputeId(input string) string {
+	sum := fmt.Sprintf("%x", sha1.Sum([]byte(input)))
+	return sum[0:12]
 }
 
 // logs a debug message indicating how long something took to execute

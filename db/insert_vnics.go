@@ -59,15 +59,15 @@ func (b *Backend) InsertVNics(vnics []common.VNic) (err error) {
 	for _, vnic := range vnics {
 
 		// Fill in some required Ids
-		vnic.Id = common.GetMD5Hash(fmt.Sprintf("%s%s%s", vnic.VcenterId, vnic.VirtualmachineMoref, vnic.Name))
-		vnic.VirtualmachineId = common.GetMD5Hash(fmt.Sprintf("%s%s", vnic.VcenterId, vnic.VirtualmachineMoref))
+		vnic.Id = common.ComputeId(fmt.Sprintf("%s%s%s", vnic.VcenterId, vnic.VirtualmachineMoref, vnic.Name))
+		vnic.VirtualmachineId = common.ComputeId(fmt.Sprintf("%s%s", vnic.VcenterId, vnic.VirtualmachineMoref))
 
 		// determine unique portgroup id
 		if vnic.VswitchType == "HostVirtualSwitch" {
 			// standard vswitch
-			vnic.PortgroupId = common.GetMD5Hash(fmt.Sprintf("%s%s%s", vnic.VcenterId, vnic.EsxiMoref, vnic.PortgroupName))
+			vnic.PortgroupId = common.ComputeId(fmt.Sprintf("%s%s%s", vnic.VcenterId, vnic.EsxiMoref, vnic.PortgroupName))
 		} else if vnic.VswitchType == "VmwareDistributedVirtualSwitch" {
-			vnic.PortgroupId = common.GetMD5Hash(fmt.Sprintf("%s%s", vnic.VcenterId, vnic.PortgroupMoref))
+			vnic.PortgroupId = common.ComputeId(fmt.Sprintf("%s%s", vnic.VcenterId, vnic.PortgroupMoref))
 		} else {
 			vnic.PortgroupId = "ORPHANED"
 		}

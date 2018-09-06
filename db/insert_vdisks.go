@@ -65,10 +65,10 @@ func (b *Backend) InsertVDisks(vdisks []common.VDisk) (err error) {
 	for _, vdisk := range vdisks {
 
 		// Fill in some required Ids
-		vdisk.Id = common.GetMD5Hash(fmt.Sprintf("%s%s%s", vdisk.VcenterId, vdisk.DiskObjectId, vdisk.Path))
-		vdisk.DatastoreId = common.GetMD5Hash(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.DatastoreMoref))
-		vdisk.VirtualMachineId = common.GetMD5Hash(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.VirtualmachineMoref))
-		vdisk.EsxiId = common.GetMD5Hash(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.EsxiMoref))
+		vdisk.Id = common.ComputeId(fmt.Sprintf("%s%s%s", vdisk.VcenterId, vdisk.DiskObjectId, vdisk.Path))
+		vdisk.DatastoreId = common.ComputeId(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.DatastoreMoref))
+		vdisk.VirtualMachineId = common.ComputeId(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.VirtualmachineMoref))
+		vdisk.EsxiId = common.ComputeId(fmt.Sprintf("%s%s", vdisk.VcenterId, vdisk.EsxiMoref))
 
 		// Determine capacity in bytes if not present
 		if vdisk.CapacityBytes == 0 && vdisk.CapacityKb > 0 {

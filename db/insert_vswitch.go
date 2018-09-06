@@ -85,11 +85,11 @@ func (b *Backend) InsertVSwitch(vswitches []common.VSwitch) (err error) {
 		// Fill in some required Ids
 		if vswitch.Type == "DVS" {
 			insertStatement = insertDVS
-			vswitch.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.Moref))
+			vswitch.Id = common.ComputeId(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.Moref))
 		} else if vswitch.Type == "SVS" {
 			insertStatement = insertVswitch
-			vswitch.Id = common.GetMD5Hash(fmt.Sprintf("%s%s%s", vswitch.VcenterId, vswitch.EsxiMoref, vswitch.Name))
-			vswitch.EsxiId = common.GetMD5Hash(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.EsxiMoref))
+			vswitch.Id = common.ComputeId(fmt.Sprintf("%s%s%s", vswitch.VcenterId, vswitch.EsxiMoref, vswitch.Name))
+			vswitch.EsxiId = common.ComputeId(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.EsxiMoref))
 		} else {
 			err = fmt.Errorf("incorrect vswitch type: %s", vswitch.Type)
 		}

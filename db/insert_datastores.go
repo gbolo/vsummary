@@ -58,7 +58,7 @@ func (b *Backend) InsertDatastores(dss []common.Datastore) (err error) {
 	for _, ds := range dss {
 
 		// Fill in some required Ids
-		ds.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", ds.VcenterId, ds.Moref))
+		ds.Id = common.ComputeId(fmt.Sprintf("%s%s", ds.VcenterId, ds.Moref))
 
 		// Store the record in the DB
 		res, err := tx.NamedExec(insertDatastore, &ds)

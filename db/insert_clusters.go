@@ -77,8 +77,8 @@ func (b *Backend) InsertClusters(clusters []common.Cluster) (err error) {
 	for _, cluster := range clusters {
 
 		// Fill in some required Ids
-		cluster.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", cluster.VcenterId, cluster.Moref))
-		cluster.DatacenterId = common.GetMD5Hash(fmt.Sprintf("%s%s", cluster.VcenterId, cluster.DatacenterMoref))
+		cluster.Id = common.ComputeId(fmt.Sprintf("%s%s", cluster.VcenterId, cluster.Moref))
+		cluster.DatacenterId = common.ComputeId(fmt.Sprintf("%s%s", cluster.VcenterId, cluster.DatacenterMoref))
 
 		// Store the record in the DB
 		res, err := tx.NamedExec(insertCluster, &cluster)

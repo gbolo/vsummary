@@ -47,9 +47,9 @@ func (b *Backend) InsertDatacenters(dcs []common.Datacenter) (err error) {
 	for _, dc := range dcs {
 
 		// Fill in some required Ids
-		dc.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", dc.VcenterId, dc.Moref))
-		dc.EsxiFolderId = common.GetMD5Hash(fmt.Sprintf("%s%s", dc.VcenterId, dc.EsxiFolderMoref))
-		dc.VmFolderId = common.GetMD5Hash(fmt.Sprintf("%s%s", dc.VcenterId, dc.VmFolderMoref))
+		dc.Id = common.ComputeId(fmt.Sprintf("%s%s", dc.VcenterId, dc.Moref))
+		dc.EsxiFolderId = common.ComputeId(fmt.Sprintf("%s%s", dc.VcenterId, dc.EsxiFolderMoref))
+		dc.VmFolderId = common.ComputeId(fmt.Sprintf("%s%s", dc.VcenterId, dc.VmFolderMoref))
 
 		// Store the record in the DB
 		res, err := tx.NamedExec(insertDatacenter, &dc)

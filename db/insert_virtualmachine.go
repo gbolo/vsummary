@@ -114,21 +114,21 @@ func (b *Backend) InsertVirtualmachines(vms []common.VirtualMachine) (err error)
 		// fill in missing data
 		// folder may not exist
 		if vm.FolderMoref != "" && vm.FolderMoref != "vapp" {
-			vm.FolderId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.FolderMoref))
+			vm.FolderId = common.ComputeId(fmt.Sprintf("%s%s", vm.VcenterId, vm.FolderMoref))
 		}
 
 		// vapps may not exist
 		if vm.VappMoref != "none" {
-			vm.VappId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.VappMoref))
+			vm.VappId = common.ComputeId(fmt.Sprintf("%s%s", vm.VcenterId, vm.VappMoref))
 		}
 		// resourcepool may not exist
 		if vm.ResourcePoolMoref != "" {
-			vm.ResourcePoolId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.ResourcePoolId))
+			vm.ResourcePoolId = common.ComputeId(fmt.Sprintf("%s%s", vm.VcenterId, vm.ResourcePoolId))
 		}
 
 		// Fill in some required Ids
-		vm.Id = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.Moref))
-		vm.EsxiId = common.GetMD5Hash(fmt.Sprintf("%s%s", vm.VcenterId, vm.EsxiMoref))
+		vm.Id = common.ComputeId(fmt.Sprintf("%s%s", vm.VcenterId, vm.Moref))
+		vm.EsxiId = common.ComputeId(fmt.Sprintf("%s%s", vm.VcenterId, vm.EsxiMoref))
 
 		// Store the user record in the DB
 		res, err := tx.NamedExec(insertVm, &vm)
