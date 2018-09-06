@@ -156,3 +156,27 @@ func (e *ExternalPoller) PollThenSend() {
 		log.Debugf("polling errors: %v", errs)
 	}
 }
+
+// Daemonize is a blocking loop which continues to PollThenSend indefinitely
+func (e *ExternalPoller) Daemonize() {
+	t := time.Tick(defaultPollingInterval)
+	log.Infof("start polling of %s", e.Config.URL)
+	// this prevents all pollers to go off at the exact same time
+	randomizedWait(1, 120)
+	e.PollThenSend()
+
+	for {
+		select {
+		case <-t:
+			if e.Enabled {
+				// this prevents all pollers to go off at the exact same time
+				randomizedWait(1, 120)
+				log.Debugf("executing poll of %s", e.Config.URL)
+				e.PollThenSend()
+			} else {
+				log.Infof("stopping polling of %s", e.Config.URL)
+				return
+			}
+		}
+	}
+}
