@@ -138,7 +138,7 @@ func writePollerPage(w http.ResponseWriter, t string) {
 
 	if err == nil {
 		pollers, _ := backend.GetPollers()
-		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers})
+		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)

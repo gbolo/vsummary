@@ -82,9 +82,9 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 }
 
 
-func handlerPutVcenter(w http.ResponseWriter, req *http.Request) {
+func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handlerPutVcenter")
+	defer common.ExecutionTime(time.Now(), "handlerAddPoller")
 
 	// parse the form
 	req.ParseForm()

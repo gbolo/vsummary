@@ -23,6 +23,7 @@ var (
 	EndpointVDisk          = getEndpoint("vdisk")
 	EndpointVNIC           = getEndpoint("vnic")
 	EndpointFolder         = getEndpoint("folder")
+	EndpointPoller         = getEndpoint("poller")
 )
 
 // getEndpoint returns a properly formatted API endpoint

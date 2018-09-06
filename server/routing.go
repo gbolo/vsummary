@@ -1,9 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/gbolo/vsummary/common"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
@@ -26,74 +26,80 @@ var routes = Routes{
 	Route{
 		"VirtualMachine",
 		"POST",
-		appendRequestPrefix("/virtualmachine"),
+		common.EndpointVirtualMachine,
 		handlerVirtualmachine,
 	},
 	Route{
 		"Datacenter",
 		"POST",
-		appendRequestPrefix("/datacenter"),
+		common.EndpointDatacenter,
 		handlerDatacenter,
 	},
 	Route{
 		"Cluster",
 		"POST",
-		appendRequestPrefix("/cluster"),
+		common.EndpointCluster,
 		handlerCluster,
 	},
 	Route{
 		"Esxi",
 		"POST",
-		appendRequestPrefix("/esxi"),
+		common.EndpointESXi,
 		handlerEsxi,
 	},
 	Route{
 		"ResourcePool",
 		"POST",
-		appendRequestPrefix("/resourcepool"),
+		common.EndpointResourcepool,
 		handlerResourcepool,
 	},
 	Route{
 		"Datastore",
 		"POST",
-		appendRequestPrefix("/datastore"),
+		common.EndpointDatastore,
 		handlerDatastore,
 	},
 	Route{
 		"VDisks",
 		"POST",
-		appendRequestPrefix("/vdisk"),
+		common.EndpointVDisk,
 		handlerVDisks,
 	},
 	Route{
 		"VNics",
 		"POST",
-		appendRequestPrefix("/vnic"),
+		common.EndpointVNIC,
 		handlerVNics,
 	},
 	Route{
 		"Folders",
 		"POST",
-		appendRequestPrefix("/folder"),
+		common.EndpointFolder,
 		handlerFolders,
 	},
 	Route{
 		"VSwitch",
 		"POST",
-		appendRequestPrefix("/vswitch"),
+		common.EndpointVSwitch,
 		handlerVswitch,
 	},
 	Route{
 		"vCenter",
 		"POST",
-		appendRequestPrefix("/vcenter"),
+		common.EndpointVCenter,
 		handlerVcenter,
 	},
 	Route{
 		"Poller",
 		"POST",
-		appendRequestPrefix("/poller"),
+		common.EndpointPoller,
 		handlerPoller,
+	},
+	Route{
+		"AddPoller",
+		"PUT",
+		common.EndpointPoller,
+		handlerAddPoller,
 	},
 
 	// vSummary UI endpoints
@@ -189,25 +195,12 @@ var routes = Routes{
 		"/api/dt/vdisks",
 		handlerDtVDisk,
 	},
-
-	Route{
-		"AddVcenter",
-		"PUT",
-		"/api/vcenter",
-		handlerPutVcenter,
-	},
 	//Route{
 	//	"Stats",
 	//	"GET",
 	//	appendRequestPrefix("/stats"),
 	//	handlerStats,
 	//},
-}
-
-// appends prefix to route path
-func appendRequestPrefix(route string) string {
-
-	return fmt.Sprintf("/api/v%s%s", apiVersion, route)
 }
 
 func newRouter() *mux.Router {

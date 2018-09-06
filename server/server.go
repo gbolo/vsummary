@@ -20,8 +20,6 @@ import (
 	//"github.com/codegangsta/negroni"
 )
 
-const apiVersion = "2"
-
 var log = logging.MustGetLogger("vsummary")
 var backend *db.Backend
 

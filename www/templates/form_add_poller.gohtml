@@ -60,7 +60,7 @@
                             //make ajax call
                             $.ajax({
                                 type: "PUT",
-                                url: "/api/vcenter",
+                                url: "{{ .AjaxEndpoint }}",
                                 data: $('form').serialize(),
                                 beforeSend: function(){
                                     $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
