@@ -1,6 +1,7 @@
 package poller
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -77,6 +78,17 @@ func (i *InternalPoller) PollThenStore() {
 			i.Config.URL,
 		)
 	}
+
+	// update last successful poll date
+	u, err := url.ParseRequestURI(i.Config.URL)
+	if err == nil {
+		i.backend.UpdateLastPollDate(common.Poller{
+			VcenterHost: u.Hostname(),
+		})
+	} else {
+		log.Errorf("could not UpdateLastPollDate due to url parse error: %s", err)
+	}
+
 }
 
 // Daemonize is a blocking loop which continues to PollThenStore until

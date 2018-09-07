@@ -1,11 +1,14 @@
 package db
 
 import (
+	"time"
+
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/crypto"
 )
 
-const insertPoller = `
+const (
+	insertPoller = `
 	INSERT INTO poller (
 		id,
 		vcenter_host,
@@ -30,6 +33,9 @@ const insertPoller = `
 		user_name=VALUES(user_name),
 		password=VALUES(password),
 		interval_min=VALUES(interval_min);`
+
+	updatePollDate = "UPDATE poller SET last_poll=:last_poll WHERE id=:id"
+)
 
 // InsertPoller inserts a poller into database
 func (b *Backend) InsertPoller(poller common.Poller) (err error) {
@@ -79,5 +85,45 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 	log.Debugf("total combined affected rows: %d", rowsAffected)
 
 	return
+
+}
+
+func (b *Backend) UpdateLastPollDate(poller common.Poller) (err error) {
+
+	// exit if there is no database connection
+	err = b.checkDB()
+	if err != nil {
+		return
+	}
+
+	// Create an Id and date
+	poller.Id = common.ComputeId(poller.VcenterHost)
+	currentTime := time.Now()
+	poller.LastPoll = currentTime.Format("2006-01-02 3:4 pm")
+
+	tx := b.db.MustBegin()
+	var rowsAffected int64 = 0
+
+	res, err := tx.NamedExec(updatePollDate, &poller)
+	if err != nil {
+		return
+	}
+
+	// tally up rows affected for logging
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		return
+	}
+
+	// commit transaction
+	err = tx.Commit()
+	if err != nil {
+		log.Errorf("failed to commit transaction to database: %s", err)
+	}
+
+	log.Debugf("total combined affected rows: %d", rowsAffected)
+
+	return
+
 
 }
