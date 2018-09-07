@@ -8,4 +8,4 @@ docker run -d --name vsum-mysql \
 -e MYSQL_USER=vsummary \
 -e MYSQL_PASSWORD=secret \
 -p 3306:3306 \
-mysql
+mysql:5.7
