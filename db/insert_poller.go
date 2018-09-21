@@ -35,6 +35,7 @@ const (
 		interval_min=VALUES(interval_min);`
 
 	updatePollDate = "UPDATE poller SET last_poll=:last_poll WHERE id=:id"
+	selectPollerById = "SELECT * FROM poller WHERE id=?"
 )
 
 // InsertPoller inserts a poller into database
@@ -126,4 +127,17 @@ func (b *Backend) UpdateLastPollDate(poller common.Poller) (err error) {
 	return
 
 
+}
+
+// SelectPoller returns a single poller
+func (b *Backend) SelectPoller(pollerId string) (poller common.Poller, err error) {
+	// exit if there is no database connection
+	err = b.checkDB()
+	if err != nil {
+		return
+	}
+
+	// do select
+	err = b.db.Get(&poller, selectPollerById, pollerId)
+	return
 }

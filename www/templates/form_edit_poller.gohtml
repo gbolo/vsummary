@@ -1,0 +1,87 @@
+{{ define "form_edit_poller" }}
+                    <form role="edit" method="post">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">Edit vCenter Entry</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-warning" role="alert">
+                                <strong>Warning!</strong>
+                                <p>Please provide a user with <strong>read-only</strong> access to vcenter
+                                    since no greater permissions are required.<br />
+                                    Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
+                            </div>
+
+                            {{- range .Pollers }}
+                            <input name="host" type="hidden" style="width:100%" value="{{ .VcenterHost }}" readonly="readonly">
+                            <table class="table table-striped">
+                                <tbody>
+                                <tr>
+                                    <td><label for="fqdn">FQDN or IP:</label></td>
+                                    <td>{{ .VcenterHost }}</td>
+                                </tr>
+                                <tr>
+                                    <td><label for="short_name">Environment:</label></td>
+                                    <td><input name="short_name" type="text" style="width:100%" value="{{ .VcenterName }}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="user_name">Username:</label></td>
+                                    <td><input name="user" type="text" style="width:100%" value="{{ .Username }}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="password">Password:</label></td>
+                                    <td><input name="pass" type="password" style="width:100%"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="enabled">Enabled</label>:</td>
+                                    <td><input type="checkbox" name="enabled" value="on" checked></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            {{- end -}}
+
+                            <div id="message" class="alert alert-danger hidden" role="alert">
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa fa-undo fa-fw'></i> Cancel</button>
+                            <button type="submit" id="submit" class="btn btn-primary"><i class='fa fa-plus fa-fw'></i> Add vCenter</button>
+                        </div>
+                    </form>
+
+
+                    <!-- ajax call to add a new poller -->
+                    <script>
+                        function hideModal(){
+                            $("#pollerModal").modal('hide');
+                        }
+                        $("#submit").click(function(e){
+                            e.preventDefault();
+                            //make ajax call
+                            $.ajax({
+                                type: "PUT",
+                                url: "{{ .AjaxEndpoint }}",
+                                data: $('form').serialize(),
+                                beforeSend: function(){
+                                    $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
+                                    $("#message").removeClass("hidden alert-danger");
+                                    $("#message").addClass("alert-info");
+                                },
+                                success: function(msg){
+                                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+                                    $("#message").removeClass("hidden alert-info alert-danger");
+                                    $("#message").addClass("alert-success");
+                                    setTimeout(hideModal, 1000);
+                                },
+                                error: function(jqXHR){
+                                    $("#message").html("<i class='fa fa-times fa-fw'></i> " + jqXHR.responseText);
+                                    $("#message").removeClass("hidden alert-info");
+                                    $("#message").addClass("alert-danger");
+                                }
+                            });
+                        });
+                    </script>
+{{ end }}

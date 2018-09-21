@@ -43,7 +43,7 @@
                         {{- range .Pollers }}
                         <tr>
                             <td>
-                                <button type="button" class="btn btn-sm btn-primary">Edit</button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="editPoller('{{ .Id }}')">Edit</button>
                                 <button type="button" class="btn btn-sm btn-primary">Poll Now</button>
                                 <button type="button" class="btn btn-sm btn-danger">Remove</button>
                             </td>
@@ -86,6 +86,11 @@
     <script>
         function addPoller() {
             $("#pollerModal").find(".modal-content").load("/ui/form/poller");
+            $("#pollerModal").modal() ;
+        }
+
+        function editPoller(id) {
+            $("#pollerModal").find(".modal-content").load("/ui/form/editpoller/"+id);
             $("#pollerModal").modal() ;
         }
     </script>

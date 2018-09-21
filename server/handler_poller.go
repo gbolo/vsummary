@@ -2,16 +2,15 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/poller"
+	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
-	//"github.com/thoas/stats"
-	//"github.com/codegangsta/negroni"
-	"fmt"
 )
 
 func handlerUiPoller(w http.ResponseWriter, req *http.Request) {
@@ -32,6 +31,21 @@ func handlerUiFormPoller(w http.ResponseWriter, req *http.Request) {
 
 	// output the page
 	writePollerPage(w, "form_add_poller")
+
+	return
+}
+
+func handlerUiFormEditPoller(w http.ResponseWriter, req *http.Request) {
+
+	vars := mux.Vars(req)
+	pollerId := vars["id"]
+	log.Debugf("pollerId: %s", pollerId)
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiFormEditPoller")
+
+	// output the page
+	writePollerEditPage(w, "form_edit_poller", pollerId)
 
 	return
 }
@@ -81,7 +95,6 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
-
 func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handlerAddPoller")
@@ -96,7 +109,7 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := poller.TestConnection(poller.PollerConfig{
-		URL: req.FormValue("host"),
+		URL:      req.FormValue("host"),
 		UserName: req.FormValue("user"),
 		Password: req.FormValue("pass"),
 		Insecure: true,
@@ -110,9 +123,9 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	if err := backend.InsertPoller(common.Poller{
 		VcenterHost: req.FormValue("host"),
 		VcenterName: req.FormValue("short_name"),
-		Username: req.FormValue("user"),
-		Password: req.FormValue("pass"),
-		Enabled: checkboxEnabled,
+		Username:    req.FormValue("user"),
+		Password:    req.FormValue("pass"),
+		Enabled:     checkboxEnabled,
 	}); err != nil {
 		log.Errorf("could not add poller: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -121,6 +134,4 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Fprint(w, "Successfuly tested and added connection")
-
-
 }

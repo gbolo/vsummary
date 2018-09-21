@@ -155,3 +155,49 @@ func writePollerPage(w http.ResponseWriter, t string) {
 
 	return
 }
+
+
+// TODO: consolidate this with writeSummaryPage
+func writePollerEditPage(w http.ResponseWriter, t string, id string) {
+
+	// read in all templates
+	templateFiles, err := findAllTemplates()
+
+	if err != nil {
+		fmt.Fprintf(w, "Error reading template(s). See logs")
+		log.Errorf("error geting template files: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	// parse and add function to templates
+	templates, err := template.New(t).
+		Funcs(sprig.TxtFuncMap()).
+		ParseFiles(templateFiles...)
+
+	if err == nil {
+		poller, errPoller := backend.SelectPoller(id)
+		if err != nil {
+			fmt.Fprintf(w, "Error finding poller. See logs")
+			log.Errorf("template execute error: %s", errPoller)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+		pollers := []common.Poller{poller}
+		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
+		if execErr != nil {
+			fmt.Fprintf(w, "Error executing template(s). See logs")
+			log.Errorf("template execute error: %s", execErr)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+
+	} else {
+		fmt.Fprintf(w, "Error parsing template(s). See logs")
+		log.Errorf("template parse error: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	return
+}

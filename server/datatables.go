@@ -489,6 +489,8 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 		di.Length,
 	)
 
+	//log.Debugf("sql query: %s", queryFiltered)
+
 	// query to find total rows filtered
 	queryFilteredCount := "SELECT FOUND_ROWS() AS rows;"
 
@@ -545,11 +547,10 @@ func (di *DataTablesInfo) generateWhereClause() (whereClause string, err error) 
 			}
 		}
 	}
-	//if whereClause != "" {
-	//	whereClause += " AND present=1)"
-	//} else {
-	//	whereClause = "WHERE present=1"
-	//}
+
+	if whereClause != "" {
+		whereClause += ")"
+	}
 
 	return
 }

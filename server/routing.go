@@ -157,6 +157,12 @@ var routes = Routes{
 		"/ui/form/poller",
 		handlerUiFormPoller,
 	},
+	Route{
+		"UiFormEditPoller",
+		"GET",
+		"/ui/form/editpoller/{id}",
+		handlerUiFormEditPoller,
+	},
 
 	// Datatables API endpoints
 	Route{
