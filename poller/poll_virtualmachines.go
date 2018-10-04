@@ -128,6 +128,7 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 
 				vnic := common.VNic{
 					Name:                common.GetString(device, "DeviceInfo", "Label"),
+					Type:                deviceType[7:],
 					MacAddress:          common.GetString(device, "MacAddress"),
 					Connected:           common.BoolToString(common.GetBool(device, "Connectable", "Connected")),
 					Status:              common.GetString(device, "Connectable", "Status"),
