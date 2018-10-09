@@ -146,6 +146,12 @@ var routes = Routes{
 		handlerUiVDisk,
 	},
 	Route{
+		"UiClusters",
+		"GET",
+		"/ui/clusters",
+		handlerUiCluster,
+	},
+	Route{
 		"UiPoller",
 		"GET",
 		"/ui/pollers",
@@ -200,6 +206,12 @@ var routes = Routes{
 		"POST",
 		"/api/dt/vdisks",
 		handlerDtVDisk,
+	},
+	Route{
+		"DtClusters",
+		"POST",
+		clusterView.AjaxEndpoint,
+		handlerDtCluster,
 	},
 	//Route{
 	//	"Stats",

@@ -121,11 +121,14 @@ func getDatatablesResponse(req *http.Request, dbTable string) (dtResponse DataTa
 // returns a human readable string from any number of bytes
 // example: 1855425871872 will return 1.9 TB
 func bytesHumanReadable(bytes string) string {
-	b, err := strconv.ParseInt(bytes, 10, 64)
+	// ignore numbers after a possible decimal
+	bytesSplit := strings.Split(bytes, ".")
+	b, err := strconv.ParseInt(bytesSplit[0], 10, 64)
 	if err != nil {
+		log.Errorf("parse int err: %s", err)
 		return "000"
 	}
-	const unit = 1000
+	const unit = 1024
 	if b < unit {
 		return fmt.Sprintf("%d B", b)
 	}
@@ -139,7 +142,9 @@ func bytesHumanReadable(bytes string) string {
 
 // returns a human readable string from any number of megabytes
 func megaBytesHumanReadable(megaBytes string) string {
-	b, _ := strconv.ParseInt(megaBytes, 10, 64)
+	// ignore numbers after a possible decimal
+	megaBytesSplit := strings.Split(megaBytes, ".")
+	b, _ := strconv.ParseInt(megaBytesSplit[0], 10, 64)
 	return bytesHumanReadable(fmt.Sprintf("%d", (b * 1000 * 1000)))
 }
 
