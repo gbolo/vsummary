@@ -15,6 +15,7 @@ const insertFolders = `
        	type,
 		parent,
 		parent_datacenter_id,
+		full_path,
 		vcenter_id
 		)
 	VALUES (
@@ -24,6 +25,7 @@ const insertFolders = `
        	:type,
 		:parent,
 		:parent_datacenter_id,
+		:full_path,
 		:vcenter_id
 		)
 	ON DUPLICATE KEY UPDATE
@@ -33,6 +35,7 @@ const insertFolders = `
 		type=VALUES(type),
 		parent=VALUES(parent),
 		parent_datacenter_id=VALUES(parent_datacenter_id),
+		full_path=VALUES(full_path),
 		vcenter_id=VALUES(vcenter_id),
 		present=1;`
 
@@ -72,6 +75,9 @@ func (b *Backend) InsertFolders(folders []common.Folder) (err error) {
 			folder.Parent = common.ComputeId(fmt.Sprintf("%s%s", folder.VcenterId, folder.ParentMoref))
 			folder.ParentDatacenterId = "n/a"
 		}
+
+		// TODO: calculate full path properly, this is just a placeholder
+		folder.FullPath = folder.Name
 
 		// Store the record in the DB
 		res, err := tx.NamedExec(insertFolders, &folder)
