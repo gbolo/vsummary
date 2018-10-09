@@ -31,6 +31,7 @@ const insertEsxi = `
 		stat_memory_usage,
 		stat_uptime_sec,
 		status,
+		in_maintenance_mode,
 		vcenter_id
 		)
 	VALUES (
@@ -57,6 +58,7 @@ const insertEsxi = `
 		:stat_memory_usage,
 		:stat_uptime_sec,
 		:status,
+		:in_maintenance_mode,
 		:vcenter_id
 		)
 	ON DUPLICATE KEY UPDATE
@@ -83,6 +85,7 @@ const insertEsxi = `
 		stat_memory_usage=VALUES(stat_memory_usage),
 		stat_uptime_sec=VALUES(stat_uptime_sec),
 		status=VALUES(status),
+		in_maintenance_mode=VALUES(in_maintenance_mode),
 		vcenter_id=VALUES(vcenter_id),
 		present=1;`
 
