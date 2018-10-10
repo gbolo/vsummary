@@ -471,7 +471,7 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 		tableName,
 	)
 	// view_portgroup doesnt have "present" column
-	if tableName == "view_portgroup" {
+	if tableName == "view_portgroup" || tableName == "view_vcenter" {
 		queryTotal = fmt.Sprintf(
 			"SELECT COUNT(*) AS count FROM %s",
 			tableName,

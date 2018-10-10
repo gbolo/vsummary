@@ -152,6 +152,12 @@ var routes = Routes{
 		handlerUiCluster,
 	},
 	Route{
+		"UiVCenters",
+		"GET",
+		"/ui/vcenters",
+		handlerUiVCenters,
+	},
+	Route{
 		"UiPoller",
 		"GET",
 		"/ui/pollers",
@@ -212,6 +218,12 @@ var routes = Routes{
 		"POST",
 		clusterView.AjaxEndpoint,
 		handlerDtCluster,
+	},
+	Route{
+		"DtVCenters",
+		"POST",
+		vcenterView.AjaxEndpoint,
+		handlerDtVCenter,
 	},
 	//Route{
 	//	"Stats",

@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -9,6 +10,57 @@ import (
 	"github.com/gbolo/vsummary/common"
 	"gopkg.in/go-playground/validator.v9"
 )
+
+var vcenterView = UiView{
+	Title:        "vCenters",
+	AjaxEndpoint: "/api/dt/vcenter",
+	TableHeaders: []tableColumnMap{
+		{"name", "Name"},
+		{"host", "Address"},
+		{"datacenters", "Datacenters"},
+		{"clusters", "Clusters"},
+		{"esxi_hosts", "Esxi Hosts"},
+		{"esxi_cpu", "Total CPU Cores"},
+		{"esxi_memory", "Total Memory"},
+		{"vms_on", "VMs PoweredOn"},
+		{"vms", "VMs"},
+		{"vms_vcpu_on", "VMs PoweredOn vCPU"},
+		{"vms_memory_on", "VMs PoweredOn Memory"},
+		//{"vcenter_fqdn", "vCenter"},
+	},
+}
+
+func handlerUiVCenters(w http.ResponseWriter, req *http.Request) {
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiCluster")
+
+	// output the page
+	writeSummaryPage(w, &vcenterView)
+
+	return
+}
+
+func handlerDtVCenter(w http.ResponseWriter, req *http.Request) {
+	dtResponse, err := getDatatablesResponse(req, "view_vcenter")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		log.Errorf("error parsing datatables request: %v", err)
+	}
+
+	// loop through data and make modifications
+	data := dtResponse.Data[:0]
+	for _, row := range dtResponse.Data {
+		row["esxi_memory"] = bytesHumanReadable(row["esxi_memory"])
+		row["vms_memory_on"] = bytesHumanReadable(row["vms_memory_on"])
+		data = append(data, row)
+	}
+
+	// write a response
+	dtResponse.Data = data
+	b, _ := json.MarshalIndent(dtResponse, "", "  ")
+	fmt.Fprintf(w, string(b))
+}
 
 func handlerVcenter(w http.ResponseWriter, req *http.Request) {
 
