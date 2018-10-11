@@ -82,14 +82,20 @@ func (p *Poller) GetEsxi() (esxiList []common.Esxi, pNics []common.PNic, vSwitch
 
 				if reflect.TypeOf(pnic).String() == "types.PhysicalNic" {
 
-					pNics = append(pNics, common.PNic{
+					newPnic := common.PNic{
 						Name:       pnic.Device,
 						MacAddress: pnic.Mac,
 						Driver:     pnic.Driver,
-						LinkSpeed:  pnic.LinkSpeed.SpeedMb,
 						EsxiMoref:  esxi.Self.Value,
 						VcenterId:  v.Client().ServiceContent.About.InstanceUuid,
-					})
+					}
+
+					// this may not be reported. avoid nil pointers!
+					if pnic.LinkSpeed != nil {
+						newPnic.LinkSpeed = pnic.LinkSpeed.SpeedMb
+					}
+
+					pNics = append(pNics, newPnic)
 				}
 			}
 		}
