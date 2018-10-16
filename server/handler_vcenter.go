@@ -51,8 +51,8 @@ func handlerDtVCenter(w http.ResponseWriter, req *http.Request) {
 	// loop through data and make modifications
 	data := dtResponse.Data[:0]
 	for _, row := range dtResponse.Data {
-		row["esxi_memory"] = bytesHumanReadable(row["esxi_memory"])
-		row["vms_memory_on"] = bytesHumanReadable(row["vms_memory_on"])
+		row["esxi_memory"] = common.BytesHumanReadable(row["esxi_memory"])
+		row["vms_memory_on"] = common.BytesHumanReadable(row["vms_memory_on"])
 		data = append(data, row)
 	}
 

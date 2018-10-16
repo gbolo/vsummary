@@ -49,7 +49,7 @@ func handlerDtVDisk(w http.ResponseWriter, req *http.Request) {
 	// loop through data and make modifications
 	data := dtResponse.Data[:0]
 	for _, row := range dtResponse.Data {
-		row["capacity_bytes"] = bytesHumanReadable(row["capacity_bytes"])
+		row["capacity_bytes"] = common.BytesHumanReadable(row["capacity_bytes"])
 		row["vm_power_state"] = decorateCell(row["vm_power_state"])
 		data = append(data, row)
 	}

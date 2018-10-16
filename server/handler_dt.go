@@ -3,9 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -26,12 +24,12 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 		row["esxi_status"] = decorateCell(row["esxi_status"])
 		row["power_state"] = decorateCell(row["power_state"])
 		row["guest_tools_running"] = decorateCell(row["guest_tools_running"])
-		row["memory_bytes"] = bytesHumanReadable(row["memory_bytes"])
-		row["memory_mb"] = megaBytesHumanReadable(row["memory_mb"])
-		row["stat_guest_memory_usage"] = megaBytesHumanReadable(row["stat_guest_memory_usage"])
-		row["stat_host_memory_usage"] = megaBytesHumanReadable(row["stat_host_memory_usage"])
+		row["memory_bytes"] = common.BytesHumanReadable(row["memory_bytes"])
+		row["memory_mb"] = common.MegaBytesHumanReadable(row["memory_mb"])
+		row["stat_guest_memory_usage"] = common.MegaBytesHumanReadable(row["stat_guest_memory_usage"])
+		row["stat_host_memory_usage"] = common.MegaBytesHumanReadable(row["stat_host_memory_usage"])
 		row["stat_cpu_usage"] = row["stat_cpu_usage"] + " MHz"
-		row["stat_uptime_sec"] = secondsToHuman(row["stat_uptime_sec"])
+		row["stat_uptime_sec"] = common.SecondsToHuman(row["stat_uptime_sec"])
 		row["folder"] = common.SetDefaultValue(row["folder"], "None")
 		row["cluster"] = common.SetDefaultValue(row["cluster"], "None")
 		data = append(data, row)
@@ -61,8 +59,8 @@ func handlerDtDatastore(w http.ResponseWriter, req *http.Request) {
 	// loop through data and make modifications
 	data := dtResponse.Data[:0]
 	for _, row := range dtResponse.Data {
-		row["capacity_bytes"] = bytesHumanReadable(row["capacity_bytes"])
-		row["free_bytes"] = bytesHumanReadable(row["free_bytes"])
+		row["capacity_bytes"] = common.BytesHumanReadable(row["capacity_bytes"])
+		row["free_bytes"] = common.BytesHumanReadable(row["free_bytes"])
 		data = append(data, row)
 	}
 
@@ -120,39 +118,6 @@ func getDatatablesResponse(req *http.Request, dbTable string) (dtResponse DataTa
 	return
 }
 
-// returns a human readable string from any number of bytes
-// example: 1855425871872 will return 1.9 TB
-func bytesHumanReadable(bytes string) string {
-	if bytes == "" {
-		return "0"
-	}
-	// ignore numbers after a possible decimal
-	bytesSplit := strings.Split(bytes, ".")
-	b, err := strconv.ParseInt(bytesSplit[0], 10, 64)
-	if err != nil {
-		log.Errorf("parse int err: %s", err)
-		return "000"
-	}
-	const unit = 1024
-	if b < unit {
-		return fmt.Sprintf("%d B", b)
-	}
-	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "kMGTPE"[exp])
-}
-
-// returns a human readable string from any number of megabytes
-func megaBytesHumanReadable(megaBytes string) string {
-	// ignore numbers after a possible decimal
-	megaBytesSplit := strings.Split(megaBytes, ".")
-	b, _ := strconv.ParseInt(megaBytesSplit[0], 10, 64)
-	return bytesHumanReadable(fmt.Sprintf("%d", (b * 1000 * 1000)))
-}
-
 // this will add some html styling to string
 func decorateCell(value string) string {
 	switch strings.ToLower(value) {
@@ -174,21 +139,5 @@ func decorateCell(value string) string {
 		return "<span class=\"label label-pill label-success\">OK</span>"
 	default:
 		return value
-	}
-}
-
-// converts seconds to days
-func secondsToHuman(secondsString string) string {
-	seconds, _ := strconv.ParseInt(secondsString, 10, 64)
-	days := math.Floor(float64(seconds) / 86400)
-	hours := math.Floor(float64(seconds%86400) / 3600)
-	minutes := math.Floor(float64(seconds%86400%3600) / 60)
-
-	if seconds == 0 {
-		return "nil"
-	} else if days < 1 {
-		return fmt.Sprintf("%dh, %dm", hours, minutes)
-	} else {
-		return fmt.Sprintf("%v days", days)
 	}
 }

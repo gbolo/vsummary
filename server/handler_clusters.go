@@ -55,10 +55,10 @@ func handlerDtCluster(w http.ResponseWriter, req *http.Request) {
 		row["status"] = decorateCell(row["status"])
 		row["ha_enabled"] = decorateCell(row["ha_enabled"])
 		row["drs_enabled"] = decorateCell(row["drs_enabled"])
-		row["avg_memory_per_host"] = bytesHumanReadable(row["avg_memory_per_host"])
-		row["total_memory_bytes"] = bytesHumanReadable(row["total_memory_bytes"])
-		row["total_memory_used"] = bytesHumanReadable(row["total_memory_used"])
-		row["avg_memory_per_vm"] = bytesHumanReadable(row["avg_memory_per_vm"])
+		row["avg_memory_per_host"] = common.BytesHumanReadable(row["avg_memory_per_host"])
+		row["total_memory_bytes"] = common.BytesHumanReadable(row["total_memory_bytes"])
+		row["total_memory_used"] = common.BytesHumanReadable(row["total_memory_used"])
+		row["avg_memory_per_vm"] = common.BytesHumanReadable(row["avg_memory_per_vm"])
 		data = append(data, row)
 	}
 
