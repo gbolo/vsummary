@@ -86,3 +86,11 @@ func CheckIfKeyExists(o interface{}, keys ...string) (e bool) {
 
 	return
 }
+
+// set default value if empty
+func SetDefaultValue(value, defaultValue string) string {
+	if value == "" {
+		return defaultValue
+	}
+	return fmt.Sprintf("%s", value)
+}

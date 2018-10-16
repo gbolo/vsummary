@@ -632,7 +632,14 @@ func populateData(query string, response *DataTablesResponse) (err error) {
 			} else {
 				v = val
 			}
-			temp[col] = fmt.Sprintf("%s", v)
+
+			// catch null columns
+			if v != nil {
+				temp[col] = fmt.Sprintf("%s", v)
+			} else {
+				temp[col] = ""
+			}
+
 		}
 
 		// add this to the response

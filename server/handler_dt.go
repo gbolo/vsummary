@@ -32,6 +32,8 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 		row["stat_host_memory_usage"] = megaBytesHumanReadable(row["stat_host_memory_usage"])
 		row["stat_cpu_usage"] = row["stat_cpu_usage"] + " MHz"
 		row["stat_uptime_sec"] = secondsToHuman(row["stat_uptime_sec"])
+		row["folder"] = common.SetDefaultValue(row["folder"], "None")
+		row["cluster"] = common.SetDefaultValue(row["cluster"], "None")
 		data = append(data, row)
 	}
 
@@ -121,6 +123,9 @@ func getDatatablesResponse(req *http.Request, dbTable string) (dtResponse DataTa
 // returns a human readable string from any number of bytes
 // example: 1855425871872 will return 1.9 TB
 func bytesHumanReadable(bytes string) string {
+	if bytes == "" {
+		return "0"
+	}
 	// ignore numbers after a possible decimal
 	bytesSplit := strings.Split(bytes, ".")
 	b, err := strconv.ParseInt(bytesSplit[0], 10, 64)
