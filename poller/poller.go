@@ -128,6 +128,7 @@ func (p *Poller) GetPollResults() (r pollResults, errors []error) {
 	err := p.Connect(&ctx)
 	if err != nil {
 		log.Errorf("failed to connect to: %s %s ", p.Config.URL, err)
+		appendIfError(&errors, err)
 		return
 	}
 	defer p.VmwareClient.Logout(ctx)
