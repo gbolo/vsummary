@@ -42,7 +42,30 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 }
 
 func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
-	handlerDatatables(w, req, "view_esxi")
+	dtResponse, err := getDatatablesResponse(req, "view_esxi")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		log.Errorf("error parsing datatables request: %v", err)
+	}
+
+	// loop through data and make modifications
+	data := dtResponse.Data[:0]
+	for _, row := range dtResponse.Data {
+		row["memory_bytes"] = common.BytesHumanReadable(row["memory_bytes"])
+		row["vmemory_mb_powered_on"] = common.MegaBytesHumanReadable(row["vmemory_mb_powered_on"])
+		row["stat_memory_usage"] = common.MegaBytesHumanReadable(row["stat_memory_usage"])
+		row["stat_cpu_usage"] = fmt.Sprintf("%s MHz", row["stat_cpu_usage"])
+		row["status"] = decorateCell(row["status"])
+		row["in_maintenance_mode"] = decorateCell(row["in_maintenance_mode"])
+		row["power_state"] = decorateCell(row["power_state"])
+		row["stat_uptime_sec"] = common.SecondsToHuman(row["stat_uptime_sec"])
+		data = append(data, row)
+	}
+
+	// write a response
+	dtResponse.Data = data
+	b, _ := json.MarshalIndent(dtResponse, "", "  ")
+	fmt.Fprintf(w, string(b))
 }
 
 func handlerDtPortgroup(w http.ResponseWriter, req *http.Request) {
@@ -61,6 +84,7 @@ func handlerDtDatastore(w http.ResponseWriter, req *http.Request) {
 	for _, row := range dtResponse.Data {
 		row["capacity_bytes"] = common.BytesHumanReadable(row["capacity_bytes"])
 		row["free_bytes"] = common.BytesHumanReadable(row["free_bytes"])
+		row["status"] = decorateCell(row["status"])
 		data = append(data, row)
 	}
 
