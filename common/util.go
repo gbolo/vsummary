@@ -143,7 +143,7 @@ func SecondsToHuman(secondsString string) string {
 	if seconds == 0 {
 		return "nil"
 	} else if days < 1 {
-		return fmt.Sprintf("%dh, %dm", hours, minutes)
+		return fmt.Sprintf("%vh, %vm", hours, minutes)
 	} else {
 		return fmt.Sprintf("%v days", days)
 	}
