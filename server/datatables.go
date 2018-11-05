@@ -646,5 +646,10 @@ func populateData(query string, response *DataTablesResponse) (err error) {
 		response.Data = append(response.Data, temp)
 	}
 
+	// avoid nil data, so datatables js client can understand json response
+	if response.Data == nil {
+		response.Data = make([]map[string]string, 0)
+	}
+
 	return
 }
