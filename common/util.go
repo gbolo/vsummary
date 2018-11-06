@@ -75,6 +75,33 @@ func GetBool(o interface{}, keys ...string) (l bool) {
 	return
 }
 
+// json parser - returns bytes value of key
+func GetBytes(o interface{}, keys ...string) (r []byte) {
+
+	b, _ := json.Marshal(o)
+
+	r, _, _, err := jsonparser.Get(b, keys...)
+	if err != nil {
+		log.Infof("error parsing json: %s", err)
+	}
+
+	return
+}
+
+// json parser - returns type from key
+func GetDataType(o interface{}, keys ...string) (dataType string) {
+
+	b, _ := json.Marshal(o)
+
+	_, dt, _, err := jsonparser.Get(b, keys...)
+	if err != nil {
+		log.Infof("error parsing json: %s", err)
+	}
+	dataType = dt.String()
+
+	return
+}
+
 // json parser - returns true if key exists
 func CheckIfKeyExists(o interface{}, keys ...string) (e bool) {
 
@@ -92,16 +119,16 @@ func CheckIfKeyExists(o interface{}, keys ...string) (e bool) {
 // set default value if empty
 func SetDefaultValue(value, defaultValue string) string {
 	if value == "" {
-		return defaultValue
+		return fmt.Sprintf("<p class=\"text-muted\">%s</p>", defaultValue)
 	}
-	return fmt.Sprintf("%s", value)
+	return value
 }
 
 // returns a human readable string from any number of bytes
 // example: 1855425871872 will return 1.9 TB
 func BytesHumanReadable(bytes string) string {
-	if bytes == "" {
-		return "0"
+	if bytes == "" || bytes == "0" {
+		return "nil"
 	}
 	// ignore numbers after a possible decimal
 	bytesSplit := strings.Split(bytes, ".")
