@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/gbolo/vsummary/common"
 )
 
@@ -21,6 +23,13 @@ const insertVcenter = `
 
 // InsertVMs inserts a vm into database
 func (b *Backend) InsertVcenter(vcenter common.VCenter) (err error) {
+
+	// never allow an empty id for vcenter
+	if vcenter.Id == "" {
+		log.Errorf("cannot insert vcenter without an id")
+		err = fmt.Errorf("vcenter is missing an id")
+		return
+	}
 
 	// exit if there is no database connection
 	err = b.checkDB()

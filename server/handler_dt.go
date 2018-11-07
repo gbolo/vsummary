@@ -32,6 +32,9 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 		row["stat_uptime_sec"] = common.SecondsToHuman(row["stat_uptime_sec"])
 		row["folder"] = common.SetDefaultValue(row["folder"], "None")
 		row["cluster"] = common.SetDefaultValue(row["cluster"], "None")
+		row["guest_os"] = common.SetDefaultValue(row["guest_os"], "unknown")
+		row["guest_hostname"] = common.SetDefaultValue(row["guest_hostname"], "unknown")
+		row["guest_ip"] = common.SetDefaultValue(row["guest_ip"], "unknown")
 		data = append(data, row)
 	}
 
