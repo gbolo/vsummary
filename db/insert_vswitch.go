@@ -86,7 +86,7 @@ func (b *Backend) InsertVSwitch(vswitches []common.VSwitch) (err error) {
 		if vswitch.Type == "DVS" {
 			insertStatement = insertDVS
 			vswitch.Id = common.ComputeId(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.Moref))
-		} else if vswitch.Type == "SVS" {
+		} else if vswitch.Type == "vSwitch" {
 			insertStatement = insertVswitch
 			vswitch.Id = common.ComputeId(fmt.Sprintf("%s%s%s", vswitch.VcenterId, vswitch.EsxiMoref, vswitch.Name))
 			vswitch.EsxiId = common.ComputeId(fmt.Sprintf("%s%s", vswitch.VcenterId, vswitch.EsxiMoref))

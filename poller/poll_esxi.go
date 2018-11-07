@@ -2,6 +2,7 @@ package poller
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -109,7 +110,7 @@ func (p *Poller) GetEsxi() (esxiList []common.Esxi, pNics []common.PNic, vSwitch
 				if reflect.TypeOf(svswitch).String() == "types.HostVirtualSwitch" {
 
 					vSwitches = append(vSwitches, common.VSwitch{
-						Type:      "SVS",
+						Type:      "vSwitch",
 						Name:      svswitch.Name,
 						Ports:     svswitch.Spec.NumPorts,
 						MaxMtu:    svswitch.Mtu,
@@ -132,7 +133,7 @@ func (p *Poller) GetEsxi() (esxiList []common.Esxi, pNics []common.PNic, vSwitch
 						Type:        "vSwitch",
 						Name:        spg.Spec.Name,
 						VswitchName: spg.Spec.VswitchName,
-						Vlan:        spg.Spec.VlanId,
+						Vlan:        fmt.Sprint(spg.Spec.VlanId),
 						EsxiMoref:   esxi.Self.Value,
 						VcenterId:   v.Client().ServiceContent.About.InstanceUuid,
 					})

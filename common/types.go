@@ -278,15 +278,13 @@ type Portgroup struct {
 	Name      string `json:"name" db:"name"`
 	Type      string `json:"type" db:"type"`
 	VlanType  string `json:"vlan_type" db:"vlan_type"`
+	Vlan      string `json:"vlan"`
 
 	// These are part of API request ONLY
 	Moref        string `json:"moref"`
 	EsxiMoref    string `json:"esxi_moref"`
 	VswitchMoref string `json:"vswitch_moref"`
 	VswitchName  string `json:"vswitch_name"`
-	VlanStart    int    `json:"vlan_start"`
-	VlanEnd      int    `json:"vlan_end"`
-	Vlan         int32  `json:"vlan"`
 
 	// These are part of db record ONLY
 	Id        string `db:"id"`

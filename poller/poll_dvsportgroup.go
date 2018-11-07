@@ -2,15 +2,13 @@ package poller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	//"fmt"
-	//"reflect"
-	//
-	//"github.com/gbolo/go-util/lib/debugging"
 	"github.com/gbolo/vsummary/common"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 func (p *Poller) GetDVSPortgroups() (list []common.Portgroup, err error) {
@@ -37,7 +35,7 @@ func (p *Poller) GetDVSPortgroups() (list []common.Portgroup, err error) {
 	err = v.Retrieve(
 		ctx,
 		[]string{moType},
-		[]string{"name", "config"},
+		[]string{"name", "config", "config.defaultPortConfig"},
 		&molist,
 	)
 	if err != nil {
@@ -48,19 +46,50 @@ func (p *Poller) GetDVSPortgroups() (list []common.Portgroup, err error) {
 	for _, mo := range molist {
 
 		// TODO: this needs to be cleaned up
-		list = append(list, common.Portgroup{
-			Name:      mo.Name,
-			Moref:     mo.Self.Value,
-			Type:      "DVS",
-			VcenterId: v.Client().ServiceContent.About.InstanceUuid,
-		})
+		object := common.Portgroup{
+			Name:         mo.Name,
+			Moref:        mo.Self.Value,
+			Type:         "DVS",
+			VswitchMoref: mo.Config.DistributedVirtualSwitch.Value,
+			VcenterId:    v.Client().ServiceContent.About.InstanceUuid,
+		}
 
-		//mo.Config.DefaultPortConfig
-		//debugging.PrettyPrint(mo.Config.DefaultPortConfig.GetDVPortSetting())
-		//fmt.Println("test-->", reflect.TypeOf(mo.Config.DefaultPortConfig.GetDVPortSetting()).String())
+		if common.CheckIfKeyExists(mo.Config.DefaultPortConfig, "Vlan") {
+
+			pconfig := mo.Config.DefaultPortConfig
+			switch vl := pconfig.(type) {
+			case *types.VMwareDVSPortSetting:
+				vlan := vl.Vlan
+				switch vlanspec := vlan.(type) {
+
+				case *types.VmwareDistributedVirtualSwitchVlanIdSpec:
+					object.VlanType = "VmwareDistributedVirtualSwitchVlanIdSpec"
+					object.Vlan = fmt.Sprint(common.GetInt(mo.Config.DefaultPortConfig, "Vlan", "VlanId"))
+
+				case *types.VmwareDistributedVirtualSwitchTrunkVlanSpec:
+					object.VlanType = "VmwareDistributedVirtualSwitchTrunkVlanSpec"
+					for i, v := range vlanspec.VlanId {
+						if v.Start == v.End {
+							object.Vlan += fmt.Sprint(v.Start)
+						} else {
+							object.Vlan += fmt.Sprintf("%v - %v", v.Start, v.End)
+						}
+						// add a comma, if needed
+						if i != len(vlanspec.VlanId)-1 && object.Vlan != "" {
+							object.Vlan += ", "
+						}
+					}
+
+				default:
+					// TODO: support for spec: *types.VmwareDistributedVirtualSwitchPvlanSpec
+					object.VlanType = "TypeNotImplemented"
+					object.Vlan = "unknown"
+				}
+			}
+		}
+		list = append(list, object)
 	}
 
 	log.Infof("poller fetched %d summaries of %s", len(list), moType)
 	return
-
 }

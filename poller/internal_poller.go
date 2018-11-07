@@ -43,7 +43,8 @@ func (i *InternalPoller) StorePollResults(r pollResults) (err []error) {
 	appendIfError(&err, i.backend.InsertVirtualmachines(r.Virtualmachine))
 	appendIfError(&err, i.backend.InsertVSwitch(r.VSwitch))
 	appendIfError(&err, i.backend.InsertVSwitch(r.Dvs))
-	// need to insert portgroups here...
+	appendIfError(&err, i.backend.InsertPortgroups(r.StdPortgroup))
+	appendIfError(&err, i.backend.InsertPortgroups(r.DvsPortGroup))
 	appendIfError(&err, i.backend.InsertVNics(r.Vnic))
 	appendIfError(&err, i.backend.InsertVDisks(r.VDisk))
 	appendIfError(&err, i.backend.InsertResourcepools(r.ResourcePool))
@@ -97,7 +98,8 @@ func (i *InternalPoller) Daemonize() {
 	t := time.Tick(defaultPollingInterval)
 	log.Infof("start polling of %s", i.Config.URL)
 	// this prevents all pollers to go off at the exact same time
-	randomizedWait(1, 120)
+	// TODO: redesign or remove this
+	randomizedWait(1, 10)
 	i.PollThenStore()
 
 	// start polling until we shouldn't anymore
