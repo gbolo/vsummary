@@ -91,3 +91,10 @@ func (i *InternalCollector) Run() {
 		}
 	}
 }
+
+//// findPollerById returns a matching internal poller
+//func (i *InternalCollector) findPollerById(id string) (foundPoller *InternalPoller) {
+//	for _, p := range i.ActivePollers {
+//		//
+//	}
+//}

@@ -119,7 +119,7 @@ func CheckIfKeyExists(o interface{}, keys ...string) (e bool) {
 // set default value if empty
 func SetDefaultValue(value, defaultValue string) string {
 	if value == "" {
-		return fmt.Sprintf("<p class=\"text-muted\">%s</p>", defaultValue)
+		return fmt.Sprintf("<span class=\"text-muted\">%s</span>", defaultValue)
 	}
 	return value
 }
@@ -128,7 +128,7 @@ func SetDefaultValue(value, defaultValue string) string {
 // example: 1855425871872 will return 1.9 TB
 func BytesHumanReadable(bytes string) string {
 	if bytes == "" || bytes == "0" {
-		return "nil"
+		return "<span class=\"text-muted\">nil</span>"
 	}
 	// ignore numbers after a possible decimal
 	bytesSplit := strings.Split(bytes, ".")
@@ -168,7 +168,7 @@ func SecondsToHuman(secondsString string) string {
 	minutes := math.Floor(float64(seconds%86400%3600) / 60)
 
 	if seconds == 0 {
-		return "nil"
+		return "<span class=\"text-muted\">nil</span>"
 	} else if days < 1 {
 		return fmt.Sprintf("%vh, %vm", hours, minutes)
 	} else {
