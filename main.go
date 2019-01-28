@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/config"
 	back "github.com/gbolo/vsummary/db"
 	"github.com/gbolo/vsummary/poller"
@@ -24,6 +25,9 @@ func handleErr(err error) {
 }
 
 func main() {
+
+	common.PrintVersion()
+	fmt.Println("---------------------------------------------------------------------------------------")
 
 	// init config and logging
 	config.ConfigInit("")
@@ -46,4 +50,15 @@ func main() {
 	i := poller.NewEmptyInternalCollector()
 	i.SetBackend(*b)
 	i.Run()
+
+	//b.SelectPoller("500bf0f86671")
+
+	// test external poller
+	//pollers, _ := b.GetPollers()
+	//e := poller.NewExternalPoller(pollers[0])
+	//err = e.SetApiUrl("http://127.0.0.1:8080")
+	//if err != nil {
+	//	log.Fatalf("error setiing api url",err)
+	//}
+	//e.Daemonize()
 }
