@@ -44,8 +44,7 @@
                         <tr>
                             <td>
                                 <button type="button" class="btn btn-sm btn-primary" onclick="editPoller('{{ .Id }}')">Edit</button>
-                                <button type="button" class="btn btn-sm btn-primary disabled">Poll Now</button>
-                                <button type="button" class="btn btn-sm btn-danger disabled">Remove</button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removePoller('{{ .Id }}')">Remove</button>
                             </td>
                             <td>{{ .VcenterName }}</td>
                             <td>{{ .VcenterHost }}</td>
@@ -91,6 +90,11 @@
 
         function editPoller(id) {
             $("#pollerModal").find(".modal-content").load("/ui/form/editpoller/"+id);
+            $("#pollerModal").modal() ;
+        }
+
+        function removePoller(id) {
+            $("#pollerModal").find(".modal-content").load("/ui/form/removepoller/"+id);
             $("#pollerModal").modal() ;
         }
     </script>

@@ -1,48 +1,29 @@
-{{ define "form_edit_poller" }}
-                    <form role="edit" method="post">
+{{ define "form_remove_poller" }}
+                    <form role="remove" method="delete">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <h4 class="modal-title" id="myModalLabel">Edit vCenter Entry</h4>
+                            <h4 class="modal-title" id="myModalLabel">Remove vCenter Poller</h4>
                         </div>
                         <div class="modal-body">
                             <div class="alert alert-warning" role="alert">
-                                <p>Please provide a user with <strong>read-only</strong> access to vcenter
-                                    since no greater permissions are required.<br />
-                                    <strong>Passwords are encrypted and stored in the database</strong>
-                                    using the key defined in the configuration.<br/>
-                                    Remember to <strong>change the default key</strong> for serious use!
-                                </p>
+                                <p>Removing a poller will <strong>NOT</strong> remove remove inventory items previously polled.</p>
                             </div>
 
-                            {{- range .Pollers }}
-                            <input name="host" type="hidden" style="width:100%" value="{{ .VcenterHost }}" readonly="readonly">
+                            <input name="host" type="hidden" style="width:100%" value="{{ (index .Pollers 0).VcenterHost }}" readonly="readonly">
                             <table class="table table-striped">
                                 <tbody>
                                 <tr>
                                     <td><label for="fqdn">FQDN or IP:</label></td>
-                                    <td>{{ .VcenterHost }}</td>
+                                    <td>{{ (index .Pollers 0).VcenterHost }}</td>
                                 </tr>
                                 <tr>
                                     <td><label for="short_name">Environment:</label></td>
-                                    <td><input name="short_name" type="text" style="width:100%" value="{{ .VcenterName }}"></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="user_name">Username:</label></td>
-                                    <td><input name="user" type="text" style="width:100%" value="{{ .Username }}"></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password:</label></td>
-                                    <td><input name="pass" type="password" style="width:100%"></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="enabled">Enabled</label>:</td>
-                                    <td><input type="checkbox" name="enabled" value="on" checked></td>
+                                    <td>{{ (index .Pollers 0).VcenterName }}</td>
                                 </tr>
                                 </tbody>
                             </table>
-                            {{- end -}}
 
                             <div id="message" class="alert alert-danger hidden" role="alert">
                             </div>
@@ -50,7 +31,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa fa-undo fa-fw'></i> Cancel</button>
-                            <button type="submit" id="submit" class="btn btn-primary"><i class='fa fa-plus fa-fw'></i> Add vCenter</button>
+                            <button type="submit" id="submit" class="btn btn-danger"><i class='fa fa-trash fa-fw'></i> Remove Poller</button>
                         </div>
                     </form>
 
@@ -64,8 +45,8 @@
                             e.preventDefault();
                             //make ajax call
                             $.ajax({
-                                type: "PUT",
-                                url: "{{ .AjaxEndpoint }}",
+                                type: "DELETE",
+                                url: "{{ .AjaxEndpoint }}/{{ (index .Pollers 0).Id }}",
                                 data: $('form').serialize(),
                                 beforeSend: function(){
                                     $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');

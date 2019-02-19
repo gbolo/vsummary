@@ -117,6 +117,7 @@ func (i *InternalPoller) Daemonize() {
 			}
 		case <-i.stopSignal:
 			log.Infof("stop signal received: stop polling of %s", i.Config.URL)
+			i.Enabled = false
 			return
 		}
 	}

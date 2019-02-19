@@ -8,10 +8,12 @@
                         </div>
                         <div class="modal-body">
                             <div class="alert alert-warning" role="alert">
-                                <strong>Warning!</strong>
                                 <p>Please provide a user with <strong>read-only</strong> access to vcenter
                                     since no greater permissions are required.<br />
-                                    Also be warned that currently <strong>passwords are not stored securely</strong> (plain text) in database!</p>
+                                    <strong>Passwords are encrypted and stored in the database</strong>
+                                    using the key defined in the configuration.<br/>
+                                    Remember to <strong>change the default key</strong> for serious use!
+                                </p>
                             </div>
 
                             <table class="table table-striped">

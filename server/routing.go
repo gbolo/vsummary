@@ -101,6 +101,12 @@ var routes = Routes{
 		common.EndpointPoller,
 		handlerAddPoller,
 	},
+	Route{
+		"DeletePoller",
+		"DELETE",
+		common.EndpointPoller + "/{id}",
+		handlerDeletePoller,
+	},
 
 	// vSummary UI endpoints
 	Route{
@@ -174,6 +180,12 @@ var routes = Routes{
 		"GET",
 		"/ui/form/editpoller/{id}",
 		handlerUiFormEditPoller,
+	},
+	Route{
+		"UiFormRemovePoller",
+		"GET",
+		"/ui/form/removepoller/{id}",
+		handlerUiFormRemovePoller,
 	},
 
 	// Datatables API endpoints

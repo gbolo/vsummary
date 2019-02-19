@@ -36,6 +36,7 @@ const (
 
 	updatePollDate = "UPDATE poller SET last_poll=:last_poll WHERE id=:id"
 	selectPollerById = "SELECT * FROM poller WHERE id=?"
+	deletePollerById = "DELETE FROM poller WHERE id=?"
 )
 
 // InsertPoller inserts a poller into database
@@ -139,5 +140,21 @@ func (b *Backend) SelectPoller(pollerId string) (poller common.Poller, err error
 
 	// do select
 	err = b.db.Get(&poller, selectPollerById, pollerId)
+	return
+}
+
+// RemovePoller removes a specified poller by ID
+func (b *Backend) RemovePoller(pollerId string) (err error) {
+	// exit if there is no database connection
+	err = b.checkDB()
+	if err != nil {
+		return
+	}
+
+	res, err := b.db.Exec(deletePollerById, pollerId)
+	if err == nil {
+		rowsAffected, _ := res.RowsAffected()
+		log.Debugf("total combined affected rows: %d", rowsAffected)
+	}
 	return
 }

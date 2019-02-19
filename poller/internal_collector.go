@@ -1,6 +1,7 @@
 package poller
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gbolo/vsummary/db"
@@ -55,7 +56,7 @@ func (i *InternalCollector) addIfUnique(p InternalPoller) {
 			log.Infof("respawning poller for %s", p.Config.URL)
 		}
 		i.ActivePollers = append(i.ActivePollers, &p)
-		// spwan a go routine for this poller
+		// spawn a go routine for this poller
 		go p.Daemonize()
 	}
 }
@@ -70,11 +71,54 @@ func (i *InternalCollector) RefreshPollers() {
 		return
 	}
 
+	// add unique new pollers
+	var backendPollerURLs []string
 	for _, p := range pollers {
 		internalPoller := NewInternalPoller(p)
 		internalPoller.SetBackend(i.backend)
 		i.addIfUnique(*internalPoller)
+		backendPollerURLs = append(backendPollerURLs, fmt.Sprintf("https://%s/sdk", p.VcenterHost))
 	}
+
+	// remove pollers that are no longer present or disabled
+	i.StopPollersByURL(difference(i.GetActivePollerURLs(), backendPollerURLs))
+}
+
+
+// GetActivePollerURLs returns a list of active pollers by URL
+func (i *InternalCollector) GetActivePollerURLs() (urls []string) {
+	for _, p := range i.ActivePollers {
+		urls = append(urls, p.Config.URL)
+	}
+	return
+}
+
+// StopPollersByURL will stop active pollers that match the list of URLs
+func (i *InternalCollector) StopPollersByURL(urls []string) {
+	for _, url := range urls {
+		for _, p := range i.ActivePollers {
+			if p.Config.URL == url && p.Enabled {
+				log.Warningf("poller URL is active in memory but no longer listed in backend: %v", url)
+				p.StopPolling()
+			}
+		}
+	}
+}
+
+
+// difference returns the elements in a that aren't in b
+func difference(a, b []string) []string {
+	mb := map[string]bool{}
+	for _, x := range b {
+		mb[x] = true
+	}
+	ab := []string{}
+	for _, x := range a {
+		if _, ok := mb[x]; !ok {
+			ab = append(ab, x)
+		}
+	}
+	return ab
 }
 
 // Run is a blocking loop. This should only be executed once.

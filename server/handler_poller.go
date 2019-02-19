@@ -50,6 +50,21 @@ func handlerUiFormEditPoller(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
+func handlerUiFormRemovePoller(w http.ResponseWriter, req *http.Request) {
+
+	vars := mux.Vars(req)
+	pollerId := vars["id"]
+	log.Debugf("pollerId: %s", pollerId)
+
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerUiFormRemovePoller")
+
+	// output the page
+	writePollerEditPage(w, "form_remove_poller", pollerId)
+
+	return
+}
+
 func handlerPoller(w http.ResponseWriter, req *http.Request) {
 
 	// log time on debug
@@ -134,4 +149,30 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Fprint(w, "Successfuly tested and added connection")
+}
+
+func handlerDeletePoller(w http.ResponseWriter, req *http.Request) {
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerDeletePoller")
+
+	// get vars from request to determine environment
+	vars := mux.Vars(req)
+	pollerID := vars["id"]
+
+	// validate poller id
+	if len(pollerID) != 12 {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "poller ID is not correctly specified")
+		return
+	}
+
+	// remove poller
+	if err := backend.RemovePoller(pollerID); err != nil {
+		log.Errorf("remove poller err: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "There was an error removing poller. See logs")
+		return
+	}
+
+	fmt.Fprint(w, "Successfuly removed poller")
 }
