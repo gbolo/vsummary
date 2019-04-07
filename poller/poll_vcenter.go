@@ -28,6 +28,7 @@ func (p *Poller) GetVcenter() (vcenter common.VCenter, err error) {
 
 	defer v.Destroy(ctx)
 
+	vcenter.Name = p.Name
 	vcenter.Id = v.Client().ServiceContent.About.InstanceUuid
 	url, err := url.Parse(p.Config.URL)
 	if err == nil {
@@ -35,5 +36,4 @@ func (p *Poller) GetVcenter() (vcenter common.VCenter, err error) {
 	}
 
 	return
-
 }
