@@ -10,6 +10,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/gbolo/vsummary/common"
+	"github.com/spf13/viper"
 )
 
 // default handler for landing page
@@ -67,14 +68,14 @@ func handlerUiDatastore(w http.ResponseWriter, req *http.Request) {
 // return list of all template filenames
 func findAllTemplates() (templateFiles []string, err error) {
 
-	files, err := ioutil.ReadDir("./www/templates")
+	files, err := ioutil.ReadDir(viper.GetString("server.templates_dir"))
 	if err != nil {
 		return
 	}
 	for _, file := range files {
 		filename := file.Name()
 		if strings.HasSuffix(filename, ".gohtml") {
-			templateFiles = append(templateFiles, "./www/templates/"+filename)
+			templateFiles = append(templateFiles, viper.GetString("server.templates_dir")+"/"+filename)
 		}
 	}
 
@@ -138,7 +139,7 @@ func writePollerPage(w http.ResponseWriter, t string) {
 
 	if err == nil {
 		pollers, _ := backend.GetPollers()
-		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
+		execErr := templates.ExecuteTemplate(w, t, UiView{Title: "vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)
@@ -155,7 +156,6 @@ func writePollerPage(w http.ResponseWriter, t string) {
 
 	return
 }
-
 
 // TODO: consolidate this with writeSummaryPage
 func writePollerEditPage(w http.ResponseWriter, t string, id string) {
@@ -184,7 +184,7 @@ func writePollerEditPage(w http.ResponseWriter, t string, id string) {
 			return
 		}
 		pollers := []common.Poller{poller}
-		execErr := templates.ExecuteTemplate(w, t, UiView{Title:"vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
+		execErr := templates.ExecuteTemplate(w, t, UiView{Title: "vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)

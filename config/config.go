@@ -67,6 +67,8 @@ func printConfigSummary() {
 		"server.bind_port",
 		"backend.db_driver",
 		"backend.db_dsn",
+		"server.static_files_dir",
+		"server.templates_dir",
 	} {
 
 		log.Debugf("%s: %s\n", c, viper.GetString(c))

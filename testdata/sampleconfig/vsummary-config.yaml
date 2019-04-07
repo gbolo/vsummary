@@ -7,6 +7,9 @@ server:
   # used to serve static files such as css, js, exc.
   static_files_dir: ./www/static
 
+  # location of go templates directory
+  templates_dir: ./www/templates
+
   # local interface to bind to
   bind_address: 0.0.0.0
 
