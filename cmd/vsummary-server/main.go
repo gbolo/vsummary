@@ -1,15 +1,15 @@
-// this main package is for dev testing only
+// TODO: this main package is for dev testing only
 // real main packages will come later...
 
 package main
 
 import (
-	"fmt"
-	"time"
+	"flag"
+	"os"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/config"
-	back "github.com/gbolo/vsummary/db"
+	"github.com/gbolo/vsummary/db"
 	"github.com/gbolo/vsummary/poller"
 	"github.com/gbolo/vsummary/server"
 	_ "github.com/go-sql-driver/mysql"
@@ -26,14 +26,22 @@ func handleErr(err error) {
 
 func main() {
 
+	// parse flags
+	cfgFile := flag.String("config", "", "path to config file")
+	outputVersion := flag.Bool("version", false, "prints version then exits")
+	flag.Parse()
+
+	// print version and exit if flag is present
 	common.PrintVersion()
-	fmt.Println("---------------------------------------------------------------------------------------")
+	if *outputVersion {
+		os.Exit(0)
+	}
 
 	// init config and logging
-	config.ConfigInit("")
+	config.ConfigInit(*cfgFile)
 
 	// init backend
-	b, err := back.InitBackend()
+	b, err := db.InitBackend()
 	handleErr(err)
 
 	// apply backend schemas
@@ -43,22 +51,8 @@ func main() {
 	// start vsummary server
 	go server.Start()
 
-	time.Sleep(3 * time.Second)
-	fmt.Println("---------------------------------------------------------------------------------------")
-
 	// start internalCollector
 	i := poller.NewEmptyInternalCollector()
 	i.SetBackend(*b)
 	i.Run()
-
-	//b.SelectPoller("500bf0f86671")
-
-	// test external poller
-	//pollers, _ := b.GetPollers()
-	//e := poller.NewExternalPoller(pollers[0])
-	//err = e.SetApiUrl("http://127.0.0.1:8080")
-	//if err != nil {
-	//	log.Fatalf("error setiing api url",err)
-	//}
-	//e.Daemonize()
 }

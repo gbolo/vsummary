@@ -1,7 +1,9 @@
 # Variables -------------------------------------------------------------------------------------------------------------
 
-PACKAGE     = vsummary
-METAPKG     = github.com/gbolo/vsummary/common
+APPNAME     = vsummary
+REPO        = github.com/gbolo/vsummary
+SERVERPKG   = $(REPO)/cmd/vsummary-server
+METAPKG     = $(REPO)/common
 DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
 COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
@@ -39,11 +41,11 @@ all: $(BIN) fmt server;                                       @ ## Run gofmt and
 
 .PHONY: server
 server: ; $(info $(M) building server executable...)          @ ## Build server binary
-	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(PACKAGE)-server
+	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(APPNAME)-server $(SERVERPKG)
 
 .PHONY: docker
 docker: clean ; $(info $(M) building docker image...)	      @ ## Build docker image
-	$Q docker build -t gbolo/$(PACKAGE):$(VERSION) .
+	$Q docker build -t gbolo/$(APPNAME):$(VERSION) .
 
 .PHONY: fmt
 fmt: ; $(info $(M) running gofmt...)                          @ ## Run gofmt on all source files

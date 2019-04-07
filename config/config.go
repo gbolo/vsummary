@@ -26,17 +26,9 @@ func ConfigInit(cfgFile string) {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("vsummary-config")
 	viper.AddConfigPath("./")
-
-	// if env VSUMMARY_TESTING=true then set a path to sampleconfig
-	if viper.GetBool("testing") {
-		testConfig := "./testdata/sampleconfig"
-
-		goPath := os.Getenv("GOPATH")
-		if goPath != "" {
-			testConfig = fmt.Sprintf("%s/src/github.com/gbolo/vsummary/testdata/sampleconfig", goPath)
-		}
-
-		viper.AddConfigPath(testConfig)
+	goPath := os.Getenv("GOPATH")
+	if goPath != "" {
+		viper.AddConfigPath(fmt.Sprintf("%s/src/github.com/gbolo/vsummary/testdata/sampleconfig", goPath))
 	}
 
 	// if the user provides a config file in a flag, lets use it
