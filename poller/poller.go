@@ -20,8 +20,6 @@ var log = logging.MustGetLogger("vsummary")
 const (
 	// relevant with externalPoller
 	apiVersion = "2"
-	// the default interval a poller will poll endpoints
-	defaultPollingInterval = 30 * time.Minute
 	// the default interval we refresh the list of pollers from the backend db
 	defaultRefreshInterval = 60 * time.Second
 )

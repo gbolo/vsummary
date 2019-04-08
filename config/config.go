@@ -16,6 +16,7 @@ func ConfigInit(cfgFile string) {
 	viper.SetDefault("server.bind_port", "8080")
 	viper.SetDefault("server.access_log", true)
 	viper.SetDefault("backend.db_driver", "mysql")
+	viper.SetDefault("poller.interval", 60)
 
 	// Configuring and pulling overrides from environmental variables
 	viper.SetEnvPrefix("VSUMMARY")

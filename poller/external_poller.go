@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gbolo/vsummary/common"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -159,8 +160,11 @@ func (e *ExternalPoller) PollThenSend() {
 
 // Daemonize is a blocking loop which continues to PollThenSend indefinitely
 func (e *ExternalPoller) Daemonize() {
-	t := time.Tick(defaultPollingInterval)
-	log.Infof("start polling of %s", e.Config.URL)
+	// TODO: global polling interval is use for now.
+	// in future versions we can try and support an interval per poller
+	t := time.Tick(time.Duration(viper.GetInt("poller.interval")) * time.Minute)
+	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), e.Config.URL)
+
 	// this prevents all pollers to go off at the exact same time
 	randomizedWait(1, 120)
 	e.PollThenSend()

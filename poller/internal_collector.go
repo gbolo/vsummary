@@ -84,7 +84,6 @@ func (i *InternalCollector) RefreshPollers() {
 	i.StopPollersByURL(difference(i.GetActivePollerURLs(), backendPollerURLs))
 }
 
-
 // GetActivePollerURLs returns a list of active pollers by URL
 func (i *InternalCollector) GetActivePollerURLs() (urls []string) {
 	for _, p := range i.ActivePollers {
@@ -104,7 +103,6 @@ func (i *InternalCollector) StopPollersByURL(urls []string) {
 		}
 	}
 }
-
 
 // difference returns the elements in a that aren't in b
 func difference(a, b []string) []string {

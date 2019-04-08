@@ -6,6 +6,7 @@ import (
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/db"
+	"github.com/spf13/viper"
 )
 
 // InternalPoller extends Poller with functionality relevant to
@@ -95,8 +96,11 @@ func (i *InternalPoller) PollThenStore() {
 // Daemonize is a blocking loop which continues to PollThenStore until
 // the channel is closed or poller is marked as disabled.
 func (i *InternalPoller) Daemonize() {
-	t := time.Tick(defaultPollingInterval)
-	log.Infof("start polling of %s", i.Config.URL)
+	// TODO: global polling interval is use for now.
+	// in future versions we can try and support an interval per poller
+	t := time.Tick(time.Duration(viper.GetInt("poller.interval")) * time.Minute)
+	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), i.Config.URL)
+
 	// this prevents all pollers to go off at the exact same time
 	// TODO: redesign or remove this
 	randomizedWait(1, 10)
