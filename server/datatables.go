@@ -480,14 +480,23 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 
 	// query to find return all filtered data
 	queryFiltered := fmt.Sprintf(
-		"SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s LIMIT %d, %d",
+		"SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s",
 		strings.Join(allColumns, ","),
 		tableName,
 		whereClause,
 		orderClause,
-		di.Start,
-		di.Length,
 	)
+
+	// decide when to add a limit filter
+	// ** NOTE: when "All" is selected, the datatables js client will send a -1 value for length
+	if di.Start >= 0 && di.Length > -1 {
+		queryFiltered = fmt.Sprintf(
+			"%s LIMIT %d, %d",
+			queryFiltered,
+			di.Start,
+			di.Length,
+		)
+	}
 
 	//log.Debugf("sql query: %s", queryFiltered)
 
