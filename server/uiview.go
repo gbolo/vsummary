@@ -12,6 +12,10 @@ type UiView struct {
 
 	// this is only used to generate poller list
 	Pollers []common.Poller
+
+	// version info
+	Version   string
+	CommitSHA string
 }
 
 // maps db columns to friendly names

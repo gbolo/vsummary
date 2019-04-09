@@ -85,6 +85,10 @@ func findAllTemplates() (templateFiles []string, err error) {
 // write generic vsummary table page
 func writeSummaryPage(w http.ResponseWriter, uiview *UiView) {
 
+	// add version info for templates
+	uiview.Version = common.Version
+	uiview.CommitSHA = common.CommitSHA
+
 	// read in all templates
 	templateFiles, err := findAllTemplates()
 
@@ -143,7 +147,13 @@ func writePollerPage(w http.ResponseWriter, t string) {
 		for i, _ := range pollers {
 			pollers[i].IntervalMin = viper.GetInt("poller.interval")
 		}
-		execErr := templates.ExecuteTemplate(w, t, UiView{Title: "vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
+		execErr := templates.ExecuteTemplate(w, t, UiView{
+			Title:        "vCenter Pollers",
+			Pollers:      pollers,
+			AjaxEndpoint: common.EndpointPoller,
+			Version:      common.Version,
+			CommitSHA:    common.CommitSHA,
+		})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)
@@ -188,7 +198,13 @@ func writePollerEditPage(w http.ResponseWriter, t string, id string) {
 			return
 		}
 		pollers := []common.Poller{poller}
-		execErr := templates.ExecuteTemplate(w, t, UiView{Title: "vCenter Pollers", Pollers: pollers, AjaxEndpoint: common.EndpointPoller})
+		execErr := templates.ExecuteTemplate(w, t, UiView{
+			Title:        "vCenter Pollers",
+			Pollers:      pollers,
+			AjaxEndpoint: common.EndpointPoller,
+			Version:      common.Version,
+			CommitSHA:    common.CommitSHA,
+		})
 		if execErr != nil {
 			fmt.Fprintf(w, "Error executing template(s). See logs")
 			log.Errorf("template execute error: %s", execErr)
