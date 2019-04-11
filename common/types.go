@@ -29,9 +29,9 @@ type VirtualMachine struct {
 	// These are part of API request ONLY
 	ObjectType        string `json:"objecttype"`
 	EsxiMoref         string `json:"esxi_moref" validate:"required"`
-	FolderMoref       string `json:"folder_moref" validate:"required"`
+	FolderMoref       string `json:"folder_moref""`
 	VappMoref         string `json:"vapp_moref"`
-	ResourcePoolMoref string `json:"resourcepool_moref" validate:"required"`
+	ResourcePoolMoref string `json:"resourcepool_moref"`
 
 	// These are part of db record ONLY
 	Id             string `db:"id"`
@@ -44,9 +44,9 @@ type VirtualMachine struct {
 type Datacenter struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
-	Name      string `json:"name" db:"name"`
-	Moref     string `json:"moref" db:"moref"`
+	VcenterId string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name      string `json:"name" db:"name" validate:"required"`
+	Moref     string `json:"moref" db:"moref" validate:"required"`
 
 	// These are part of API request ONLY
 	EsxiFolderMoref string `json:"esxi_folder_moref"`
@@ -61,8 +61,8 @@ type Datacenter struct {
 type Cluster struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterId        string `json:"vcenter_id" db:"vcenter_id"`
-	Name             string `json:"name" db:"name"`
+	VcenterId        string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name             string `json:"name" db:"name" validate:"required"`
 	TotalCpuThreads  int16  `json:"total_cpu_threads" db:"total_cpu_threads"`
 	TotalCpuMhz      int32  `json:"total_cpu_mhz" db:"total_cpu_mhz"`
 	TotalMemoryBytes int64  `json:"total_memory_bytes" db:"total_memory_bytes"`
@@ -76,8 +76,8 @@ type Cluster struct {
 	Status           string `json:"status" db:"status"`
 
 	// These are part of API request ONLY
-	Moref           string `json:"moref" db:"moref"`
-	DatacenterMoref string `json:"datacenter_moref"`
+	Moref           string `json:"moref" db:"moref" validate:"required"`
+	DatacenterMoref string `json:"datacenter_moref" validate:"required"`
 
 	// These are part of db record ONLY
 	Id           string `db:"id"`
@@ -87,9 +87,9 @@ type Cluster struct {
 type ResourcePool struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterId          string `json:"vcenter_id" db:"vcenter_id"`
-	Name               string `json:"name" db:"name"`
-	Moref              string `json:"moref" db:"moref"`
+	VcenterId          string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name               string `json:"name" db:"name" validate:"required"`
+	Moref              string `json:"moref" db:"moref" validate:"required"`
 	Type               string `json:"type" db:"type"`
 	Status             string `json:"status" db:"status"`
 	VappState          string `json:"vapp_state" db:"vapp_state"`
@@ -130,12 +130,12 @@ type Poller struct {
 type Esxi struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterId         string `json:"vcenter_id" db:"vcenter_id"`
-	Name              string `json:"name" db:"name"`
+	VcenterId         string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name              string `json:"name" db:"name" validate:"required"`
 	MaxEvc            string `json:"max_evc" db:"max_evc"`
 	CurrentEvc        string `json:"current_evc" db:"current_evc"`
-	PowerState        string `json:"power_state" db:"power_state"`
-	InMaintenanceMode string `json:"in_maintenance_mode" db:"in_maintenance_mode"`
+	PowerState        string `json:"power_state" db:"power_state" validate:"required"`
+	InMaintenanceMode string `json:"in_maintenance_mode" db:"in_maintenance_mode" validate:"required"`
 	Vendor            string `json:"vendor" db:"vendor"`
 	Model             string `json:"model" db:"model"`
 	Uuid              string `json:"uuid" db:"uuid"`
@@ -152,10 +152,10 @@ type Esxi struct {
 	StatCpuUsage      int32  `json:"stat_cpu_usage" db:"stat_cpu_usage"`
 	StatMemoryUsage   int32  `json:"stat_memory_usage" db:"stat_memory_usage"`
 	StatUptimeSec     int32  `json:"stat_uptime_sec" db:"stat_uptime_sec"`
-	Status            string `json:"status" db:"status"`
+	Status            string `json:"status" db:"status" validate:"required"`
 
 	// These are part of API request ONLY
-	Moref        string `json:"moref" db:"moref"`
+	Moref        string `json:"moref" db:"moref" validate:"required"`
 	ClusterMoref string `json:"cluster_moref"`
 
 	// These are part of db record ONLY
@@ -173,12 +173,12 @@ type VCenter struct {
 
 type Folder struct {
 	// These are part of BOTH API request AND db record
-	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
-	Name      string `json:"name" db:"name"`
+	VcenterId string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name      string `json:"name" db:"name" validate:"required"`
 	Type      string `json:"type" db:"type"`
 
 	// These are part of API request ONLY
-	Moref       string `json:"moref"`
+	Moref       string `json:"moref" validate:"required"`
 	ParentMoref string `json:"parent_moref"`
 
 	// These are part of db record ONLY
@@ -190,9 +190,9 @@ type Folder struct {
 
 type VDisk struct {
 	// These are part of BOTH API request AND db record
-	VcenterId       string `json:"vcenter_id" db:"vcenter_id"`
-	Name            string `json:"name" db:"name"`
-	CapacityBytes   int64  `json:"capacity_bytes" db:"capacity_bytes"`
+	VcenterId       string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name            string `json:"name" db:"name" validate:"required"`
+	CapacityBytes   int64  `json:"capacity_bytes" db:"capacity_bytes" validate:"required"`
 	Path            string `json:"path" db:"path"`
 	ThinProvisioned string `json:"thin_provisioned" db:"thin_provisioned"`
 	Uuid            string `json:"uuid" db:"uuid"`
@@ -213,14 +213,14 @@ type VDisk struct {
 
 type PNic struct {
 	// These are part of BOTH API request AND db record
-	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
-	Name       string `json:"name" db:"name"`
+	VcenterId  string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name       string `json:"name" db:"name" validate:"required"`
 	MacAddress string `json:"mac" db:"mac"`
 	LinkSpeed  int32  `json:"link_speed" db:"link_speed"`
 	Driver     string `json:"driver" db:"driver"`
 
 	// These are part of API request ONLY
-	EsxiMoref string `json:"esxi_moref"`
+	EsxiMoref string `json:"esxi_moref" validate:"required"`
 
 	// These are part of db record ONLY
 	Id     string `db:"id"`
@@ -232,18 +232,18 @@ type PNic struct {
 
 type VNic struct {
 	// These are part of BOTH API request AND db record
-	VcenterId  string `json:"vcenter_id" db:"vcenter_id"`
-	Name       string `json:"name" db:"name"`
-	MacAddress string `json:"mac" db:"mac"`
-	Connected  string `json:"connected" db:"connected"`
-	Status     string `json:"status" db:"status"`
+	VcenterId  string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name       string `json:"name" db:"name" validate:"required"`
+	MacAddress string `json:"mac" db:"mac" validate:"required"`
+	Connected  string `json:"connected" db:"connected" validate:"required"`
+	Status     string `json:"status" db:"status" validate:"required"`
 	Type       string `json:"type" db:"type"`
 
 	// These are part of API request ONLY
 	Moref               string `json:"moref"`
 	PortgroupMoref      string `json:"portgroup_moref"`
 	PortgroupName       string `json:"portgroup_name"`
-	VirtualmachineMoref string `json:"vm_moref"`
+	VirtualmachineMoref string `json:"vm_moref" validate:"required"`
 	EsxiMoref           string `json:"esxi_moref"`
 	VswitchType         string `json:"vswitch_type"`
 	VswitchName         string `json:"vswitch_name"`
@@ -256,8 +256,8 @@ type VNic struct {
 
 type VSwitch struct {
 	// These are part of BOTH API request AND db record
-	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
-	Name      string `json:"name" db:"name"`
+	VcenterId string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name      string `json:"name" db:"name" validate:"required"`
 	MaxMtu    int32  `json:"max_mtu" db:"max_mtu"`
 	Ports     int32  `json:"ports" db:"ports"`
 	Version   string `json:"version" db:"version"`
@@ -274,8 +274,8 @@ type VSwitch struct {
 
 type Portgroup struct {
 	// These are part of BOTH API request AND db record
-	VcenterId string `json:"vcenter_id" db:"vcenter_id"`
-	Name      string `json:"name" db:"name"`
+	VcenterId string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name      string `json:"name" db:"name" validate:"required"`
 	Type      string `json:"type" db:"type"`
 	VlanType  string `json:"vlan_type" db:"vlan_type"`
 	Vlan      string `json:"vlan"`
@@ -293,10 +293,10 @@ type Portgroup struct {
 
 type Datastore struct {
 	// These are part of BOTH API request AND db record
-	VcenterId        string `json:"vcenter_id" db:"vcenter_id"`
-	Name             string `json:"name" db:"name"`
-	Moref            string `json:"moref"`
-	Status           string `json:"status" db:"status"`
+	VcenterId        string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
+	Name             string `json:"name" db:"name" validate:"required"`
+	Moref            string `json:"moref" validate:"required"`
+	Status           string `json:"status" db:"status" validate:"required"`
 	CapacityBytes    int64  `json:"capacity_bytes" db:"capacity_bytes"`
 	FreeBytes        int64  `json:"free_bytes" db:"free_bytes"`
 	UncommittedBytes int64  `json:"uncommitted_bytes" db:"uncommitted_bytes"`
