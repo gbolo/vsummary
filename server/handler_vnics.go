@@ -2,11 +2,11 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"fmt"
 	"github.com/gbolo/vsummary/common"
 	"gopkg.in/go-playground/validator.v9"
 )

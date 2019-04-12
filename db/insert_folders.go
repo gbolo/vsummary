@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gbolo/vsummary/common"
-	"strings"
 )
 
 const insertFolders = `

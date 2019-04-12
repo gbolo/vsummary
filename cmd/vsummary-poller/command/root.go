@@ -2,11 +2,11 @@ package command
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
 
 	"github.com/gbolo/vsummary/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -39,8 +39,8 @@ func init() {
 
 	// global flags for our cli
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file")
-	rootCmd.PersistentFlags().String( "log-level", "INFO", "supported levels: INFO, WARNING, CRITICAL, DEBUG")
-	rootCmd.PersistentFlags().String( "vsummary-url", "", "vsummary-server URL")
+	rootCmd.PersistentFlags().String("log-level", "INFO", "supported levels: INFO, WARNING, CRITICAL, DEBUG")
+	rootCmd.PersistentFlags().String("vsummary-url", "", "vsummary-server URL")
 
 	// viper integration
 	viper.BindPFlag("log_level", rootCmd.PersistentFlags().Lookup("log-level"))

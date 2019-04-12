@@ -99,7 +99,6 @@ func ConfigInitPoller(cfgFile string) {
 	return
 }
 
-
 func printConfigSummary() {
 
 	log.Debugf("Configuration:\n")

@@ -2,9 +2,10 @@ package command
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var vsummaryApiUrl string

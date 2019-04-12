@@ -19,7 +19,7 @@ var (
 
 // PrintVersion prints the current version information to stdout
 func PrintVersion() {
-	fmt.Printf(`vSummary Version Dump:
+	fmt.Printf(`------- version info -------
   version     : %s
   build date  : %s
   git hash    : %s

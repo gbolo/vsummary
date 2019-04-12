@@ -34,7 +34,7 @@ const (
 		password=VALUES(password),
 		interval_min=VALUES(interval_min);`
 
-	updatePollDate = "UPDATE poller SET last_poll=:last_poll WHERE id=:id"
+	updatePollDate   = "UPDATE poller SET last_poll=:last_poll WHERE id=:id"
 	selectPollerById = "SELECT * FROM poller WHERE id=?"
 	deletePollerById = "DELETE FROM poller WHERE id=?"
 )
@@ -126,7 +126,6 @@ func (b *Backend) UpdateLastPollDate(poller common.Poller) (err error) {
 	log.Debugf("total combined affected rows: %d", rowsAffected)
 
 	return
-
 
 }
 

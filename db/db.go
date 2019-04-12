@@ -3,8 +3,8 @@ package db
 import (
 	"errors"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 )
