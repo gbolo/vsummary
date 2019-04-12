@@ -3,6 +3,7 @@
 APPNAME     = vsummary
 REPO        = github.com/gbolo/vsummary
 SERVERPKG   = $(REPO)/cmd/vsummary-server
+POLLERPKG   = $(REPO)/cmd/vsummary-poller
 METAPKG     = $(REPO)/common
 DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
@@ -37,14 +38,18 @@ $(BIN)/golint: REPOSITORY=golang.org/x/lint/golint
 # Targets for our app --------------------------------------------------------------------------------------------------
 
 .PHONY: all
-all: $(BIN) fmt server;                                       @ ## Run gofmt and server
+all: $(BIN) server poller;                                    @ ## Build server and poller
 
 .PHONY: server
 server: ; $(info $(M) building server executable...)          @ ## Build server binary
 	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(APPNAME)-server $(SERVERPKG)
 
+.PHONY: poller
+poller: ; $(info $(M) building poller executable...)          @ ## Build poller binary
+	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(APPNAME)-poller $(POLLERPKG)
+
 .PHONY: docker
-docker: clean ; $(info $(M) building docker image...)	      @ ## Build docker image
+docker: clean ; $(info $(M) building docker image...)         @ ## Build docker image
 	$Q docker build -t gbolo/$(APPNAME):$(VERSION) .
 
 .PHONY: fmt
@@ -65,7 +70,7 @@ test: ; $(info $(M) running go test...)                       @ ## Run go unit t
 
 .PHONY: clean
 clean: ; $(info $(M) cleaning...)                             @ ## Cleanup everything
-	@rm -rf $(BIN)
+	$Q rm -rvf $(BIN)
 
 .PHONY: help
 help:
@@ -75,4 +80,3 @@ help:
 .PHONY: version
 version:
 	@echo $(VERSION)
-

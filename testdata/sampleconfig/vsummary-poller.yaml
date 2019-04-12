@@ -1,0 +1,30 @@
+---
+
+# poller settings ------------------------------------------------------------------------------------------------------
+poller:
+
+  # vsummary server URL to submit results to
+  url: http://localhost:8080
+
+  # interval in minutes on how often we should poll
+  interval: 60
+
+  # HTTP client options for connection to vsummary server
+  client:
+
+    # for TLS when using internal PKI
+    ca_file: /path/to/cas.pem
+
+  vcenters:
+
+    - hostname: vcsa.mid.linuxctl.com
+      environment: MIDGAR
+      username: gbolo
+      password: secret
+
+
+# misc settings --------------------------------------------------------------------------------------------------------
+log_level: INFO
+
+# symetric aes key used to encrypt/decrypt passwords.
+aes_key: K6DW7J6D47BCZ57F5BCV8PCA2C95KM7Q

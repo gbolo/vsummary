@@ -180,13 +180,15 @@ type Viper struct {
 	remoteProviders []*defaultRemoteProvider
 
 	// Name of file to look for inside the path
-	configName string
-	configFile string
-	configType string
-	envPrefix  string
+	configName        string
+	configFile        string
+	configType        string
+	configPermissions os.FileMode
+	envPrefix         string
 
 	automaticEnvApplied bool
 	envKeyReplacer      *strings.Replacer
+	allowEmptyEnv       bool
 
 	config         map[string]interface{}
 	override       map[string]interface{}
@@ -209,6 +211,7 @@ func New() *Viper {
 	v := new(Viper)
 	v.keyDelim = "."
 	v.configName = "config"
+	v.configPermissions = os.FileMode(0644)
 	v.fs = afero.NewOsFs()
 	v.config = make(map[string]interface{})
 	v.override = make(map[string]interface{})
@@ -373,6 +376,14 @@ func (v *Viper) mergeWithEnvPrefix(in string) string {
 	return strings.ToUpper(in)
 }
 
+// AllowEmptyEnv tells Viper to consider set,
+// but empty environment variables as valid values instead of falling back.
+// For backward compatibility reasons this is false by default.
+func AllowEmptyEnv(allowEmptyEnv bool) { v.AllowEmptyEnv(allowEmptyEnv) }
+func (v *Viper) AllowEmptyEnv(allowEmptyEnv bool) {
+	v.allowEmptyEnv = allowEmptyEnv
+}
+
 // TODO: should getEnv logic be moved into find(). Can generalize the use of
 // rewriting keys many things, Ex: Get('someKey') -> some_key
 // (camel case to snake case for JSON keys perhaps)
@@ -380,11 +391,14 @@ func (v *Viper) mergeWithEnvPrefix(in string) string {
 // getEnv is a wrapper around os.Getenv which replaces characters in the original
 // key. This allows env vars which have different keys than the config object
 // keys.
-func (v *Viper) getEnv(key string) string {
+func (v *Viper) getEnv(key string) (string, bool) {
 	if v.envKeyReplacer != nil {
 		key = v.envKeyReplacer.Replace(key)
 	}
-	return os.Getenv(key)
+
+	val, ok := os.LookupEnv(key)
+
+	return val, ok && (v.allowEmptyEnv || val != "")
 }
 
 // ConfigFileUsed returns the file used to populate the config registry.
@@ -611,10 +625,9 @@ func (v *Viper) isPathShadowedInFlatMap(path []string, mi interface{}) string {
 //       "foo.bar.baz" in a lower-priority map
 func (v *Viper) isPathShadowedInAutoEnv(path []string) string {
 	var parentKey string
-	var val string
 	for i := 1; i < len(path); i++ {
 		parentKey = strings.Join(path[0:i], v.keyDelim)
-		if val = v.getEnv(v.mergeWithEnvPrefix(parentKey)); val != "" {
+		if _, ok := v.getEnv(v.mergeWithEnvPrefix(parentKey)); ok {
 			return parentKey
 		}
 	}
@@ -676,6 +689,12 @@ func (v *Viper) Get(key string) interface{} {
 			return cast.ToString(val)
 		case int32, int16, int8, int:
 			return cast.ToInt(val)
+		case uint:
+			return cast.ToUint(val)
+		case uint32:
+			return cast.ToUint32(val)
+		case uint64:
+			return cast.ToUint64(val)
 		case int64:
 			return cast.ToInt64(val)
 		case float64, float32:
@@ -739,6 +758,24 @@ func (v *Viper) GetInt64(key string) int64 {
 	return cast.ToInt64(v.Get(key))
 }
 
+// GetUint returns the value associated with the key as an unsigned integer.
+func GetUint(key string) uint { return v.GetUint(key) }
+func (v *Viper) GetUint(key string) uint {
+	return cast.ToUint(v.Get(key))
+}
+
+// GetUint32 returns the value associated with the key as an unsigned integer.
+func GetUint32(key string) uint32 { return v.GetUint32(key) }
+func (v *Viper) GetUint32(key string) uint32 {
+	return cast.ToUint32(v.Get(key))
+}
+
+// GetUint64 returns the value associated with the key as an unsigned integer.
+func GetUint64(key string) uint64 { return v.GetUint64(key) }
+func (v *Viper) GetUint64(key string) uint64 {
+	return cast.ToUint64(v.Get(key))
+}
+
 // GetFloat64 returns the value associated with the key as a float64.
 func GetFloat64(key string) float64 { return v.GetFloat64(key) }
 func (v *Viper) GetFloat64(key string) float64 {
@@ -800,8 +837,6 @@ func (v *Viper) UnmarshalKey(key string, rawVal interface{}, opts ...DecoderConf
 		return err
 	}
 
-	v.insensitiviseMaps()
-
 	return nil
 }
 
@@ -816,8 +851,6 @@ func (v *Viper) Unmarshal(rawVal interface{}, opts ...DecoderConfigOption) error
 	if err != nil {
 		return err
 	}
-
-	v.insensitiviseMaps()
 
 	return nil
 }
@@ -860,8 +893,6 @@ func (v *Viper) UnmarshalExact(rawVal interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	v.insensitiviseMaps()
 
 	return nil
 }
@@ -993,7 +1024,7 @@ func (v *Viper) find(lcaseKey string) interface{} {
 	if v.automaticEnvApplied {
 		// even if it hasn't been registered, if automaticEnv is used,
 		// check any Get request
-		if val = v.getEnv(v.mergeWithEnvPrefix(lcaseKey)); val != "" {
+		if val, ok := v.getEnv(v.mergeWithEnvPrefix(lcaseKey)); ok {
 			return val
 		}
 		if nested && v.isPathShadowedInAutoEnv(path) != "" {
@@ -1002,7 +1033,7 @@ func (v *Viper) find(lcaseKey string) interface{} {
 	}
 	envkey, exists := v.env[lcaseKey]
 	if exists {
-		if val = v.getEnv(envkey); val != "" {
+		if val, ok := v.getEnv(envkey); ok {
 			return val
 		}
 	}
@@ -1248,13 +1279,21 @@ func (v *Viper) ReadConfig(in io.Reader) error {
 // MergeConfig merges a new configuration with an existing config.
 func MergeConfig(in io.Reader) error { return v.MergeConfig(in) }
 func (v *Viper) MergeConfig(in io.Reader) error {
-	if v.config == nil {
-		v.config = make(map[string]interface{})
-	}
 	cfg := make(map[string]interface{})
 	if err := v.unmarshalReader(in, cfg); err != nil {
 		return err
 	}
+	return v.MergeConfigMap(cfg)
+}
+
+// MergeConfigMap merges the configuration from the map given with an existing config.
+// Note that the map given may be modified.
+func MergeConfigMap(cfg map[string]interface{}) error { return v.MergeConfigMap(cfg) }
+func (v *Viper) MergeConfigMap(cfg map[string]interface{}) error {
+	if v.config == nil {
+		v.config = make(map[string]interface{})
+	}
+	insensitiviseMap(cfg)
 	mergeMaps(cfg, v.config, nil)
 	return nil
 }
@@ -1315,7 +1354,7 @@ func (v *Viper) writeConfig(filename string, force bool) error {
 			return fmt.Errorf("File: %s exists. Use WriteConfig to overwrite.", filename)
 		}
 	}
-	f, err := v.fs.OpenFile(filename, flags, os.FileMode(0644))
+	f, err := v.fs.OpenFile(filename, flags, v.configPermissions)
 	if err != nil {
 		return err
 	}
@@ -1560,13 +1599,6 @@ func (v *Viper) WatchRemoteConfigOnChannel() error {
 	return v.watchKeyValueConfigOnChannel()
 }
 
-func (v *Viper) insensitiviseMaps() {
-	insensitiviseMap(v.config)
-	insensitiviseMap(v.defaults)
-	insensitiviseMap(v.override)
-	insensitiviseMap(v.kvstore)
-}
-
 // Retrieve the first found remote configuration.
 func (v *Viper) getKeyValueConfig() error {
 	if RemoteConfig == nil {
@@ -1757,6 +1789,12 @@ func (v *Viper) SetConfigType(in string) {
 	if in != "" {
 		v.configType = in
 	}
+}
+
+// SetConfigPermissions sets the permissions for the config file.
+func SetConfigPermissions(perm os.FileMode) { v.SetConfigPermissions(perm) }
+func (v *Viper) SetConfigPermissions(perm os.FileMode) {
+	v.configPermissions = perm.Perm()
 }
 
 func (v *Viper) getConfigType() string {

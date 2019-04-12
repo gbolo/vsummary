@@ -80,10 +80,16 @@ func NewPoller(c common.Poller) (p *Poller) {
 
 // Configure allows you to configure a Poller based from a common.Poller
 func (p *Poller) Configure(c common.Poller) {
-	decryptedPassword, err := crypto.Decrypt(c.Password)
-	if err != nil {
-		log.Warningf("failed to decrypt password for: %s", c.VcenterHost)
-		return
+	var decryptedPassword string
+	if c.PlainTextPassword != "" {
+		decryptedPassword = c.PlainTextPassword
+	} else {
+		var err error
+		decryptedPassword, err = crypto.Decrypt(c.Password)
+		if err != nil {
+			log.Warningf("failed to decrypt password for: %s", c.VcenterHost)
+			return
+		}
 	}
 	p.Config = &PollerConfig{
 		URL:         fmt.Sprintf("https://%s/sdk", c.VcenterHost),

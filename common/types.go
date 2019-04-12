@@ -114,9 +114,9 @@ type ResourcePool struct {
 type Poller struct {
 
 	// These are part of BOTH API request AND db record
-	VcenterHost string `json:"vcenter_host" db:"vcenter_host" validate:"required"`
-	VcenterName string `json:"vcenter_name" db:"vcenter_name" validate:"required"`
-	Username    string `json:"user_name" db:"user_name" validate:"required"`
+	VcenterHost string `json:"vcenter_host" db:"vcenter_host" validate:"required" mapstructure:"hostname"`
+	VcenterName string `json:"vcenter_name" db:"vcenter_name" validate:"required" mapstructure:"environment"`
+	Username    string `json:"user_name" db:"user_name" validate:"required" mapstructure:"username"`
 	Password    string `json:"password" db:"password" validate:"required"`
 	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`
 	IntervalMin int    `json:"interval_min" db:"interval_min" validate:"required"`
@@ -125,6 +125,9 @@ type Poller struct {
 	Id       string `db:"id"`
 	Internal bool   `db:"internal"`
 	LastPoll string `db:"last_poll"`
+
+	// This is used by external poller only
+	PlainTextPassword string `mapstructure:"password"`
 }
 
 type Esxi struct {

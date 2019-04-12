@@ -166,7 +166,7 @@ func (e *ExternalPoller) Daemonize() {
 	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), e.Config.URL)
 
 	// this prevents all pollers to go off at the exact same time
-	randomizedWait(1, 120)
+	randomizedWait(1, 10)
 	e.PollThenSend()
 
 	for {
@@ -183,4 +183,19 @@ func (e *ExternalPoller) Daemonize() {
 			}
 		}
 	}
+}
+
+// GetExternalPollersFromConfig returns preconfigured list of ExternalPoller(s) found in config
+func GetExternalPollersFromConfig() (externalPollers []*ExternalPoller) {
+	var pollersInConfig []common.Poller
+	err := viper.UnmarshalKey("poller.vcenters", &pollersInConfig)
+	if err != nil || len(pollersInConfig) < 1 {
+		return
+	}
+
+	for _, poller := range pollersInConfig {
+		poller.Enabled = true
+		externalPollers = append(externalPollers, NewExternalPoller(poller))
+	}
+	return
 }

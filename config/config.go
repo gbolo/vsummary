@@ -59,6 +59,47 @@ func ConfigInit(cfgFile string) {
 
 }
 
+func ConfigInitPoller(cfgFile string) {
+
+	// Set some defaults
+	viper.SetDefault("log_level", "CRITICAL")
+	viper.SetDefault("poller.interval", 60)
+
+	// Configuring and pulling overrides from environmental variables
+	viper.SetEnvPrefix("VSUMMARY")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
+
+	// set default config name and paths to look for it
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("vsummary-poller")
+	viper.AddConfigPath("./")
+	goPath := os.Getenv("GOPATH")
+	if goPath != "" {
+		viper.AddConfigPath(fmt.Sprintf("%s/src/github.com/gbolo/vsummary/testdata/sampleconfig", goPath))
+	}
+
+	// if the user provides a config file in a flag, lets use it
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	}
+
+	// If a config file is found, read it in.
+	err := viper.ReadInConfig()
+
+	// Kick-off the logging module
+	loggingInit(viper.GetString("log_level"))
+
+	if err == nil {
+		log.Infof("using config file: %s", viper.ConfigFileUsed())
+	} else {
+		log.Warning(("no config file found: using environment variables and hard-coded defaults"))
+	}
+
+	return
+}
+
+
 func printConfigSummary() {
 
 	log.Debugf("Configuration:\n")
