@@ -9,7 +9,7 @@ DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
 COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
 LDFLAGS     = -X $(METAPKG).Version=$(VERSION) -X $(METAPKG).BuildDate=$(DATE) -X $(METAPKG).CommitSHA=$(COMMIT_SHA)
-PKGS        = $(or $(PKG),$(shell $(GO) list ./...))
+PKGS        = $(shell $(GO) list ./...)
 TESTPKGS    = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS))
 BIN         = $(CURDIR)/bin
 GO          = go
@@ -55,6 +55,11 @@ docker: clean ; $(info $(M) building docker image...)         @ ## Build docker 
 .PHONY: fmt
 fmt: ; $(info $(M) running gofmt...)                          @ ## Run gofmt on all source files
 	$Q $(GO) fmt ./...
+
+.PHONY: check-fmt
+check-fmt: SHELL:=/bin/bash
+check-fmt: ; $(info $(M) checking for gofmt issues...)        @ ## Check for gofmt issues
+	$Q diff -u <(echo -n) <($(GO) fmt ./...)
 
 .PHONY: goimports
 goimports: | $(GOIMPORTS) ; $(info $(M) running goimports...) @ ## Run goimports on all source files

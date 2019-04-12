@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.12.x
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y --no-install-recommends build-essential make
+
+script:
+  - make check-fmt
+  - make test
+  - make all
+  - make docker
