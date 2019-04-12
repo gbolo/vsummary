@@ -11,6 +11,7 @@ before_install:
   - sudo apt-get install -y --no-install-recommends build-essential make
 
 script:
+  - make versions
   - make check-fmt
   - make test
   - make all
