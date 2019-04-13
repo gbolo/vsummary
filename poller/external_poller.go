@@ -10,8 +10,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gbolo/vsummary/common"
 	"github.com/spf13/viper"
+
+	"github.com/gbolo/vsummary/common"
 )
 
 var (

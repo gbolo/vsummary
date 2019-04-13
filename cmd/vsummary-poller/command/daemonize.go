@@ -39,7 +39,7 @@ func daemonize() {
 	}
 
 	// daemonize all pollers
-	for i, _ := range externalPollers {
+	for i := range externalPollers {
 		err := externalPollers[i].SetApiUrl(vsummaryApiUrl)
 		if err != nil {
 			fmt.Printf("Error with vSummary Server URL: %v\n", err)

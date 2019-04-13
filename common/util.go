@@ -1,7 +1,7 @@
 package common
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -17,9 +17,9 @@ var (
 	log = logging.MustGetLogger("vsummary")
 )
 
-// ComputeId returns the first 12 characters from a SHA1 hash of the input text
+// ComputeId returns the first 12 characters from a SHA256 hash of the input text
 func ComputeId(input string) string {
-	sum := fmt.Sprintf("%x", sha1.Sum([]byte(input)))
+	sum := fmt.Sprintf("%x", sha256.Sum256([]byte(input)))
 	return sum[0:12]
 }
 

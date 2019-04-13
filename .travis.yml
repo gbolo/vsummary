@@ -12,7 +12,7 @@ before_install:
 
 script:
   - make versions
-  - make check-fmt
+  - make lint
   - make test
   - make all
   - make docker

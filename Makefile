@@ -13,6 +13,7 @@ PKGS        = $(shell $(GO) list ./...)
 TESTPKGS    = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS))
 BIN         = $(CURDIR)/bin
 GO          = go
+GOFMT       = gofmt
 
 V ?= 0
 Q  = $(if $(filter 1,$V),,@)
@@ -25,56 +26,51 @@ $(BIN):
 
 $(BIN)/%: | $(BIN) ; $(info $(M) building $(REPOSITORY)...)
 	$Q tmp=$$(mktemp -d); \
-	   env GO111MODULE=off GOCACHE=off GOPATH=$$tmp GOBIN=$(BIN) $(GO) get $(REPOSITORY) \
+	   env GO111MODULE=off GOPATH=$$tmp GOBIN=$(BIN) $(GO) get $(REPOSITORY) \
 		|| ret=$$?; \
 	   rm -rf $$tmp ; exit $$ret
 
 GOIMPORTS = $(BIN)/goimports
 $(BIN)/goimports: REPOSITORY=golang.org/x/tools/cmd/goimports
 
-GOLINT = $(BIN)/golint
-$(BIN)/golint: REPOSITORY=golang.org/x/lint/golint
+GOLANGCI_LINT = $(BIN)/golangci-lint
+$(BIN)/golangci-lint: REPOSITORY=github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # Targets for our app --------------------------------------------------------------------------------------------------
 
 .PHONY: all
-all: $(BIN) server poller;                                    @ ## Build server and poller
+all: $(BIN) server poller;                                        @ ## Build server and poller binaries
 
 .PHONY: server
-server: ; $(info $(M) building server executable...)          @ ## Build server binary
+server: ; $(info $(M) building server executable...)              @ ## Build server binary
 	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(APPNAME)-server $(SERVERPKG)
 
 .PHONY: poller
-poller: ; $(info $(M) building poller executable...)          @ ## Build poller binary
+poller: ; $(info $(M) building poller executable...)              @ ## Build poller binary
 	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/$(APPNAME)-poller $(POLLERPKG)
 
 .PHONY: docker
-docker: clean ; $(info $(M) building docker image...)         @ ## Build docker image
+docker: clean ; $(info $(M) building docker image...)             @ ## Build docker image
 	$Q docker build -t gbolo/$(APPNAME):$(VERSION) .
 
 .PHONY: fmt
-fmt: ; $(info $(M) running gofmt...)                          @ ## Run gofmt on all source files
-	$Q $(GO) fmt ./...
-
-.PHONY: check-fmt
-check-fmt: SHELL:=/bin/bash
-check-fmt: ; $(info $(M) checking for gofmt issues...)        @ ## Check for gofmt issues
-	$Q diff -u <(echo -n) <($(GO) fmt ./...)
+fmt: ; $(info $(M) running gofmt...)                              @ ## Run gofmt on all source files
+	$Q $(GOFMT) -s -l -w $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: goimports
-goimports: | $(GOIMPORTS) ; $(info $(M) running goimports...) @ ## Run goimports on all source files
+goimports: | $(GOIMPORTS) ; $(info $(M) running goimports...)     @ ## Run goimports on all source files
 	$Q $(GOIMPORTS) -w $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: lint
-lint: | $(GOLINT) ; $(info $(M) running golint...)            @ ## Run golint
-	$Q $(GOLINT) -set_exit_status $(PKGS)
+lint: | $(GOLANGCI_LINT) ; $(info $(M) running golangci-lint...)  @ ## Run golangci-lint for code issues
+	$Q $(GOLANGCI_LINT) run
 
 .PHONY: test
-test: ; $(info $(M) running go test...)                       @ ## Run go unit tests
+test: ; $(info $(M) running go test...)                           @ ## Run go unit tests
 	$Q $(GO) test -v -cover $(TESTPKGS)
 
 .PHONY: clean
-clean: ; $(info $(M) cleaning...)                             @ ## Cleanup everything
+clean: ; $(info $(M) cleaning...)                                 @ ## Cleanup everything
 	$Q rm -rvf $(BIN)
 
 .PHONY: help
@@ -84,4 +80,4 @@ help:
 
 .PHONY: versions
 versions:
-	@echo "app version $(VERSION)"; $(GO) version
+	@echo "app version $(VERSION) $(COMMIT_SHA)"; $(GO) version

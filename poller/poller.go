@@ -18,8 +18,6 @@ import (
 var log = logging.MustGetLogger("vsummary")
 
 const (
-	// relevant with externalPoller
-	apiVersion = "2"
 	// the default interval we refresh the list of pollers from the backend db
 	defaultRefreshInterval = 60 * time.Second
 )

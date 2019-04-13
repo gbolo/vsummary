@@ -625,7 +625,7 @@ func populateData(query string, response *DataTablesResponse) (err error) {
 	valuePtrs := make([]interface{}, len(columns))
 
 	for rows.Next() {
-		for i, _ := range columns {
+		for i := range columns {
 			valuePtrs[i] = &values[i]
 		}
 		rows.Scan(valuePtrs...)
