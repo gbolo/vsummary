@@ -2,8 +2,8 @@
 
 APPNAME     = vsummary
 REPO        = github.com/gbolo/vsummary
-SERVERPKG   = $(REPO)/cmd/vsummary-server
-POLLERPKG   = $(REPO)/cmd/vsummary-poller
+SERVERPKG   = ./cmd/vsummary-server
+POLLERPKG   = ./cmd/vsummary-poller
 METAPKG     = $(REPO)/common
 DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
