@@ -26,7 +26,7 @@ $(BIN):
 
 $(BIN)/%: | $(BIN) ; $(info $(M) building $(REPOSITORY)...)
 	$Q tmp=$$(mktemp -d); \
-	   env GO111MODULE=off GOCACHE=off GOPATH=$$tmp GOBIN=$(BIN) $(GO) get $(REPOSITORY) \
+	   env GO111MODULE=off GOPATH=$$tmp GOBIN=$(BIN) $(GO) get $(REPOSITORY) \
 		|| ret=$$?; \
 	   rm -rf $$tmp ; exit $$ret
 
