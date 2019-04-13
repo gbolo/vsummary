@@ -249,17 +249,12 @@ func newRouter() *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
-
-		var handler http.Handler
-		handler = route.HandlerFunc
-		//handler = accessLog(handler, route.Name)
-
 		// add routes to mux
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(handler)
+			Handler(route.HandlerFunc)
 	}
 
 	// add route to mux to handle static files

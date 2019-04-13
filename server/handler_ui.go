@@ -144,7 +144,7 @@ func writePollerPage(w http.ResponseWriter, t string) {
 	if err == nil {
 		pollers, _ := backend.GetPollers()
 		// TODO: for now we only support global polling interval
-		for i, _ := range pollers {
+		for i := range pollers {
 			pollers[i].IntervalMin = viper.GetInt("poller.interval")
 		}
 		execErr := templates.ExecuteTemplate(w, t, UiView{

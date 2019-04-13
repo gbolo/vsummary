@@ -104,7 +104,7 @@ func (b *Backend) InsertFolders(folders []common.Folder) (err error) {
 
 	log.Debugf("total combined affected rows: %d", rowsAffected)
 
-	// TODO: we need to update folder full path after after we instered all the folders above
+	// TODO: we need to update folder full path after after we inserted all the folders above
 	// call some function to do that here
 
 	return
