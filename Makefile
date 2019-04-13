@@ -2,8 +2,8 @@
 
 APPNAME     = vsummary
 REPO        = github.com/gbolo/vsummary
-SERVERPKG   = ./cmd/vsummary-server
-POLLERPKG   = ./cmd/vsummary-poller
+SERVERPKG   = $(REPO)/cmd/vsummary-server
+POLLERPKG   = $(REPO)/cmd/vsummary-poller
 METAPKG     = $(REPO)/common
 DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
@@ -84,4 +84,4 @@ help:
 
 .PHONY: versions
 versions:
-	@echo "app version $(VERSION)"; $(GO) version
+	@echo "app version $(VERSION) $(COMMIT_SHA)"; $(GO) version
