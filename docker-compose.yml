@@ -1,0 +1,44 @@
+################################################################################
+#
+#   docker compose for vsummary development
+#   intended to be used for testing purposes only
+#
+################################################################################
+
+version: '2'
+
+services:
+
+  vsummary-server:
+    image: gbolo/vsummary:latest
+    container_name: vsummary-server
+    restart: unless-stopped
+    environment:
+      # format: <username>:<password>@<host>:<port>/<database>
+      VSUMMARY_BACKEND_DB_DSN: vsummary:secret@(mysql:3306)/vsummary
+      VSUMMARY_SERVER_ACCESS_LOG: "false"
+    networks:
+      - vsummary.dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    container_name: vsummary-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: vsummary
+      MYSQL_USER: vsummary
+      MYSQL_PASSWORD: secret
+    networks:
+      - vsummary.dev
+
+networks:
+  vsummary.dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.197.199.0/24
