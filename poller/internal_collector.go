@@ -65,19 +65,20 @@ func (i *InternalCollector) addIfUnique(p InternalPoller) {
 // then populates internalPoller list of ActivePollers with it.
 func (i *InternalCollector) RefreshPollers() {
 	pollers, err := i.backend.GetPollers()
-	log.Debugf("found %d pollers", len(pollers))
 	if err != nil {
 		log.Errorf("error getting pollers: %v", err)
 		return
 	}
 
-	// add unique new pollers
+	// add unique new internal pollers
 	var backendPollerURLs []string
 	for _, p := range pollers {
-		internalPoller := NewInternalPoller(p)
-		internalPoller.SetBackend(i.backend)
-		i.addIfUnique(*internalPoller)
-		backendPollerURLs = append(backendPollerURLs, fmt.Sprintf("https://%s/sdk", p.VcenterHost))
+		if p.Internal {
+			internalPoller := NewInternalPoller(p)
+			internalPoller.SetBackend(i.backend)
+			i.addIfUnique(*internalPoller)
+			backendPollerURLs = append(backendPollerURLs, fmt.Sprintf("https://%s/sdk", p.VcenterHost))
+		}
 	}
 
 	// remove pollers that are no longer present or disabled

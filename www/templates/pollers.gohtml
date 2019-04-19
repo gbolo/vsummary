@@ -31,8 +31,9 @@
                         <thead class="thead-light">
                         <tr >
                             <th>Actions</th>
-                            <th>Name</th>
-                            <th>Address</th>
+                            <th>Poller Type</th>
+                            <th>Environment</th>
+                            <th>vCenter</th>
                             <th>Username</th>
                             <th>Enabled</th>
                             <th>Interval (min)</th>
@@ -43,8 +44,19 @@
                         {{- range .Pollers }}
                         <tr>
                             <td>
+                                {{ if .Internal }}
                                 <button type="button" class="btn btn-sm btn-primary" onclick="editPoller('{{ .Id }}')">Edit</button>
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removePoller('{{ .Id }}')">Remove</button>
+                                {{ else }}
+                                N/A
+                                {{ end }}
+                            </td>
+                            <td>
+                            {{ if .Internal }}
+                                Internal
+                            {{ else }}
+                                External
+                            {{ end }}
                             </td>
                             <td>{{ .VcenterName }}</td>
                             <td>{{ .VcenterHost }}</td>

@@ -40,19 +40,23 @@ type ExternalPoller struct {
 	Poller
 	stopSignal     chan bool
 	vSummaryApiUrl string
-}
-
-// NewEmptyExternalPoller returns a empty ExternalPoller
-func NewEmptyExternalPoller() *ExternalPoller {
-	return &ExternalPoller{
-		stopSignal: make(chan bool),
-	}
+	cPoller        common.Poller
 }
 
 // NewExternalPoller returns a ExternalPoller based from a common.Poller
 func NewExternalPoller(c common.Poller) (e *ExternalPoller) {
-	e = NewEmptyExternalPoller()
+	e = &ExternalPoller{
+		stopSignal: make(chan bool),
+	}
 	e.Configure(c)
+	e.cPoller = common.Poller{
+		VcenterName: c.VcenterName,
+		VcenterHost: c.VcenterHost,
+		Username:    c.Username,
+		Internal:    false,
+		IntervalMin: c.IntervalMin,
+		Enabled:     true,
+	}
 	return
 }
 
@@ -120,6 +124,7 @@ func (e *ExternalPoller) sendResult(endpoint string, o interface{}) (err error) 
 
 // SendPollResults will attempt to send the polling results to the vSummary API server
 func (e *ExternalPoller) SendPollResults(r pollResults) (err []error) {
+	appendIfError(&err, e.sendResult(common.EndpointPoller, e.cPoller))
 	appendIfError(&err, e.sendResult(common.EndpointVCenter, r.Vcenter))
 	appendIfError(&err, e.sendResult(common.EndpointESXi, r.Esxi))
 	appendIfError(&err, e.sendResult(common.EndpointDatastore, r.Datastore))
@@ -197,6 +202,8 @@ func GetExternalPollersFromConfig() (externalPollers []*ExternalPoller) {
 
 	for _, poller := range pollersInConfig {
 		poller.Enabled = true
+		poller.Internal = false
+		poller.IntervalMin = viper.GetInt("poller.interval")
 		externalPollers = append(externalPollers, NewExternalPoller(poller))
 	}
 	return

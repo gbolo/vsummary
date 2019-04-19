@@ -73,6 +73,7 @@ func pollNow() {
 		VcenterName:       flagEnvironment,
 		Username:          flagUsername,
 		PlainTextPassword: flagPassword,
+		IntervalMin:       0,
 	})
 
 	// set vsummary-server URL
