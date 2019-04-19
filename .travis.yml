@@ -14,5 +14,8 @@ script:
   - make versions
   - make lint
   - make test
+  - make setup-integration-prereqs
+  - make integration-test
+  - make down-integration-prereqs
   - make all
   - make docker

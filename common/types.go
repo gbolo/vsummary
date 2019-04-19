@@ -10,10 +10,10 @@ type VirtualMachine struct {
 	Vcpu                 int32  `json:"vcpu" db:"vcpu" validate:"required"`
 	MemoryMb             int32  `json:"memory_mb" db:"memory_mb" validate:"required"`
 	ConfigGuestOs        string `json:"config_guest_os" db:"config_guest_os" validate:"required"`
-	ConfigVersion        string `json:"config_version" db:"config_version" validate:"required"`
-	SmbiosUuid           string `json:"smbios_uuid" db:"smbios_uuid" validate:"required"`
+	ConfigVersion        string `json:"config_version" db:"config_version"`
+	SmbiosUuid           string `json:"smbios_uuid" db:"smbios_uuid"`
 	InstanceUuid         string `json:"instance_uuid" db:"instance_uuid" validate:"required"`
-	ConfigChangeVersion  string `json:"config_change_version" db:"config_change_version" validate:"required"`
+	ConfigChangeVersion  string `json:"config_change_version" db:"config_change_version"`
 	GuestToolsRunning    string `json:"guest_tools_running" db:"guest_tools_running" validate:"required"`
 	GuestToolsVersion    string `json:"guest_tools_version" db:"guest_tools_version"`
 	GuestHostname        string `json:"guest_hostname" db:"guest_hostname"`
@@ -29,7 +29,7 @@ type VirtualMachine struct {
 	// These are part of API request ONLY
 	ObjectType        string `json:"objecttype"`
 	EsxiMoref         string `json:"esxi_moref" validate:"required"`
-	FolderMoref       string `json:"folder_moref""`
+	FolderMoref       string `json:"folder_moref"`
 	VappMoref         string `json:"vapp_moref"`
 	ResourcePoolMoref string `json:"resourcepool_moref"`
 
@@ -195,7 +195,7 @@ type VDisk struct {
 	// These are part of BOTH API request AND db record
 	VcenterId       string `json:"vcenter_id" db:"vcenter_id" validate:"required"`
 	Name            string `json:"name" db:"name" validate:"required"`
-	CapacityBytes   int64  `json:"capacity_bytes" db:"capacity_bytes" validate:"required"`
+	CapacityBytes   int64  `json:"capacity_bytes" db:"capacity_bytes"`
 	Path            string `json:"path" db:"path"`
 	ThinProvisioned string `json:"thin_provisioned" db:"thin_provisioned"`
 	Uuid            string `json:"uuid" db:"uuid"`

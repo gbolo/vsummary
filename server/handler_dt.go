@@ -35,6 +35,7 @@ func handlerDtVirtualMachine(w http.ResponseWriter, req *http.Request) {
 		row["guest_os"] = common.SetDefaultValue(row["guest_os"], "unknown")
 		row["guest_hostname"] = common.SetDefaultValue(row["guest_hostname"], "unknown")
 		row["guest_ip"] = common.SetDefaultValue(row["guest_ip"], "unknown")
+		row["config_change_version"] = common.SetDefaultValue(row["config_change_version"], "unknown")
 		data = append(data, row)
 	}
 
@@ -62,6 +63,7 @@ func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
 		row["in_maintenance_mode"] = decorateCell(row["in_maintenance_mode"])
 		row["power_state"] = decorateCell(row["power_state"])
 		row["stat_uptime_sec"] = common.SecondsToHuman(row["stat_uptime_sec"])
+		row["max_evc"] = common.SetDefaultValue(row["max_evc"], "unknown")
 		data = append(data, row)
 	}
 
