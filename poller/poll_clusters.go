@@ -57,11 +57,21 @@ func (p *Poller) GetClusters() (clList []common.Cluster, err error) {
 			TotalMemoryBytes: summary.TotalMemory,
 			TotalVmotions:    int32(common.GetInt(cluster, "Summary", "NumVmotions")),
 			NumHosts:         summary.NumHosts,
-			DRSEnabled:       common.BoolToString(*cluster.Configuration.DrsConfig.Enabled),
 			DRSBehaviour:     string(cluster.Configuration.DrsConfig.DefaultVmBehavior),
-			HAEnabled:        common.BoolToString(*cluster.Configuration.DasConfig.Enabled),
 			CurrentBalance:   int32(common.GetInt(cluster, "Summary", "CurrentBalance")),
 			TargetBalance:    int32(common.GetInt(cluster, "Summary", "TargetBalance")),
+
+			// defaults
+			DRSEnabled: "false",
+			HAEnabled:  "false",
+		}
+
+		if cluster.Configuration.DrsConfig.Enabled != nil {
+			clStruct.DRSEnabled = common.BoolToString(*cluster.Configuration.DrsConfig.Enabled)
+		}
+
+		if cluster.Configuration.DasConfig.Enabled != nil {
+			clStruct.HAEnabled = common.BoolToString(*cluster.Configuration.DasConfig.Enabled)
 		}
 
 		clList = append(clList, clStruct)

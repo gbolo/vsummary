@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS vm
   (
      id                      VARCHAR(32) PRIMARY KEY,
      name                    VARCHAR(128),
-     moref                   VARCHAR(32),
+     moref                   VARCHAR(128),
      vmx_path                VARCHAR(255),
      vcpu                    SMALLINT UNSIGNED,
      memory_mb               INT UNSIGNED,
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS esxi
 CREATE TABLE IF NOT EXISTS resourcepool
   (
      id                   VARCHAR(32) PRIMARY KEY,
-     moref                VARCHAR(16),
+     moref                VARCHAR(128),
      full_path            VARCHAR(512),
      name                 VARCHAR(128),
      type                 VARCHAR(64),
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS resourcepool
      mem_reservation      BIGINT UNSIGNED,
      mem_limit            BIGINT,
      parent               VARCHAR(32),
-     parent_moref         VARCHAR(16),
+     parent_moref         VARCHAR(128),
      cluster_id           VARCHAR(32),
      vcenter_id           VARCHAR(36),
      present              TINYINT DEFAULT 1
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS resourcepool
 CREATE TABLE IF NOT EXISTS folder
   (
      id                   VARCHAR(32) PRIMARY KEY,
-     moref                VARCHAR(32),
+     moref                VARCHAR(128),
      name                 VARCHAR(128),
      type                 VARCHAR(64),
      full_path            VARCHAR(512),
@@ -294,7 +294,7 @@ CREATE TABLE IF NOT EXISTS datastore
   (
      id                VARCHAR(32) PRIMARY KEY,
      name              VARCHAR(128),
-     moref             VARCHAR(16),
+     moref             VARCHAR(128),
      status            VARCHAR(32),
      capacity_bytes    BIGINT UNSIGNED,
      free_bytes        BIGINT UNSIGNED,

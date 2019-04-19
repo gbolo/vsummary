@@ -5,11 +5,12 @@ REPO        = github.com/gbolo/vsummary
 SERVERPKG   = $(REPO)/cmd/vsummary-server
 POLLERPKG   = $(REPO)/cmd/vsummary-poller
 METAPKG     = $(REPO)/common
+INTTESTPKG  = $(REPO)/integrationtest
 DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
 COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
 LDFLAGS     = -X $(METAPKG).Version=$(VERSION) -X $(METAPKG).BuildDate=$(DATE) -X $(METAPKG).CommitSHA=$(COMMIT_SHA)
-PKGS        = $(shell $(GO) list ./...)
+PKGS        = $(shell $(GO) list ./... | grep -v $(INTTESTPKG))
 TESTPKGS    = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS))
 BIN         = $(CURDIR)/bin
 GO          = go
@@ -65,9 +66,27 @@ goimports: | $(GOIMPORTS) ; $(info $(M) running goimports...)     @ ## Run goimp
 lint: | $(GOLANGCI_LINT) ; $(info $(M) running golangci-lint...)  @ ## Run golangci-lint for code issues
 	$Q $(GOLANGCI_LINT) run
 
-.PHONY: test
-test: ; $(info $(M) running go test...)                           @ ## Run go unit tests
+.PHONY: unit-test
+unit-test: ; $(info $(M) running unit tests...)                   @ ## Run go unit tests
 	$Q $(GO) test -v -cover $(TESTPKGS)
+
+.PHONY: integration-test
+integration-test: ; $(info $(M) running integration tests...)     @ ## Run integration tests
+	$Q $(GO) test -v -cover \
+	-coverpkg $(REPO)/db,$(REPO)/poller \
+	$(INTTESTPKG)
+
+.PHONY: setup-integration-prereqs
+setup-integration-prereqs: ; $(info $(M) setup integration...)    @ ## Setup integration prerequisites
+	$Q testdata/scripts/setup-integration-prereqs.sh
+
+.PHONY: down-integration-prereqs
+down-integration-prereqs: ; $(info $(M) teardown integration...)  @ ## Shutdown integration prerequisites
+	$Q testdata/scripts/setup-integration-prereqs.sh down
+
+.PHONY: vcsim
+vcsim: ; $(info $(M) starting vcsim...)                           @ ## Start local vCenter simulator
+	testdata/scripts/vcsim.sh
 
 .PHONY: clean
 clean: ; $(info $(M) cleaning...)                                 @ ## Cleanup everything

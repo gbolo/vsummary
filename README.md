@@ -50,7 +50,7 @@ VSUMMARY_BACKEND_DB_DSN="vsummary:secret@(localhost:3306)/vsummary"
 ```
 
 ## External Polling
-`vsummary-server` has a built in vCenter poller which is configurable from the web UI. However, if the `vsummary-server` does not have direct access to all vCenter servers, then you may deploy one or more `vsummary-poller` to collect from other vCenter(s) and send that information back to your `vsummary-server` (via the API) for a centralized view of your entire vCenter infrastructure. The docker image has both `vsummary-server` and `vsummary-poller` pre-installed. You can also build `vsummary-poller` for your OS of choice if you would like to void using docker for this.
+`vsummary-server` has a built in vCenter poller which is configurable from the web UI. However, if the `vsummary-server` does not have direct access to all vCenter servers, then you may deploy one or more `vsummary-poller` to collect from other vCenter(s) and send that information back to your `vsummary-server` (via the API) for a centralized view of your entire vCenter infrastructure. The docker image has both `vsummary-server` and `vsummary-poller` pre-installed. You can also build `vsummary-poller` for your OS of choice if you would like to avoid using docker for this.
 
 ### Usage of vsummary-poller
 `vsummary-poller` has two modes:
@@ -84,18 +84,38 @@ Full list of make targets:
 ```
 $ make help
 
-all             Build server and poller binaries
-server          Build server binary
-poller          Build poller binary
-docker          Build docker image
-fmt             Run gofmt on all source files
-goimports       Run goimports on all source files
-lint            Run golangci-lint for code issues
-test            Run go unit tests
-clean           Cleanup everything
+all                        Build server and poller binaries
+server                     Build server binary
+poller                     Build poller binary
+docker                     Build docker image
+fmt                        Run gofmt on all source files
+goimports                  Run goimports on all source files
+lint                       Run golangci-lint for code issues
+unit-test                  Run go unit tests
+integration-test           Run integration tests
+setup-integration-prereqs  Setup integration prerequisites
+down-integration-prereqs   Shutdown integration prerequisites
+vcsim                      Start local vCenter simulator
+clean                      Cleanup everything
 ```
 
 binaries will be placed in `./bin` directory.
+
+### Integration Test
+In addition to passing the `make lint` target, please also ensure your changes pass
+the integration test. This will bring up a local vCenter Simulator and MySQL server
+(docker containers) and run tests against them:
+
+```
+# this brings up the required containers
+make setup-integration-prereqs
+
+# this runs the actual testing
+make integration-test
+
+# this stops and removes the required containers
+make down-integration-prereqs
+```
 
 ## Docker Deployment
 A docker image is automatically created for every commit with the tag `latest`
@@ -126,7 +146,7 @@ Follow the yaml indentation and for each indentation include a `_`.
 For example:
 ```yaml
 ---
-# http server settings -------------------------------------------------------------------------------------------------
+# http server settings ---------
 server:
   # port to listen on
   bind_port: 8080

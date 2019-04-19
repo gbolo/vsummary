@@ -62,7 +62,7 @@ func (i *InternalPoller) StopPolling() {
 }
 
 // PollThenStore will poll all endpoints then store results to backend db
-func (i *InternalPoller) PollThenStore() {
+func (i *InternalPoller) PollThenStore() (errs []error) {
 	r, errs := i.GetPollResults()
 	if len(errs) > 0 {
 		log.Warningf(
@@ -79,6 +79,7 @@ func (i *InternalPoller) PollThenStore() {
 			len(errs),
 			i.Config.URL,
 		)
+		return
 	}
 
 	// update last successful poll date
@@ -91,6 +92,7 @@ func (i *InternalPoller) PollThenStore() {
 		log.Errorf("could not UpdateLastPollDate due to url parse error: %s", err)
 	}
 
+	return
 }
 
 // Daemonize is a blocking loop which continues to PollThenStore until

@@ -104,7 +104,7 @@ func (e *ExternalPoller) sendResult(endpoint string, o interface{}) (err error) 
 
 	// we only accept 202 as success
 	if res.StatusCode != http.StatusAccepted {
-		err = fmt.Errorf("recieved %d response code from %", res.StatusCode, url)
+		err = fmt.Errorf("recieved %d response code from %v", res.StatusCode, url)
 		return
 	}
 
@@ -138,7 +138,7 @@ func (e *ExternalPoller) SendPollResults(r pollResults) (err []error) {
 }
 
 // PollThenSend will poll all endpoints then send results to vSummary API server
-func (e *ExternalPoller) PollThenSend() {
+func (e *ExternalPoller) PollThenSend() (errs []error) {
 	r, errs := e.GetPollResults()
 	if len(errs) > 0 {
 		log.Warningf(
@@ -157,6 +157,7 @@ func (e *ExternalPoller) PollThenSend() {
 		)
 		log.Debugf("polling errors: %v", errs)
 	}
+	return
 }
 
 // Daemonize is a blocking loop which continues to PollThenSend indefinitely
