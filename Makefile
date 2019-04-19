@@ -10,7 +10,7 @@ DATE       ?= $(shell date +%FT%T%z)
 VERSION     = 1.0
 COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
 LDFLAGS     = -X $(METAPKG).Version=$(VERSION) -X $(METAPKG).BuildDate=$(DATE) -X $(METAPKG).CommitSHA=$(COMMIT_SHA)
-PKGS        = $(shell $(GO) list ./...)
+PKGS        = $(shell $(GO) list ./... | grep -v $(INTTESTPKG))
 TESTPKGS    = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS))
 BIN         = $(CURDIR)/bin
 GO          = go
@@ -66,8 +66,8 @@ goimports: | $(GOIMPORTS) ; $(info $(M) running goimports...)     @ ## Run goimp
 lint: | $(GOLANGCI_LINT) ; $(info $(M) running golangci-lint...)  @ ## Run golangci-lint for code issues
 	$Q $(GOLANGCI_LINT) run
 
-.PHONY: test
-test: ; $(info $(M) running go test...)                           @ ## Run go unit tests
+.PHONY: unit-test
+unit-test: ; $(info $(M) running unit tests...)                   @ ## Run go unit tests
 	$Q $(GO) test -v -cover $(TESTPKGS)
 
 .PHONY: integration-test

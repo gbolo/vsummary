@@ -91,7 +91,7 @@ docker                     Build docker image
 fmt                        Run gofmt on all source files
 goimports                  Run goimports on all source files
 lint                       Run golangci-lint for code issues
-test                       Run go unit tests
+unit-test                  Run go unit tests
 integration-test           Run integration tests
 setup-integration-prereqs  Setup integration prerequisites
 down-integration-prereqs   Shutdown integration prerequisites
@@ -146,7 +146,7 @@ Follow the yaml indentation and for each indentation include a `_`.
 For example:
 ```yaml
 ---
-# http server settings -------------------------------------------------------------------------------------------------
+# http server settings ---------
 server:
   # port to listen on
   bind_port: 8080

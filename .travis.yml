@@ -13,7 +13,7 @@ before_install:
 script:
   - make versions
   - make lint
-  - make test
+  - make unit-test
   - make setup-integration-prereqs
   - make integration-test
   - make down-integration-prereqs
