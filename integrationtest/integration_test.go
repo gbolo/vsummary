@@ -30,6 +30,8 @@ func setupServer(t *testing.T) {
 	// set some overrides
 	os.Setenv("VSUMMARY_LOG_LEVEL", "info")
 	os.Setenv("VSUMMARY_SERVER_ACCESS_LOG", "false")
+	os.Setenv("VSUMMARY_BACKEND_DB_DSN", "vsummary:secret@(127.0.0.1:13306)/vsummary")
+
 	// init config and logging
 	config.ConfigInit("")
 

@@ -10,7 +10,7 @@ docker run -d --name vsummary-mysql \
   -e MYSQL_DATABASE=vsummary \
   -e MYSQL_USER=vsummary \
   -e MYSQL_PASSWORD=secret \
-  -p 3306:3306 \
+  -p 13306:3306 \
   mysql:5.7
 
 docker run -d --name vsummary-vcsim \
