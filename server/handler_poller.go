@@ -141,6 +141,7 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 		Username:    req.FormValue("user"),
 		Password:    req.FormValue("pass"),
 		Enabled:     checkboxEnabled,
+		Internal:    true,
 	}); err != nil {
 		log.Errorf("could not add poller: %s", err)
 		w.WriteHeader(http.StatusBadRequest)

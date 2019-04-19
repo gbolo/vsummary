@@ -13,7 +13,8 @@ generate_post_poller(){
   "user_name": "${VCSIM_USER}",
   "password": "${VCSIM_USER}",
   "enabled": true,
-  "interval_min": 60
+  "interval_min": 60,
+  "internal": true
 }
 EOF
 }

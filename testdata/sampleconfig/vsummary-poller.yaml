@@ -17,10 +17,10 @@ poller:
 
   vcenters:
 
-    - hostname: vcsa.mid.linuxctl.com
-      environment: MIDGAR
-      username: gbolo
-      password: secret
+    - hostname: 127.0.0.1:8989
+      environment: vcim
+      username: user
+      password: pass
 
 
 # misc settings --------------------------------------------------------------------------------------------------------

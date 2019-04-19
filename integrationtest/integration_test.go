@@ -76,9 +76,14 @@ func setupPoller(t *testing.T) (testPoller *poller.Poller) {
 func TestExternalPoller(t *testing.T) {
 	setupServer(t)
 	// create external poller
-	externalpoller := poller.ExternalPoller{
-		Poller: *setupPoller(t),
-	}
+	externalpoller := poller.NewExternalPoller(common.Poller{
+		VcenterHost:       TestVcenterHost,
+		VcenterName:       TestVcenterName,
+		Username:          TestVcenterUsername,
+		PlainTextPassword: TestVcenterPassword,
+		IntervalMin:       10,
+		Enabled:           true,
+	})
 
 	// external poller sends results to vsummary server
 	externalpoller.SetApiUrl(TestVsummaryUrl)

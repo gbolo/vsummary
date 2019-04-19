@@ -117,9 +117,9 @@ type Poller struct {
 	VcenterHost string `json:"vcenter_host" db:"vcenter_host" validate:"required" mapstructure:"hostname"`
 	VcenterName string `json:"vcenter_name" db:"vcenter_name" validate:"required" mapstructure:"environment"`
 	Username    string `json:"user_name" db:"user_name" validate:"required" mapstructure:"username"`
-	Password    string `json:"password" db:"password" validate:"required"`
+	Password    string `json:"password" db:"password"`
 	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`
-	IntervalMin int    `json:"interval_min" db:"interval_min" validate:"required"`
+	IntervalMin int    `json:"interval_min" db:"interval_min"`
 
 	// These are part of db record ONLY
 	Id       string `db:"id"`
