@@ -11,7 +11,7 @@ generate_post_poller(){
   "vcenter_host": "${VCSIM_HOST}",
   "vcenter_name": "vcsim",
   "user_name": "${VCSIM_USER}",
-  "password": "${VCSIM_USER}",
+  "plain_password": "${VCSIM_PASS}",
   "enabled": true,
   "interval_min": 60,
   "internal": true
@@ -24,3 +24,5 @@ curl -i \
   -H "Content-Type:application/json" \
   -X POST --data "$(generate_post_poller)" \
   ${VSUMMARY_SERVER_URL}/api/v2/poller
+
+echo

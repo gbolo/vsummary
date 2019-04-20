@@ -21,3 +21,4 @@ testdata/*.go
 ### build artifacts
 bin/
 
+TODO.txt

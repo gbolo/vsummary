@@ -30,7 +30,7 @@ func (p *Poller) GetVcenter() (vcenter common.VCenter, err error) {
 
 	vcenter.Name = p.Name
 	vcenter.Id = v.Client().ServiceContent.About.InstanceUuid
-	url, err := url.Parse(p.Config.URL)
+	url, err := url.Parse(p.Config.VcenterURL)
 	if err == nil {
 		vcenter.Host = url.Host
 	}

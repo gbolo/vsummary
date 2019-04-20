@@ -96,12 +96,6 @@ var routes = Routes{
 		handlerPoller,
 	},
 	Route{
-		"AddPoller",
-		"PUT",
-		common.EndpointPoller,
-		handlerAddPoller,
-	},
-	Route{
 		"DeletePoller",
 		"DELETE",
 		common.EndpointPoller + "/{id}",

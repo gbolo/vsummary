@@ -149,7 +149,7 @@ func (e *ExternalPoller) PollThenSend() (errs []error) {
 		log.Warningf(
 			"will not send poll results since %d error(s) occurred during polling of: %s",
 			len(errs),
-			e.Config.URL,
+			e.Config.VcenterURL,
 		)
 		return
 	}
@@ -158,7 +158,7 @@ func (e *ExternalPoller) PollThenSend() (errs []error) {
 		log.Warningf(
 			"there were %d errors during sending polling results of: %s",
 			len(errs),
-			e.Config.URL,
+			e.Config.VcenterURL,
 		)
 		log.Debugf("polling errors: %v", errs)
 	}
@@ -170,7 +170,7 @@ func (e *ExternalPoller) Daemonize() {
 	// TODO: global polling interval is use for now.
 	// in future versions we can try and support an interval per poller
 	t := time.Tick(time.Duration(viper.GetInt("poller.interval")) * time.Minute)
-	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), e.Config.URL)
+	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), e.Config.VcenterURL)
 
 	// this prevents all pollers to go off at the exact same time
 	randomizedWait(1, 10)
@@ -182,10 +182,10 @@ func (e *ExternalPoller) Daemonize() {
 			if e.Enabled {
 				// this prevents all pollers to go off at the exact same time
 				randomizedWait(1, 120)
-				log.Debugf("executing poll of %s", e.Config.URL)
+				log.Debugf("executing poll of %s", e.Config.VcenterURL)
 				e.PollThenSend()
 			} else {
-				log.Infof("stopping polling of %s", e.Config.URL)
+				log.Infof("stopping polling of %s", e.Config.VcenterURL)
 				return
 			}
 		}

@@ -117,17 +117,20 @@ type Poller struct {
 	VcenterHost string `json:"vcenter_host" db:"vcenter_host" validate:"required" mapstructure:"hostname"`
 	VcenterName string `json:"vcenter_name" db:"vcenter_name" validate:"required" mapstructure:"environment"`
 	Username    string `json:"user_name" db:"user_name" validate:"required" mapstructure:"username"`
-	Password    string `json:"password" db:"password"`
 	Enabled     bool   `json:"enabled" db:"enabled" validate:"required"`
+	Internal    bool   `json:"internal" db:"internal"`
 	IntervalMin int    `json:"interval_min" db:"interval_min"`
 
 	// These are part of db record ONLY
-	Id       string `db:"id"`
-	Internal bool   `db:"internal"`
-	LastPoll string `db:"last_poll"`
+	Id                string `db:"id"`
+	EncryptedPassword string `db:"encrypted_password"`
+	LastPoll          string `db:"last_poll"`
 
-	// This is used by external poller only
-	PlainTextPassword string `mapstructure:"password"`
+	// This should never be stored in database. Used only for actual polling
+	PlainTextPassword string `json:"plain_password" mapstructure:"password"`
+
+	// a derived field that's used for polling only
+	VcenterURL string
 }
 
 type Esxi struct {

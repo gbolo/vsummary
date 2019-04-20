@@ -68,7 +68,7 @@ func (i *InternalPoller) PollThenStore() (errs []error) {
 		log.Warningf(
 			"will not store poll results since %d error(s) occurred during polling of: %s",
 			len(errs),
-			i.Config.URL,
+			i.Config.VcenterURL,
 		)
 		return
 	}
@@ -77,13 +77,13 @@ func (i *InternalPoller) PollThenStore() (errs []error) {
 		log.Warningf(
 			"there were %d errors during storing polling results of: %s",
 			len(errs),
-			i.Config.URL,
+			i.Config.VcenterURL,
 		)
 		return
 	}
 
 	// update last successful poll date
-	u, err := url.ParseRequestURI(i.Config.URL)
+	u, err := url.ParseRequestURI(i.Config.VcenterURL)
 	if err == nil {
 		i.backend.UpdateLastPollDate(common.Poller{
 			VcenterHost: u.Hostname(),
@@ -101,7 +101,7 @@ func (i *InternalPoller) Daemonize() {
 	// TODO: global polling interval is use for now.
 	// in future versions we can try and support an interval per poller
 	t := time.Tick(time.Duration(viper.GetInt("poller.interval")) * time.Minute)
-	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), i.Config.URL)
+	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), i.Config.VcenterURL)
 
 	// this prevents all pollers to go off at the exact same time
 	// TODO: redesign or remove this
@@ -115,14 +115,14 @@ func (i *InternalPoller) Daemonize() {
 			if i.Enabled {
 				// this prevents all pollers to go off at the exact same time
 				randomizedWait(1, 120)
-				log.Debugf("executing poll of %s", i.Config.URL)
+				log.Debugf("executing poll of %s", i.Config.VcenterURL)
 				i.PollThenStore()
 			} else {
-				log.Infof("stopping polling of %s", i.Config.URL)
+				log.Infof("stopping polling of %s", i.Config.VcenterURL)
 				return
 			}
 		case <-i.stopSignal:
-			log.Infof("stop signal received: stop polling of %s", i.Config.URL)
+			log.Infof("stop signal received: stop polling of %s", i.Config.VcenterURL)
 			i.Enabled = false
 			return
 		}
