@@ -17,28 +17,29 @@
                             </div>
 
                             {{- range .Pollers }}
-                            <input name="host" type="hidden" style="width:100%" value="{{ .VcenterHost }}" readonly="readonly">
+                            <input name="vcenter_host" type="hidden" style="width:100%" value="{{ .VcenterHost }}" readonly="readonly">
+                            <input type="hidden" name="internal" value="true">
                             <table class="table table-striped">
                                 <tbody>
                                 <tr>
-                                    <td><label for="fqdn">FQDN or IP:</label></td>
+                                    <td><label for="vcenter_host">FQDN or IP:</label></td>
                                     <td>{{ .VcenterHost }}</td>
                                 </tr>
                                 <tr>
-                                    <td><label for="short_name">Environment:</label></td>
-                                    <td><input name="short_name" type="text" style="width:100%" value="{{ .VcenterName }}"></td>
+                                    <td><label for="vcenter_name">Environment:</label></td>
+                                    <td><input name="vcenter_name" type="text" style="width:100%" value="{{ .VcenterName }}"></td>
                                 </tr>
                                 <tr>
                                     <td><label for="user_name">Username:</label></td>
-                                    <td><input name="user" type="text" style="width:100%" value="{{ .Username }}"></td>
+                                    <td><input name="user_name" type="text" style="width:100%" value="{{ .Username }}"></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="password">Password:</label></td>
-                                    <td><input name="pass" type="password" style="width:100%"></td>
+                                    <td><label for="plain_password">Password:</label></td>
+                                    <td><input name="plain_password" type="password" style="width:100%"></td>
                                 </tr>
                                 <tr>
                                     <td><label for="enabled">Enabled</label>:</td>
-                                    <td><input type="checkbox" name="enabled" value="on" checked></td>
+                                    <td><input type="checkbox" name="enabled" value="true" data-unchecked-value="false" checked></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -64,16 +65,18 @@
                             e.preventDefault();
                             //make ajax call
                             $.ajax({
-                                type: "PUT",
+                                type: "POST",
                                 url: "{{ .AjaxEndpoint }}",
-                                data: $('form').serialize(),
+                                // convert form data to json string :)
+                                data: JSON.stringify($('form').serializeJSON({parseBooleans: true})),
+                                dataType: 'json',
                                 beforeSend: function(){
                                     $("#message").html('<img src="/static/img/ripple.gif" /> Testing Connection...');
                                     $("#message").removeClass("hidden alert-danger");
                                     $("#message").addClass("alert-info");
                                 },
                                 success: function(msg){
-                                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg);
+                                    $("#message").html("<i class='fa fa-check fa-fw'></i> " + msg.message);
                                     $("#message").removeClass("hidden alert-info alert-danger");
                                     $("#message").addClass("alert-success");
                                     setTimeout(hideModal, 1000);

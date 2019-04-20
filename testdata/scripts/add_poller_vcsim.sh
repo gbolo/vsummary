@@ -24,3 +24,5 @@ curl -i \
   -H "Content-Type:application/json" \
   -X POST --data "$(generate_post_poller)" \
   ${VSUMMARY_SERVER_URL}/api/v2/poller
+
+echo

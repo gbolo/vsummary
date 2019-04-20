@@ -65,6 +65,7 @@ func handlerUiFormRemovePoller(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
+// can be used to store both internal and external pollers
 func handlerPoller(w http.ResponseWriter, req *http.Request) {
 
 	// log time on debug
@@ -80,8 +81,8 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 	req.Body.Close()
 
 	// decode json body
-	var poller common.Poller
-	err = json.Unmarshal(reqBody, &poller)
+	var reqPoller common.Poller
+	err = json.Unmarshal(reqBody, &reqPoller)
 	if err != nil {
 		log.Errorf("failed to decode body: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -91,64 +92,44 @@ func handlerPoller(w http.ResponseWriter, req *http.Request) {
 	// validate
 	validate := validator.New()
 
-	err = validate.Struct(poller)
+	err = validate.Struct(reqPoller)
 	if err != nil {
 		log.Errorf("failed to validate body: %s", err)
+		fmt.Fprint(w, "ALL fields must be populated")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
+	if reqPoller.PlainTextPassword == "" && reqPoller.Internal {
+		log.Error("poller cannot be marked as internal with an empty plain_password field")
+		fmt.Fprint(w, "Password field MUST be set")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// test connection if it's internal
+	if reqPoller.Internal {
+		if err := poller.TestConnection(reqPoller); err != nil {
+			log.Errorf("could not connect to vCenter: %s", err)
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, fmt.Sprintf("Could not connect to vCenter: %s", err))
+			return
+		}
+	}
+
 	// insert to backend
-	err = backend.InsertPoller(poller)
+	err = backend.InsertPoller(reqPoller)
 	if err != nil {
 		log.Errorf("failed to insert poller: %s", err)
+		fmt.Fprint(w, "Failed to insert poller. (database error, check logs)")
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
+	fmt.Fprint(w, `{"status": "OK", "message": "successful tested and added poller"}`)
 	return
-}
-
-func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handlerAddPoller")
-
-	// parse the form
-	req.ParseForm()
-
-	// convert checkbox value
-	checkboxEnabled := false
-	if req.FormValue("enabled") == "on" {
-		checkboxEnabled = true
-	}
-
-	if err := poller.TestConnection(common.Poller{
-		VcenterHost:       req.FormValue("host"),
-		Username:          req.FormValue("user"),
-		PlainTextPassword: req.FormValue("pass"),
-	}); err != nil {
-		log.Errorf("could not connect to vCenter: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, fmt.Sprintf("Could not connect to vCenter: %s", err))
-		return
-	}
-
-	if err := backend.InsertPoller(common.Poller{
-		VcenterHost:       req.FormValue("host"),
-		VcenterName:       req.FormValue("short_name"),
-		Username:          req.FormValue("user"),
-		PlainTextPassword: req.FormValue("pass"),
-		Enabled:           checkboxEnabled,
-		Internal:          true,
-	}); err != nil {
-		log.Errorf("could not add poller: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, fmt.Sprintf("Could not add poller: %s", err))
-		return
-	}
-
-	fmt.Fprint(w, "Successfuly tested and added connection")
 }
 
 func handlerDeletePoller(w http.ResponseWriter, req *http.Request) {

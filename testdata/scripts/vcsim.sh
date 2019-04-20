@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+docker rm -f vsummary-vcsim | 2>/dev/null || true
 docker run -d --name vsummary-vcsim \
   -p 8989:8989 \
   -v $(pwd)/testdata/tls/:/data/tls \
