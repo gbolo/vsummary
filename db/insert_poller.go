@@ -15,7 +15,7 @@ const (
 		vcenter_name,
 		enabled,
 		user_name,
-		password,
+		encrypted_password,
 		interval_min,
 		internal
 		)
@@ -25,7 +25,7 @@ const (
 		:vcenter_name,
 		:enabled,
 		:user_name,
-		:password,
+		:encrypted_password,
 		:interval_min,
 		:internal
 		)
@@ -33,7 +33,7 @@ const (
 		vcenter_name=VALUES(vcenter_name),
 		enabled=VALUES(enabled),
 		user_name=VALUES(user_name),
-		password=VALUES(password),
+		encrypted_password=VALUES(encrypted_password),
 		interval_min=VALUES(interval_min),
 		internal=VALUES(internal);`
 
@@ -52,14 +52,13 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 	}
 
 	// attempt to encrypt the provided password before storing to database
-	log.Debug("encrypting password before database insert/update")
-	encryptedPassword, err := crypto.Encrypt(poller.Password)
-
-	if err != nil {
-		return
+	if poller.EncryptedPassword == "" && poller.PlainTextPassword != "" {
+		log.Debug("encrypting password before database insert/update")
+		poller.EncryptedPassword, err = crypto.Encrypt(poller.PlainTextPassword)
+		if err != nil {
+			return
+		}
 	}
-
-	poller.Password = encryptedPassword
 
 	// Create an Id
 	poller.Id = common.ComputeId(poller.VcenterHost)

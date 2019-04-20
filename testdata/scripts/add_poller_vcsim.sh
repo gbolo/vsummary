@@ -11,7 +11,7 @@ generate_post_poller(){
   "vcenter_host": "${VCSIM_HOST}",
   "vcenter_name": "vcsim",
   "user_name": "${VCSIM_USER}",
-  "password": "${VCSIM_USER}",
+  "plain_password": "${VCSIM_PASS}",
   "enabled": true,
   "interval_min": 60,
   "internal": true

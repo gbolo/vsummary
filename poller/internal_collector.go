@@ -30,18 +30,18 @@ func (i *InternalCollector) addIfUnique(p InternalPoller) {
 	uniquePoller := true
 	for k, a := range i.ActivePollers {
 		// TODO: instead of host, we should use vcenter UUID to determine if it's truly unique
-		if a.Config.URL == p.Config.URL {
+		if a.Config.VcenterURL == p.Config.VcenterURL {
 			uniquePoller = false
 			spawnPoller = false
 			// stop the poller if it marked as disabled
 			if p.Enabled == false && a.Poller.Enabled {
-				log.Infof("poller state has changed to disabled for %s", a.Config.URL)
+				log.Infof("poller state has changed to disabled for %s", a.Config.VcenterURL)
 				i.ActivePollers[k].Enabled = false
 				i.ActivePollers[k].StopPolling()
 			}
 			// spawn a new poller since it was disabled
 			if p.Enabled && a.Enabled == false {
-				log.Infof("poller state has changed to enabled for %s", a.Config.URL)
+				log.Infof("poller state has changed to enabled for %s", a.Config.VcenterURL)
 				i.ActivePollers[k].Enabled = true
 				spawnPoller = true
 			}
@@ -51,9 +51,9 @@ func (i *InternalCollector) addIfUnique(p InternalPoller) {
 
 	if spawnPoller {
 		if uniquePoller {
-			log.Infof("spawning new poller for %s", p.Config.URL)
+			log.Infof("spawning new poller for %s", p.Config.VcenterURL)
 		} else {
-			log.Infof("respawning poller for %s", p.Config.URL)
+			log.Infof("respawning poller for %s", p.Config.VcenterURL)
 		}
 		i.ActivePollers = append(i.ActivePollers, &p)
 		// spawn a go routine for this poller
@@ -88,7 +88,7 @@ func (i *InternalCollector) RefreshPollers() {
 // GetActivePollerURLs returns a list of active pollers by URL
 func (i *InternalCollector) GetActivePollerURLs() (urls []string) {
 	for _, p := range i.ActivePollers {
-		urls = append(urls, p.Config.URL)
+		urls = append(urls, p.Config.VcenterURL)
 	}
 	return
 }
@@ -97,7 +97,7 @@ func (i *InternalCollector) GetActivePollerURLs() (urls []string) {
 func (i *InternalCollector) StopPollersByURL(urls []string) {
 	for _, url := range urls {
 		for _, p := range i.ActivePollers {
-			if p.Config.URL == url && p.Enabled {
+			if p.Config.VcenterURL == url && p.Enabled {
 				log.Warningf("poller URL is active in memory but no longer listed in backend: %v", url)
 				p.StopPolling()
 			}

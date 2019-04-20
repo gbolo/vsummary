@@ -123,11 +123,10 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 		checkboxEnabled = true
 	}
 
-	if err := poller.TestConnection(poller.PollerConfig{
-		URL:      req.FormValue("host"),
-		UserName: req.FormValue("user"),
-		Password: req.FormValue("pass"),
-		Insecure: true,
+	if err := poller.TestConnection(common.Poller{
+		VcenterHost:       req.FormValue("host"),
+		Username:          req.FormValue("user"),
+		PlainTextPassword: req.FormValue("pass"),
 	}); err != nil {
 		log.Errorf("could not connect to vCenter: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -136,12 +135,12 @@ func handlerAddPoller(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := backend.InsertPoller(common.Poller{
-		VcenterHost: req.FormValue("host"),
-		VcenterName: req.FormValue("short_name"),
-		Username:    req.FormValue("user"),
-		Password:    req.FormValue("pass"),
-		Enabled:     checkboxEnabled,
-		Internal:    true,
+		VcenterHost:       req.FormValue("host"),
+		VcenterName:       req.FormValue("short_name"),
+		Username:          req.FormValue("user"),
+		PlainTextPassword: req.FormValue("pass"),
+		Enabled:           checkboxEnabled,
+		Internal:          true,
 	}); err != nil {
 		log.Errorf("could not add poller: %s", err)
 		w.WriteHeader(http.StatusBadRequest)

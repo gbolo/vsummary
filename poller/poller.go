@@ -43,7 +43,7 @@ type Poller struct {
 	Name         string
 	Enabled      bool
 	VmwareClient *govmomi.Client
-	Config       *PollerConfig
+	Config       *common.Poller
 }
 
 // pollResults stores the results of a full poll
@@ -78,24 +78,16 @@ func NewPoller(c common.Poller) (p *Poller) {
 
 // Configure allows you to configure a Poller based from a common.Poller
 func (p *Poller) Configure(c common.Poller) {
-	var decryptedPassword string
-	if c.PlainTextPassword != "" {
-		decryptedPassword = c.PlainTextPassword
-	} else {
-		var err error
-		decryptedPassword, err = crypto.Decrypt(c.Password)
+	if c.PlainTextPassword == "" {
+		decryptedPassword, err := crypto.Decrypt(c.EncryptedPassword)
 		if err != nil {
 			log.Warningf("failed to decrypt password for: %s", c.VcenterHost)
 			return
 		}
+		c.PlainTextPassword = decryptedPassword
 	}
-	p.Config = &PollerConfig{
-		URL:         fmt.Sprintf("https://%s/sdk", c.VcenterHost),
-		UserName:    c.Username,
-		Password:    decryptedPassword,
-		IntervalMin: c.IntervalMin,
-		Insecure:    true,
-	}
+	p.Config = &c
+	p.Config.VcenterURL = fmt.Sprintf("https://%s/sdk", c.VcenterHost)
 	p.Name = c.VcenterName
 	p.Enabled = c.Enabled
 }
@@ -103,19 +95,17 @@ func (p *Poller) Configure(c common.Poller) {
 // Connect establishes a connection to the vmware endpoint
 func (p *Poller) Connect(ctx *context.Context) (err error) {
 
-	if p.Config.URL == "" {
-		err = errors.New("vsphere URL cannot be empty")
+	if p.Config.VcenterURL == "" {
+		err = errors.New("vCenter URL cannot be empty")
 		return
 	}
 
-	vUrl, err := soap.ParseURL(p.Config.URL)
+	vUrl, err := soap.ParseURL(p.Config.VcenterURL)
 	if err != nil {
 		return
 	}
-
-	vUrl.User = url.UserPassword(p.Config.UserName, p.Config.Password)
-
-	p.VmwareClient, err = govmomi.NewClient(*ctx, vUrl, p.Config.Insecure)
+	vUrl.User = url.UserPassword(p.Config.Username, p.Config.PlainTextPassword)
+	p.VmwareClient, err = govmomi.NewClient(*ctx, vUrl, true)
 	return
 
 }
@@ -129,7 +119,7 @@ func (p *Poller) GetPollResults() (r pollResults, errors []error) {
 
 	err := p.Connect(&ctx)
 	if err != nil {
-		log.Errorf("failed to connect to: %s %s ", p.Config.URL, err)
+		log.Errorf("failed to connect to: %s %s ", p.Config.VcenterURL, err)
 		appendIfError(&errors, err)
 		return
 	}
@@ -167,16 +157,15 @@ func (p *Poller) GetPollResults() (r pollResults, errors []error) {
 }
 
 // TestConnection will test if we can successfully log into the provided vcenter server
-func TestConnection(p PollerConfig) (err error) {
-	poller := NewEmptyPoller()
-	poller.Config = &p
+func TestConnection(p common.Poller) (err error) {
+	poller := NewPoller(p)
 
 	// create context and connect to vsphere
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	if err = poller.Connect(&ctx); err != nil {
-		log.Errorf("failed to connect to: %s %s ", poller.Config.URL, err)
+		log.Errorf("failed to connect to: %s %s ", poller.Config.VcenterURL, err)
 		return
 	}
 	return
