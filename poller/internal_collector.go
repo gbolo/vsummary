@@ -7,6 +7,9 @@ import (
 	"github.com/gbolo/vsummary/db"
 )
 
+// BuiltInCollector is a package-wide instance of InternalCollector
+var BuiltInCollector InternalCollector
+
 // internal poller that contains a list of pollers as well as a backend db
 type InternalCollector struct {
 	ActivePollers []*InternalPoller
@@ -129,15 +132,17 @@ func (i *InternalCollector) Run() {
 	for {
 		select {
 		case <-tick:
-			log.Debug("refreshing pollers from backend")
 			i.RefreshPollers()
 		}
 	}
 }
 
-//// findPollerById returns a matching internal poller
-//func (i *InternalCollector) findPollerById(id string) (foundPoller *InternalPoller) {
-//	for _, p := range i.ActivePollers {
-//		//
-//	}
-//}
+// PollPollerById executes a poll to a matching internal poller by id
+func (i *InternalCollector) PollPollerById(id string) (errs []error) {
+	for _, p := range i.ActivePollers {
+		if p.Config.Id == id {
+			errs = p.PollThenStore()
+		}
+	}
+	return
+}

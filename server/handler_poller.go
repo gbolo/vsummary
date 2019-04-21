@@ -136,7 +136,7 @@ func handlerDeletePoller(w http.ResponseWriter, req *http.Request) {
 	// log time on debug
 	defer common.ExecutionTime(time.Now(), "handlerDeletePoller")
 
-	// get vars from request to determine environment
+	// get vars from request to determine poller id
 	vars := mux.Vars(req)
 	pollerID := vars["id"]
 
@@ -156,4 +156,29 @@ func handlerDeletePoller(w http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Fprint(w, "Successfuly removed poller")
+}
+
+func handlerPollNow(w http.ResponseWriter, req *http.Request) {
+	// log time on debug
+	defer common.ExecutionTime(time.Now(), "handlerPollNow")
+
+	// get vars from request to determine poller id
+	vars := mux.Vars(req)
+	pollerID := vars["id"]
+
+	// validate poller id
+	// TODO: we should be able to return 404 if it doesn't exist
+	if len(pollerID) != 12 {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "poller ID is not correctly specified")
+		return
+	}
+
+	// poll the poller now
+	errs := poller.BuiltInCollector.PollPollerById(pollerID)
+	if len(errs) > 0 {
+		log.Errorf("PollPollerById produced errors for poller: %s", pollerID)
+	}
+
+	fmt.Fprint(w, "OK")
 }
