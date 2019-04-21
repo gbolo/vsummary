@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/crypto"
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/vim25/soap"
 )
@@ -25,17 +27,6 @@ const (
 func init() {
 	// seed the random package with current time with nano-second precision
 	rand.Seed(time.Now().UTC().UnixNano())
-}
-
-// PollerConfig holds all necessary information a poller needs to poll
-type PollerConfig struct {
-	URL         string
-	UserName    string
-	Password    string
-	IntervalMin int
-
-	// Don't validate TLS Cert
-	Insecure bool
 }
 
 // Poller can poll a single endpoint
@@ -95,6 +86,7 @@ func (p *Poller) Configure(c common.Poller) {
 // Connect establishes a connection to the vmware endpoint
 func (p *Poller) Connect(ctx *context.Context) (err error) {
 
+	// construct vCenter URL
 	if p.Config.VcenterURL == "" {
 		err = errors.New("vCenter URL cannot be empty")
 		return
@@ -105,9 +97,27 @@ func (p *Poller) Connect(ctx *context.Context) (err error) {
 		return
 	}
 	vUrl.User = url.UserPassword(p.Config.Username, p.Config.PlainTextPassword)
-	p.VmwareClient, err = govmomi.NewClient(*ctx, vUrl, true)
-	return
 
+	// configure default vmware client
+	p.VmwareClient, err = govmomi.NewClient(*ctx, vUrl, true)
+	if err != nil {
+		log.Errorf("error setting vmware client: %v", err)
+		return
+	}
+
+	// load any defined CAs
+	caFiles := viper.GetString("poller.vcenter_cafile")
+	if caFiles != "" {
+		errLoadingCAs := p.VmwareClient.SetRootCAs(caFiles)
+		if errLoadingCAs != nil {
+			log.Errorf("error loading custom CA(s): %v", errLoadingCAs)
+		} else {
+			// since we were able to load CA(s), we should now enforce it
+			log.Infof("loaded additional CA file(s) to validate vCenter URL(s): %v", caFiles)
+			p.VmwareClient.Client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = false
+		}
+	}
+	return
 }
 
 // GetPollResults will return pollResults along with all errors encountered during the polling
@@ -117,6 +127,7 @@ func (p *Poller) GetPollResults() (r pollResults, errors []error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// connect
 	err := p.Connect(&ctx)
 	if err != nil {
 		log.Errorf("failed to connect to: %s %s ", p.Config.VcenterURL, err)
