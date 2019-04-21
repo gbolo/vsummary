@@ -86,10 +86,12 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 		log.Errorf("failed to commit transaction to database: %s", err)
 	}
 
-	log.Debugf("total combined affected rows: %d", rowsAffected)
+	// update poll date if it's an external poller
+	if !poller.Internal && rowsAffected > 0 {
+		err = b.UpdateLastPollDate(poller)
+	}
 
 	return
-
 }
 
 func (b *Backend) UpdateLastPollDate(poller common.Poller) (err error) {
