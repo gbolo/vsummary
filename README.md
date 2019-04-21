@@ -128,7 +128,7 @@ To deploy the `vsummary-server` run the following:
 docker run -d --name vsummary-server \
   -p 8080:8080 \
   -e VSUMMARY_BACKEND_DB_DSN="<CHANGE_ME>" \
-  gbolo/vsummary:1.0
+  gbolo/vsummary:latest
 ```
 
 then open your browser to port `8080` on the deployed machine.

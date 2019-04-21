@@ -7,7 +7,7 @@ POLLERPKG   = $(REPO)/cmd/vsummary-poller
 METAPKG     = $(REPO)/common
 INTTESTPKG  = $(REPO)/integrationtest
 DATE       ?= $(shell date +%FT%T%z)
-VERSION     = 1.0
+VERSION     = 1.1
 COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
 LDFLAGS     = -X $(METAPKG).Version=$(VERSION) -X $(METAPKG).BuildDate=$(DATE) -X $(METAPKG).CommitSHA=$(COMMIT_SHA)
 PKGS        = $(shell $(GO) list ./... | grep -v $(INTTESTPKG))
