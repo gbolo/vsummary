@@ -2,12 +2,15 @@ package poller
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -34,6 +37,35 @@ func init() {
 	}
 }
 
+// setClientTrustStore will append the specified CA cert(s) with the system truststore
+// into the vSummaryClient tls truststore
+func setClientTrustStore(caFilePath string) (err error) {
+	clientTLSConfig := &tls.Config{}
+	// start with the system trust store (not an empty one)
+	clientTLSConfig.RootCAs, err = x509.SystemCertPool()
+	if err != nil {
+		return
+	}
+
+	// attempt to load the specified CA file
+	if caFilePath != "" {
+		var certBytes []byte
+		certBytes, err = ioutil.ReadFile(caFilePath)
+		if err != nil {
+			return
+		}
+		if !clientTLSConfig.RootCAs.AppendCertsFromPEM(certBytes) {
+			err = fmt.Errorf("failed to load CA certificate(s): %s", caFilePath)
+			return
+		}
+		log.Infof("loaded additional CA file to validate vsummary-server endpoint: %v", caFilePath)
+	}
+
+	// replace the client truststore with this one
+	vSummaryClient.Transport.(*http.Transport).TLSClientConfig = clientTLSConfig
+	return
+}
+
 // ExternalPoller extends Poller with functionality relevant to
 // sending results to a vSummary API server over http(s).
 type ExternalPoller struct {
@@ -56,6 +88,10 @@ func NewExternalPoller(c common.Poller) (e *ExternalPoller) {
 		Internal:    false,
 		IntervalMin: c.IntervalMin,
 		Enabled:     true,
+	}
+	err := setClientTrustStore(viper.GetString("poller.api_cafile"))
+	if err != nil {
+		log.Warningf("there were errors setting up client TLS truststore: %v", err)
 	}
 	return
 }
@@ -151,16 +187,26 @@ func (e *ExternalPoller) PollThenSend() (errs []error) {
 			len(errs),
 			e.Config.VcenterURL,
 		)
+		for _, err := range errs {
+			if strings.Contains(err.Error(), "certificate signed by unknown authority") {
+				log.Errorf(
+					"vcenter endpoint (%s) is not trusted. Ensure you set the correct TLS CA cert(s)",
+					e.Config.VcenterURL,
+				)
+				break
+			}
+		}
+		log.Debugf("polling errors: %v", errs)
 		return
 	}
 	errs = e.SendPollResults(r)
 	if len(errs) > 0 {
 		log.Warningf(
-			"there were %d errors during sending polling results of: %s",
+			"there were %d error(s) posting polling results to the vsummary-server API endpoint: %s",
 			len(errs),
-			e.Config.VcenterURL,
+			e.vSummaryApiUrl,
 		)
-		log.Debugf("polling errors: %v", errs)
+		log.Debugf("API post errors: %v", errs)
 	}
 	return
 }

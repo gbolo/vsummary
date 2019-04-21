@@ -1,6 +1,7 @@
 package poller
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -69,6 +70,16 @@ func (i *InternalPoller) PollThenStore() (errs []error) {
 			len(errs),
 			i.Config.VcenterURL,
 		)
+		for _, err := range errs {
+			if strings.Contains(err.Error(), "certificate signed by unknown authority") {
+				log.Errorf(
+					"vcenter endpoint (%s) is not trusted. Ensure you set the correct TLS CA cert(s)",
+					i.Config.VcenterURL,
+				)
+				break
+			}
+		}
+		log.Debugf("polling errors: %v", errs)
 		return
 	}
 	errs = i.StorePollResults(r)

@@ -53,10 +53,10 @@ poller:
   # interval in minutes on how often we should poll
   interval: 60
 
-  # HTTP client options for connection to vsummary server
-  client:
-
-    # proxy host
+  # CA pem-encoded file (can contain more than one CA certificate)
+  # This will be loaded into vmware client to validate vCenter certificate(s)
+  # !! if specified, validation of vCenter TLS certficate is enforced !!
+  vcenter_cafile: ""
 
 
 # misc settings --------------------------------------------------------------------------------------------------------

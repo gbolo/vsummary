@@ -106,3 +106,39 @@ func TestInternalPoller(t *testing.T) {
 		t.Errorf("error(s) with PollThenStore: %v", errs)
 	}
 }
+
+func TestValidateVcenterCertficate(t *testing.T) {
+	// specify the correct CA file
+	os.Setenv("VSUMMARY_POLLER_VCENTER_CAFILE", "../testdata/tls/ca_root.pem")
+	// create external poller
+	externalpoller := poller.NewExternalPoller(common.Poller{
+		VcenterHost:       TestVcenterHost,
+		VcenterName:       TestVcenterName,
+		Username:          TestVcenterUsername,
+		PlainTextPassword: TestVcenterPassword,
+		IntervalMin:       10,
+		Enabled:           true,
+	})
+
+	_, errs := externalpoller.GetPollResults()
+	if len(errs) > 0 {
+		t.Errorf("expected no errors but recieved: %v", errs)
+	}
+
+	// specify the incorrect CA file
+	os.Setenv("VSUMMARY_POLLER_VCENTER_CAFILE", "../testdata/tls/bad_root_ca.pem")
+	// create external poller
+	externalpoller = poller.NewExternalPoller(common.Poller{
+		VcenterHost:       TestVcenterHost,
+		VcenterName:       TestVcenterName,
+		Username:          TestVcenterUsername,
+		PlainTextPassword: TestVcenterPassword,
+		IntervalMin:       10,
+		Enabled:           true,
+	})
+
+	_, errs = externalpoller.GetPollResults()
+	if len(errs) == 0 {
+		t.Error("expected TLS errors but recieved none")
+	}
+}

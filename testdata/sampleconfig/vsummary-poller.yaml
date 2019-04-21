@@ -9,12 +9,17 @@ poller:
   # interval in minutes on how often we should poll
   interval: 60
 
-  # HTTP client options for connection to vsummary server
-  client:
+  # CA pem-encoded file (can contain more than one CA certificate)
+  # This will be loaded into vmware client to validate vCenter certificate(s)
+  # !! if specified, validation of vCenter TLS certficate is enforced !!
+  vcenter_cafile: ""
 
-    # for TLS when using internal PKI
-    ca_file: /path/to/cas.pem
+  # CA pem-encoded file (can contain more than one CA certificate)
+  # the http client will append this to the system trust store
+  # in order to validate the vsummary-server certificate
+  api_cafile: ""
 
+  # list of vcenter(s) to poll when using "daemonize" option
   vcenters:
 
     - hostname: 127.0.0.1:8989
