@@ -45,6 +45,7 @@
                         <tr>
                             <td>
                                 {{ if .Internal }}
+                                <button type="button" class="btn btn-sm btn-info" onclick="pollNow('{{ .Id }}')">Poll Now</button>
                                 <button type="button" class="btn btn-sm btn-primary" onclick="editPoller('{{ .Id }}')">Edit</button>
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removePoller('{{ .Id }}')">Remove</button>
                                 {{ else }}
@@ -118,6 +119,16 @@
         function removePoller(id) {
             $("#pollerModal").find(".modal-content").load("/ui/form/removepoller/"+id);
             $("#pollerModal").modal() ;
+        }
+
+        function pollNow(id) {
+            $.ajax({
+                type: "POST",
+                url: "{{ .AjaxEndpoint }}/" + id + "/pollnow",
+                success: function(msg){
+                    location.reload();
+                }
+            });
         }
     </script>
 

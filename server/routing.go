@@ -101,6 +101,12 @@ var routes = Routes{
 		common.EndpointPoller + "/{id}",
 		handlerDeletePoller,
 	},
+	Route{
+		"PollNow",
+		"POST",
+		common.EndpointPoller + "/{id}/pollnow",
+		handlerPollNow,
+	},
 
 	// vSummary UI endpoints
 	Route{

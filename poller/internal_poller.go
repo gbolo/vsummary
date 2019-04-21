@@ -1,7 +1,6 @@
 package poller
 
 import (
-	"net/url"
 	"time"
 
 	"github.com/gbolo/vsummary/common"
@@ -83,15 +82,10 @@ func (i *InternalPoller) PollThenStore() (errs []error) {
 	}
 
 	// update last successful poll date
-	u, err := url.ParseRequestURI(i.Config.VcenterURL)
-	if err == nil {
-		i.backend.UpdateLastPollDate(common.Poller{
-			VcenterHost: u.Hostname(),
-		})
-	} else {
-		log.Errorf("could not UpdateLastPollDate due to url parse error: %s", err)
+	updateErr := i.backend.UpdateLastPollDate(*i.Config)
+	if updateErr != nil {
+		log.Errorf("UpdateLastPollDate failed: %v", updateErr)
 	}
-
 	return
 }
 

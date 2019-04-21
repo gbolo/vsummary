@@ -51,8 +51,7 @@ func main() {
 	// start vsummary server
 	go server.Start()
 
-	// start internalCollector
-	i := poller.NewEmptyInternalCollector()
-	i.SetBackend(*b)
-	i.Run()
+	// configure and start built-in internalCollector
+	poller.BuiltInCollector.SetBackend(*b)
+	poller.BuiltInCollector.Run()
 }
