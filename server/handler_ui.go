@@ -43,17 +43,6 @@ func handlerUiEsxi(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
-func handlerUiPortgroup(w http.ResponseWriter, req *http.Request) {
-
-	// log time on debug
-	defer common.ExecutionTime(time.Now(), "handlerUiPortgroup")
-
-	// output the page
-	writeSummaryPage(w, &portgroupView)
-
-	return
-}
-
 func handlerUiDatastore(w http.ResponseWriter, req *http.Request) {
 
 	// log time on debug

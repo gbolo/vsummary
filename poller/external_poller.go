@@ -165,9 +165,8 @@ func (e *ExternalPoller) SendPollResults(r pollResults) (err []error) {
 	appendIfError(&err, e.sendResult(common.EndpointESXi, r.Esxi))
 	appendIfError(&err, e.sendResult(common.EndpointDatastore, r.Datastore))
 	appendIfError(&err, e.sendResult(common.EndpointVirtualMachine, r.Virtualmachine))
-	appendIfError(&err, e.sendResult(common.EndpointVSwitch, r.VSwitch))
-	appendIfError(&err, e.sendResult(common.EndpointVSwitch, r.Dvs))
-	// need to insert portgroups here...
+	appendIfError(&err, e.sendResult(common.EndpointVSwitch, append(r.VSwitch, r.Dvs...)))
+	appendIfError(&err, e.sendResult(common.EndpointPortGroup, append(r.StdPortgroup, r.DvsPortGroup...)))
 	appendIfError(&err, e.sendResult(common.EndpointVNIC, r.Vnic))
 	appendIfError(&err, e.sendResult(common.EndpointVDisk, r.VDisk))
 	appendIfError(&err, e.sendResult(common.EndpointResourcepool, r.ResourcePool))
