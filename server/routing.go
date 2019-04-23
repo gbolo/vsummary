@@ -72,6 +72,12 @@ var routes = Routes{
 		handlerVNics,
 	},
 	Route{
+		"Portgroups",
+		"POST",
+		common.EndpointPortGroup,
+		handlerPortgroups,
+	},
+	Route{
 		"Folders",
 		"POST",
 		common.EndpointFolder,

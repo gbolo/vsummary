@@ -98,23 +98,6 @@ var esxiView = UiView{
 	},
 }
 
-var portgroupView = UiView{
-	Title:        "PortGroup",
-	AjaxEndpoint: "/api/dt/portgroups",
-	TableHeaders: []tableColumnMap{
-		{"name", "Name"},
-		{"type", "Type"},
-		{"vlan", "Vlan"},
-		{"vlan_type", "VlanType"},
-		{"vswitch_name", "vSwitch"},
-		{"vswitch_type", "vSwitchType"},
-		{"vswitch_max_mtu", "vSwitchMTU"},
-		{"vnics", "vNics"},
-		{"vcenter_fqdn", "vCenter"},
-		{"vcenter_short_name", "VC-ENV"},
-	},
-}
-
 var datastoreView = UiView{
 	Title:        "Datastore",
 	AjaxEndpoint: "/api/dt/datastores",

@@ -73,10 +73,6 @@ func handlerDtEsxi(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, string(b))
 }
 
-func handlerDtPortgroup(w http.ResponseWriter, req *http.Request) {
-	handlerDatatables(w, req, "view_portgroup")
-}
-
 func handlerDtDatastore(w http.ResponseWriter, req *http.Request) {
 	dtResponse, err := getDatatablesResponse(req, "view_datastore")
 	if err != nil {
