@@ -28,10 +28,10 @@ $dc_pre_name = array(
 	"Johannesburg"
 );
 
-$api_endpoint = 'http://localhost/api/update.php';
+$api_endpoint = 'http://172.16.0.1:8080/api/v2';
 $vc_id = 'TEST'.md5(mt_rand());
 $vc_type = strtolower( $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)] );
-$vc_fqdn = 'vca.'.$vc_type.'.sample.tld';
+$vc_fqdn = 'vca.'.strtolower( substr( $vc_type, 0, 3 ) ).'.demo.linuxctl.com';
 
 $vm_pre_name = array(
 	"nginx",
@@ -127,12 +127,12 @@ $folder_L2 = array(
 	"misc"
 );
 
-function vsummary_api_call($data){
+function vsummary_api_call($data, $context){
 
     global $api_endpoint;
 	$data_string = json_encode($data);
 
-	$ch = curl_init($api_endpoint);
+	$ch = curl_init($api_endpoint."/".$context);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -146,7 +146,7 @@ function vsummary_api_call($data){
 	// Check if any error occurred
 	if (!curl_errno($ch)) {
 	  	$info = curl_getinfo($ch);
-	  	$status = ($info['http_code'] == 200 ? 'SUCCESS' : 'FAILED');
+	  	$status = ($info['http_code'] == 202 ? 'SUCCESS' : 'FAILED');
 	  	$result = $status . '! RESPONSE: ' . $info['http_code'] . ' TIME: ' . $info['total_time'] . "s\n";
 	  	return $result;
 	} else {
@@ -175,7 +175,6 @@ function gen_datacenter($num){
 	        "vcenter_id":  "'.$vc_id.'",
 	        "name":  "'.$name.'",
 	        "esxi_folder_moref":  "group-h'.$i.'",
-	        "objecttype":  "DC",
 	        "vm_folder_moref":  "group-v'.$i.'",
 	        "moref":  "datacenter-'.$i.'"
 	    }';
@@ -197,7 +196,6 @@ function gen_folder($dc){
     {
         "vcenter_id":  "'.$vc_id.'",
         "name":  "vm",
-        "objecttype":  "FOLDER",
         "parent_moref":  "'.$dc['moref'].'",
         "type":  "Folder VirtualMachine VirtualApp",
         "moref":  "'.$dc['vm_folder_moref'].'"
@@ -210,7 +208,6 @@ function gen_folder($dc){
 	    {
 	        "vcenter_id":  "'.$vc_id.'",
 	        "name":  "'.$name.'",
-	        "objecttype":  "FOLDER",
 	        "parent_moref":  "'.$dc['vm_folder_moref'].'",
 	        "type":  "Folder VirtualMachine VirtualApp",
 	        "moref":  "group-v'.$i.'"
@@ -226,7 +223,6 @@ function gen_folder($dc){
 	    {
 	        "vcenter_id":  "'.$vc_id.'",
 	        "name":  "'.$name.'",
-	        "objecttype":  "FOLDER",
 	        "parent_moref":  "'.$folder['moref'].'",
 	        "type":  "Folder VirtualMachine VirtualApp",
 	        "moref":  "group-v'.$i.'"
@@ -242,6 +238,8 @@ function gen_folder($dc){
 function gen_cluster($num, $dc){
 
 	global $vc_id;
+	global $vc_type;
+	global $esxi_hosts_per_cluster;
 
 	for ($i = 1; $i <= $num; $i++) {
 
@@ -252,16 +250,15 @@ function gen_cluster($num, $dc){
 	        "total_cpu_mhz":  10784,
 	        "moref":  "domain-c'.$i.'",
 	        "drs_enabled":  "True",
-	        "name":  "CLUSTER-'.$i.'",
+	        "name":  "'.strtoupper( substr( $vc_type, 0, 3 ) ).'-CL'.$i.'",
 	        "total_vmotions":  '.rand(50, 5000).',
 	        "total_memory_bytes":  17178796032,
 	        "status":  "green",
-	        "num_hosts":  2,
+	        "num_hosts":  '.$esxi_hosts_per_cluster.',
 	        "datacenter_moref":  "'.$dc['esxi_folder_moref'].'",
 	        "current_balance":  '.rand(10, 180).',
-	        "drs_behaviour":  2,
+	        "drs_behaviour":  "2",
 	        "total_cpu_threads":  4,
-	        "objecttype":  "CLUSTER",
 	        "vcenter_id":  "'.$vc_id.'"
 	    }';
 		$arr[] = json_decode($json, true);
@@ -283,14 +280,13 @@ function gen_resourcepool($num, $cl){
 	    {
 	        "mem_reservation":  0,
 	        "vapp_state":  "n/a",
-	        "objecttype":  "RES",
 	        "cpu_limit":  -1,
 	        "mem_limit":  -1,
 	        "moref":  "resgroup-'.$i.'",
 	        "parent_moref":  "resgroup-1",
 	        "name":  "'.$name.'",
 	        "type":  "ResourcePool",
-	        "status":  1,
+	        "status":  "green",
 	        "cluster_moref":  "'.$cl['moref'].'",
 	        "vcenter_id":  "'.$i.'",
 	        "configured_memory_mb":  2048,
@@ -313,19 +309,18 @@ function gen_esxi($num, $cl){
 		{
 		    "max_evc":  "intel-sandybridge",
 		    "cpu_threads":  12,
-		    "name":  "esxi-'.$i.'.'.$vc_type.'.linuxctl.com",
+		    "name":  "esxi'.$i.'.'.strtolower( substr( $vc_type, 0, 3 ) ).'.demo.linuxctl.com",
 		    "vendor":  "Supermicro",
 		    "stat_memory_usage":  29971,
 		    "version":  "6.0.0",
 		    "model":  "X9SRA/X9SRA-3",
 		    "vcenter_id":  "'.$vc_id.'",
-		    "objecttype":  "ESXI",
 		    "build":  "3073146",
 		    "cpu_sockets":  1,
 		    "current_evc":  "intel-sandybridge",
 		    "cpu_model":  "Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz",
 		    "nics":  4,
-		    "power_state":  1,
+		    "power_state":  "poweredOn",
 		    "in_maintenance_mode":  "false",
 		    "cpu_mhz":  1999,
 		    "hbas":  3,
@@ -354,7 +349,7 @@ function gen_dvs($num){
 	    {
 	        "version":  "6.0.0",
 	        "name":  "DVS-'.$vc_type.'-'.$i.'",
-	        "objecttype":  "DVS",
+					"type": "DVS",
 	        "max_mtu":  1500,
 	        "vcenter_id":  "'.$vc_id.'",
 	        "ports":  '.rand(64, 2048).',
@@ -374,7 +369,6 @@ function gen_ds($num){
 		{
 		    "moref":  "datastore-'.rand(1, 1000).'",
 		    "type":  "VMFS",
-		    "objecttype":  "DS",
 		    "vcenter_id":  "'.$vc_id.'",
 		    "capacity_bytes":  999922073600,
 		    "name":  "DS'.$i.'-1TB",
@@ -397,13 +391,13 @@ function gen_pg($num, $dvs){
         {
 	        "moref":  "dvportgroup-'.$i.'",
 	        "vlan_type":  "VmwareDistributedVirtualSwitchVlanIdSpec",
-	        "vlan":  '.rand(5,4000).',
+	        "vlan":  "'.rand(5,4000).'",
 	        "vlan_end":  "na",
-	        "objecttype":  "DVSPG",
 	        "vlan_start":  "na",
+					"type": "DVS",
 	        "name":  "'.$name.'",
 	        "vcenter_id":  "'.$dvs['vcenter_id'].'",
-	        "dvs_moref":  "'.$dvs['moref'].'"
+	        "vswitch_moref":  "'.$dvs['moref'].'"
 	    }';
 		$arr[] = json_decode($json, true);
 	}
@@ -421,6 +415,7 @@ function gen_vm($num, $esxi){
 		$name = $vm_pre_name[mt_rand(0, count($vm_pre_name) - 1)].'-'.rand(1, 9);
 		$ram = 1024 * rand(1, 16);
 		$power_state = rand(0, 1);
+		$power_state_string = "poweredOn";
 		$guest = $guest_os[array_rand($guest_os)];
 	 	$date = new DateTime(date('Y-m-d', strtotime('-'.rand(1, 365).' days')));
 	 	$folder = $fd_total[mt_rand(0, count($fd_total) - 1)];
@@ -431,6 +426,7 @@ function gen_vm($num, $esxi){
 		if ($power_state == 1){
 			$vmtools = 'guestToolsRunning';
 		} else {
+			$power_state_string = "poweredOff";
 			$vmtools = 'guestToolsNotRunning';
 		}
 		$json = '
@@ -457,10 +453,9 @@ function gen_vm($num, $esxi){
 		        "stat_host_memory_usage":  '.rand(1, 1000).',
 		        "stat_guest_memory_usage":  '.rand(1, 300).',
 		        "stat_uptime_sec":  '.rand(10000, 31557600).',
-		        "power_state":  '.$power_state.',
+		        "power_state":  "'.$power_state_string.'",
 		        "esxi_moref":  "'.$esxi['moref'].'",
 		        "vcenter_id":  "'.$vc_id.'",
-		        "objecttype":  "VM",
 						"guest_os": "'.$guest.'"
 		    }';
 		$arr[] = json_decode($json, true);
@@ -486,7 +481,6 @@ function gen_vnic($vm){
 	        "portgroup_name":  "'.$pg['name'].'",
 	        "esxi_moref":  "'.$vm['esxi_moref'].'",
 	        "mac":  "'.gen_mac().'",
-	        "objecttype":  "VNIC",
 	        "vm_moref":  "'.$vm['moref'].'",
 	        "name":  "Network adapter '.$i.'",
 	        "type":  "VirtualVmxnet3",
@@ -494,7 +488,7 @@ function gen_vnic($vm){
 	        "status":  "'.$status.'",
 	        "vcenter_id":  "'.$vc_id.'",
 	        "portgroup_moref":  "'.$pg['moref'].'",
-	        "connected":  '.$connected.',
+	        "connected":  "'.$connected.'",
 	        "vswitch_name":  "SAMPLE"
 	    }';
 		$arr[] = json_decode($json, true);
@@ -513,8 +507,7 @@ function gen_vdisk($vm){
 	    {
 	        "path":  "['.$ds['name'].'] '.$vm['name'].'/'.$vm['name'].'.vmdk",
 	        "datastore_moref":  "'.$ds['moref'].'",
-	        "objecttype":  "VDISK",
-	        "thin_provisioned":  true,
+	        "thin_provisioned":  "true",
 	        "esxi_moref":  "'.$vm['esxi_moref'].'",
 	        "capacity_bytes":  '.rand(10000000000, 50000000000).',
 	        "name":  "Hard disk '.$i.'",
@@ -538,7 +531,6 @@ function gen_pnic($esxi){
 	        "vcenter_id":  "'.$vc_id.'",
 	        "name":  "vmnic'.$i.'",
 	        "esxi_moref":  "'.$esxi['moref'].'",
-	        "objecttype":  "PNIC",
 	        "mac":  "'.gen_mac().'",
 	        "link_speed":  10000,
 	        "driver":  "ixgbe"
@@ -557,6 +549,7 @@ function gen_pnic($esxi){
 $dc_total = gen_datacenter(1);
 
 $cl_total = [];
+$esxi_hosts_per_cluster = rand(2, 10);
 $fd_total = [];
 foreach ($dc_total as $dc){
 	$n = rand(1, 3);
@@ -570,8 +563,8 @@ foreach ($dc_total as $dc){
 $esxi_total = [];
 $rp_total = [];
 foreach ($cl_total as $cl){
-	$n = rand(2, 10);
-	$esxi = gen_esxi($n,$cl);
+	// $n = rand(2, 10);
+	$esxi = gen_esxi($esxi_hosts_per_cluster, $cl);
 	$esxi_total = array_merge($esxi_total, $esxi);
 
 	$n = rand(1, 3);
@@ -609,24 +602,23 @@ foreach ($vm_total as $vm){
 }
 
 $vcenter_arr = array(
-    "vc_uuid" => $vc_id,
-    "objecttype" =>  "VCENTER",
-    "vc_shortname" => strtoupper($vc_type),
-    "vc_fqdn" =>  $vc_fqdn
+    "id" => $vc_id,
+    "name" => strtoupper($vc_type),
+    "host" =>  $vc_fqdn
 );
 
 
 echo "POSTING RANDOM SAMPLE DATA FOR VSUMMARY API: $api_endpoint\n---\n";
-echo '[vcenter] ' . vsummary_api_call($vcenter_arr);
-echo '[datacenter] ' . vsummary_api_call($dc_total);
-echo '[cluster] ' . vsummary_api_call($cl_total);
-echo '[resourcepool] ' . vsummary_api_call($rp_total);
-echo '[esxi] ' . vsummary_api_call($esxi_total);
-echo '[dvs] ' . vsummary_api_call($dvs_total);
-echo '[datastore] ' . vsummary_api_call($ds_total);
-echo '[vm] ' . vsummary_api_call($vm_total);
-echo '[portgroup] ' . vsummary_api_call($pg_total);
-echo '[pnic] ' . vsummary_api_call($pnic_total);
-echo '[vnic] ' . vsummary_api_call($vnic_total);
-echo '[vdisk] ' . vsummary_api_call($vdisk_total);
-echo '[folder] ' . vsummary_api_call($fd_total);
+echo '[vcenter] ' . vsummary_api_call($vcenter_arr,"vcenter");
+echo '[datacenter] ' . vsummary_api_call($dc_total,"datacenter");
+echo '[cluster] ' . vsummary_api_call($cl_total,"cluster");
+echo '[resourcepool] ' . vsummary_api_call($rp_total,"resourcepool");
+echo '[esxi] ' . vsummary_api_call($esxi_total,"esxi");
+echo '[dvs] ' . vsummary_api_call($dvs_total,"vswitch");
+echo '[datastore] ' . vsummary_api_call($ds_total, "datastore");
+echo '[vm] ' . vsummary_api_call($vm_total, "virtualmachine");
+echo '[portgroup] ' . vsummary_api_call($pg_total, "portgroup");
+// echo '[pnic] ' . vsummary_api_call($pnic_total,"404");
+echo '[vnic] ' . vsummary_api_call($vnic_total,"vnic");
+echo '[vdisk] ' . vsummary_api_call($vdisk_total,"vdisk");
+echo '[folder] ' . vsummary_api_call($fd_total,"folder");
