@@ -23,7 +23,7 @@ var portgroupView = UiView{
 		{"vswitch_max_mtu", "vSwitchMTU"},
 		{"vnics", "vNics"},
 		{"vcenter_fqdn", "vCenter"},
-		{"vcenter_short_name", "VC-ENV"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 

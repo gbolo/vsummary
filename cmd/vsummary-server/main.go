@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"os"
+	"sync"
 
 	"github.com/gbolo/vsummary/common"
 	"github.com/gbolo/vsummary/config"
@@ -14,6 +15,7 @@ import (
 	"github.com/gbolo/vsummary/server"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 )
 
 var log = logging.MustGetLogger("vsummary")
@@ -52,6 +54,15 @@ func main() {
 	go server.Start()
 
 	// configure and start built-in internalCollector
-	poller.BuiltInCollector.SetBackend(*b)
-	poller.BuiltInCollector.Run()
+	if viper.GetBool("demo_enabled") {
+		log.Warning("===== !! DEMO MODE ENABLED !! =====")
+		log.Warning("internal poller is disabled in demo mode")
+		// block forever
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		wg.Wait()
+	} else {
+		poller.BuiltInCollector.SetBackend(*b)
+		poller.BuiltInCollector.Run()
+	}
 }

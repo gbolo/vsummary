@@ -51,6 +51,7 @@ $vm_pre_name = array(
 	"haproxy",
 	"influxdb",
 	"sensu",
+	"sensu-go",
 	"opennms",
 	"nagios",
 	"cacti",
@@ -60,12 +61,28 @@ $vm_pre_name = array(
 	"nfs",
 	"mail",
 	"app",
+	"ansible",
 	"puppet",
 	"dns",
 	"dhcp",
 	"testvm",
 	"ftp",
-	"centos",
+	"kubernetes",
+	"gitea",
+	"git",
+	"gitlab",
+	"powerdns",
+	"jenkins",
+	"build",
+	"fabric-peer",
+	"fabric-ca",
+	"fabric-orderer",
+	"couchdb",
+	"mongodb",
+	"prometheus",
+	"jaeger",
+	"vault",
+	"zfs",
 	"nas"
 );
 
@@ -111,11 +128,8 @@ $rp_name = array(
 
 $folder_L1 = array(
 	"DEVOPS",
-	"NETWORKING",
-	"DATABASE",
-	"SECURITY",
-	"WEB",
-	"MAIL",
+	"TESTING",
+	"DEV",
 	"OTHER",
 	"SHARED"
 );

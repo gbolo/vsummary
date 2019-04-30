@@ -58,7 +58,7 @@ var virtualMachineView = UiView{
 		{"vnics", "vNICs"},
 		{"vmx_path", "VMX"},
 		{"vcenter_fqdn", "vCenter"},
-		{"vcenter_short_name", "VC-ENV"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 
@@ -94,7 +94,7 @@ var esxiView = UiView{
 		{"cluster", "Cluster"},
 		{"datacenter", "Datacenter"},
 		{"vcenter_fqdn", "vCenter"},
-		{"vcenter_short_name", "VC-ENV"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 
@@ -108,6 +108,6 @@ var datastoreView = UiView{
 		{"capacity_bytes", "Capacity"},
 		{"free_bytes", "Free"},
 		{"vcenter_fqdn", "vCenter"},
-		{"vcenter_short_name", "VC-ENV"},
+		{"vcenter_short_name", "Site"},
 	},
 }

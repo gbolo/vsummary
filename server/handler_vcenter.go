@@ -15,7 +15,7 @@ var vcenterView = UiView{
 	Title:        "vCenters",
 	AjaxEndpoint: "/api/dt/vcenter",
 	TableHeaders: []tableColumnMap{
-		{"name", "Name"},
+		{"name", "Site"},
 		{"host", "Address"},
 		{"datacenters", "Datacenters"},
 		{"clusters", "Clusters"},

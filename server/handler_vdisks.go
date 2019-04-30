@@ -25,6 +25,7 @@ var vDiskView = UiView{
 		{"datastore_type", "DatastoreType"},
 		{"esxi_name", "ESXi"},
 		{"vcenter_fqdn", "vCenter"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 

@@ -518,7 +518,7 @@ FROM vcenter;`
 	schemaViewCluster = `
 CREATE OR REPLACE VIEW view_cluster AS
 SELECT
-  cluster.*, vcenter.name AS vcenter_short_name,
+  cluster.*, vcenter.name AS vcenter_short_name, vcenter.host AS vcenter_fqdn,
   ( cluster.total_memory_bytes / cluster.num_hosts ) AS avg_memory_per_host,
   ( SELECT coalesce(sum(esxi.stat_memory_usage),0)*1024*1024
     FROM esxi

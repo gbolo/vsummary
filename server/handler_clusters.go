@@ -27,7 +27,8 @@ var clusterView = UiView{
 		{"vms_on", "VMs PoweredOn"},
 		{"avg_vcpu_per_vm", "Avg vCPU per VM"},
 		{"avg_memory_per_vm", "Avg Memory per VM"},
-		//{"vcenter_fqdn", "vCenter"},
+		{"vcenter_fqdn", "vCenter"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 
