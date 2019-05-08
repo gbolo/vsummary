@@ -177,12 +177,12 @@ function gen_mac(){
 function gen_datacenter($num){
 
 	global $vc_id;
-	global $dc_pre_name;
+	global $vc_type;
 	$arr;
 
 	for ($i = 1; $i <= $num; $i++) {
 
-		$name = $dc_pre_name[mt_rand(0, count($dc_pre_name) - 1)].'-DC'.rand(1, 9);
+		$name = strtoupper( substr( $vc_type, 0, 3 ) ).'-DC'.rand(1, 9);
 
 		$json = '
 	    {
@@ -621,6 +621,14 @@ $vcenter_arr = array(
     "host" =>  $vc_fqdn
 );
 
+$poller_arr = array(
+		"vcenter_host" => "{$vc_fqdn}",
+		"vcenter_name" => strtoupper($vc_type),
+		"user_name" => "demo",
+		"enabled" => true,
+		"interval_min" => 300,
+		"internal" => false
+);
 
 echo "POSTING RANDOM SAMPLE DATA FOR VSUMMARY API: $api_endpoint\n---\n";
 echo '[vcenter] ' . vsummary_api_call($vcenter_arr,"vcenter");
@@ -636,3 +644,4 @@ echo '[portgroup] ' . vsummary_api_call($pg_total, "portgroup");
 echo '[vnic] ' . vsummary_api_call($vnic_total,"vnic");
 echo '[vdisk] ' . vsummary_api_call($vdisk_total,"vdisk");
 echo '[folder] ' . vsummary_api_call($fd_total,"folder");
+echo '[poller] ' . vsummary_api_call($poller_arr,"poller");
