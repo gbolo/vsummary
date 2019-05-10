@@ -65,17 +65,9 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 
 	// begin a transaction, set all related objects to absent
 	tx := b.db.MustBegin()
-	var rowsAffected int64 = 0
 
 	// Store the user record in the DB
-	res, err := tx.NamedExec(insertPoller, &poller)
-
-	if err != nil {
-		return
-	}
-
-	// tally up rows affected for logging
-	rowsAffected, err = res.RowsAffected()
+	_, err = tx.NamedExec(insertPoller, &poller)
 	if err != nil {
 		return
 	}
@@ -84,10 +76,11 @@ func (b *Backend) InsertPoller(poller common.Poller) (err error) {
 	err = tx.Commit()
 	if err != nil {
 		log.Errorf("failed to commit transaction to database: %s", err)
+		return
 	}
 
 	// update poll date if it's an external poller
-	if !poller.Internal && rowsAffected > 0 {
+	if !poller.Internal {
 		err = b.UpdateLastPollDate(poller)
 	}
 
@@ -105,7 +98,7 @@ func (b *Backend) UpdateLastPollDate(poller common.Poller) (err error) {
 	// Create an Id and date
 	poller.Id = common.ComputeId(poller.VcenterHost)
 	currentTime := time.Now()
-	poller.LastPoll = currentTime.Format("2006-01-02 3:4 pm")
+	poller.LastPoll = currentTime.Format("2006-01-02 @ 3:04PM MST")
 
 	tx := b.db.MustBegin()
 	var rowsAffected int64 = 0
