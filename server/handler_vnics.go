@@ -28,6 +28,7 @@ var vNicView = UiView{
 		{"vswitch_type", "Backing"},
 		{"vswitch_max_mtu", "MaxMTU"},
 		{"vcenter_fqdn", "vCenter"},
+		{"vcenter_short_name", "Site"},
 	},
 }
 

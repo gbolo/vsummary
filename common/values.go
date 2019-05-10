@@ -24,6 +24,9 @@ var (
 	EndpointVNIC           = getEndpoint("vnic")
 	EndpointFolder         = getEndpoint("folder")
 	EndpointPoller         = getEndpoint("poller")
+
+	// wildcard route for demo mode
+	EndpointDemoWildcard = getEndpoint("")
 )
 
 // getEndpoint returns a properly formatted API endpoint
