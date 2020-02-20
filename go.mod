@@ -1,0 +1,46 @@
+module github.com/gbolo/vsummary
+
+go 1.13
+
+require (
+	github.com/Masterminds/semver v1.4.3-0.20180807142431-c84ddcca87bf
+	github.com/Masterminds/sprig v2.16.0+incompatible
+	github.com/alecthomas/gometalinter v3.0.0+incompatible
+	github.com/aokoli/goutils v1.0.1
+	github.com/buger/jsonparser v0.0.0-20181023193515-52c6e1462ebd
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
+	github.com/client9/misspell v0.3.4
+	github.com/fsnotify/fsnotify v1.4.8-0.20180830220226-ccc981bf8038
+	github.com/gbolo/go-util v0.0.0-20181104195751-d2a475e3300b
+	github.com/go-playground/locales v0.12.1
+	github.com/go-playground/universal-translator v0.16.1-0.20170327191703-71201497bace
+	github.com/go-sql-driver/mysql v1.4.1-0.20181031140716-fd197cdcfae0
+	github.com/google/uuid v1.1.0
+	github.com/gorilla/handlers v1.4.1-0.20181012153334-350d97a79266
+	github.com/gorilla/mux v1.6.3-0.20181030152528-3d80bc801bb0
+	github.com/hashicorp/hcl v1.0.1-0.20180906183839-65a6292f0157
+	github.com/huandu/xstrings v1.2.1-0.20180906151751-8bbcf2f9ccb5
+	github.com/imdario/mergo v0.3.6
+	github.com/jmoiron/sqlx v1.2.1-0.20181024163419-82935fac6c1a
+	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a
+	github.com/lunixbochs/vtclean v1.0.0
+	github.com/magiconair/properties v1.8.0
+	github.com/manifoldco/promptui v0.4.1-0.20190411181407-35bab80e16a4
+	github.com/mattn/go-colorable v0.1.1
+	github.com/mattn/go-isatty v0.0.7
+	github.com/mitchellh/mapstructure v1.1.2
+	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/pelletier/go-toml v1.2.1-0.20180930205832-81a861c69d25
+	github.com/spf13/afero v1.1.2
+	github.com/spf13/cast v1.3.0
+	github.com/spf13/cobra v0.0.4
+	github.com/spf13/jwalterweatherman v1.1.0
+	github.com/spf13/pflag v1.0.4-0.20181223182923-24fa6976df40
+	github.com/spf13/viper v1.3.3-0.20190408140645-7a605a50e69c
+	github.com/vmware/govmomi v0.19.1-0.20181101223037-a080485c311e
+	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
+	golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223
+	golang.org/x/text v0.3.1-0.20181010134911-4d1c5fb19474
+	gopkg.in/go-playground/validator.v9 v9.23.0
+	gopkg.in/yaml.v2 v2.2.2
+)
