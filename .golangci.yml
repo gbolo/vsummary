@@ -23,7 +23,7 @@ linters:
     - goimports
     - gofmt
     - gosec
-    - misspell
+    # - misspell
     - unused
     - deadcode
     - varcheck
