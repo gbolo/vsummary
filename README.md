@@ -1,9 +1,9 @@
-vSummary [![](https://images.microbadger.com/badges/image/gbolo/vsummary.svg)](http://microbadger.com/images/gbolo/vsummary "Image Badge") [![Build Status](https://travis-ci.org/gbolo/vsummary.svg?branch=master)](https://travis-ci.org/gbolo/vsummary) [![Go Report Card](https://goreportcard.com/badge/github.com/gbolo/vsummary)](https://goreportcard.com/report/github.com/gbolo/vsummary)
+vSummary [![](https://img.shields.io/badge/demo-link-green)](https://vsummary.linuxctl.com/) [![](https://images.microbadger.com/badges/image/gbolo/vsummary.svg)](http://microbadger.com/images/gbolo/vsummary "Image Badge") [![Build Status](https://travis-ci.org/gbolo/vsummary.svg?branch=master)](https://travis-ci.org/gbolo/vsummary) [![Go Report Card](https://goreportcard.com/badge/github.com/gbolo/vsummary)](https://goreportcard.com/report/github.com/gbolo/vsummary)
 ================
 
 vSummary is an open source tool for collecting and displaying a summary of your vSphere Environment(s). Visit the [demo site](https://vsummary.linuxctl.com/) or see the screenshots below for a better understanding.
 
-![Alt text](https://raw.githubusercontent.com/gbolo/vSummary/php/screenshots/screenshot_1.png "Screenshot 1")
+![screenshot](https://github.com/gbolo/vsummary/raw/master/contrib/screenshots/screenshot_3.png "Screenshot 3")
 
 ## Quick Start
 To quickly give `vsummary-server` a test drive, you can spin up the included
