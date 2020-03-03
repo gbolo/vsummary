@@ -122,7 +122,7 @@ func TestValidateVcenterCertficate(t *testing.T) {
 
 	_, errs := externalpoller.GetPollResults()
 	if len(errs) > 0 {
-		t.Errorf("expected no errors but recieved: %v", errs)
+		t.Errorf("expected no errors but received: %v", errs)
 	}
 
 	// specify the incorrect CA file
@@ -139,6 +139,6 @@ func TestValidateVcenterCertficate(t *testing.T) {
 
 	_, errs = externalpoller.GetPollResults()
 	if len(errs) == 0 {
-		t.Error("expected TLS errors but recieved none")
+		t.Error("expected TLS errors but received none")
 	}
 }

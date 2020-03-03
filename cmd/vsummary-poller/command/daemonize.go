@@ -15,7 +15,7 @@ var daemonizeCmd = &cobra.Command{
 	Use:   "daemonize",
 	Short: "Daemonize this poller for use as a service",
 	Long: `When daemonizing a poller, an interval is set (in minutes) and this poller
-will remain running as a proccess polling all vcenter(s) defined in the supplied
+will remain running as a process polling all vcenter(s) defined in the supplied
 configuration file indefinitely`,
 	Run: func(cmd *cobra.Command, args []string) {
 		daemonize()

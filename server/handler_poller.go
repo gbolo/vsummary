@@ -155,7 +155,7 @@ func handlerDeletePoller(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, "Successfuly removed poller")
+	fmt.Fprint(w, "Successfully removed poller")
 }
 
 func handlerPollNow(w http.ResponseWriter, req *http.Request) {
