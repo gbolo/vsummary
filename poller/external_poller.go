@@ -144,7 +144,7 @@ func (e *ExternalPoller) sendResult(endpoint string, o interface{}) (err error) 
 
 	// we only accept 202 as success
 	if res.StatusCode != http.StatusAccepted {
-		err = fmt.Errorf("recieved %d response code from %v", res.StatusCode, url)
+		err = fmt.Errorf("received %d response code from %v", res.StatusCode, url)
 		return
 	}
 
