@@ -62,6 +62,10 @@ const insertCluster = `
 // Insert into database
 func (b *Backend) InsertClusters(clusters []common.Cluster) (err error) {
 
+	if len(clusters) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

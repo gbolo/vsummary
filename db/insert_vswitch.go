@@ -67,6 +67,10 @@ const insertDVS = `
 // Insert into database
 func (b *Backend) InsertVSwitch(vswitches []common.VSwitch) (err error) {
 
+	if len(vswitches) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

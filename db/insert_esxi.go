@@ -92,6 +92,10 @@ const insertEsxi = `
 // Insert into database
 func (b *Backend) InsertEsxi(esxis []common.Esxi) (err error) {
 
+	if len(esxis) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {
