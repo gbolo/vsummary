@@ -42,6 +42,10 @@ const insertFolders = `
 // Insert into database
 func (b *Backend) InsertFolders(folders []common.Folder) (err error) {
 
+	if len(folders) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

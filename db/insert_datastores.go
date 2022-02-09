@@ -43,6 +43,10 @@ const insertDatastore = `
 
 func (b *Backend) InsertDatastores(dss []common.Datastore) (err error) {
 
+	if len(dss) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

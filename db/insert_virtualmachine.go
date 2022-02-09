@@ -98,6 +98,10 @@ const insertVm = `
 // InsertVirtualmachines inserts a vm into database
 func (b *Backend) InsertVirtualmachines(vms []common.VirtualMachine) (err error) {
 
+	if len(vms) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

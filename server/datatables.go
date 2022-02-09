@@ -480,7 +480,7 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 
 	// query to find return all filtered data
 	queryFiltered := fmt.Sprintf(
-		"SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s",
+		"SELECT %s FROM %s %s %s",
 		strings.Join(allColumns, ","),
 		tableName,
 		whereClause,
@@ -498,12 +498,14 @@ func (di *DataTablesInfo) fetchDataForResponse(tableName string) (response DataT
 		)
 	}
 
-	//log.Debugf("sql query: %s", queryFiltered)
-
 	// query to find total rows filtered
-	queryFilteredCount := "SELECT FOUND_ROWS() AS rows;"
+	queryFilteredCount := fmt.Sprintf(
+		"SELECT COUNT(*) FROM %s %s",
+		tableName,
+		whereClause,
+	)
 
-	// populate the resonse
+	// populate the response
 	err = querySingleRow(queryTotal, &response.RecordsTotal)
 	if err != nil {
 		return

@@ -64,6 +64,10 @@ const insertResourcepool = `
 // Insert into database
 func (b *Backend) InsertResourcepools(resourcepools []common.ResourcePool) (err error) {
 
+	if len(resourcepools) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {

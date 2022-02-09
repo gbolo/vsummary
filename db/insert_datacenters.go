@@ -32,6 +32,10 @@ const insertDatacenter = `
 // InsertVMs inserts a vm into database
 func (b *Backend) InsertDatacenters(dcs []common.Datacenter) (err error) {
 
+	if len(dcs) == 0 {
+		return
+	}
+
 	// exit if there is no database connection
 	err = b.checkDB()
 	if err != nil {
