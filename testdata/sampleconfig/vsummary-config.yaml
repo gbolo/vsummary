@@ -17,7 +17,7 @@ server:
   bind_port: 8080
 
   # enable access log on stdout
-  access_log: true
+  access_log: false
 
   # TLS options
   tls:

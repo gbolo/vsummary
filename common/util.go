@@ -42,7 +42,7 @@ func GetInt(o interface{}, keys ...string) (i int64) {
 
 	i, err := jsonparser.GetInt(b, keys...)
 	if err != nil {
-		log.Infof("error parsing json: %s", err)
+		log.Infof("error parsing json keys %v: %s", keys, err)
 	}
 
 	return
@@ -56,7 +56,7 @@ func GetString(o interface{}, keys ...string) (s string) {
 
 	s, err := jsonparser.GetString(b, keys...)
 	if err != nil {
-		log.Infof("error parsing json: %s", err)
+		log.Infof("error parsing json keys %v: %s", keys, err)
 	}
 
 	return
@@ -69,7 +69,7 @@ func GetBool(o interface{}, keys ...string) (l bool) {
 
 	l, err := jsonparser.GetBoolean(b, keys...)
 	if err != nil {
-		log.Infof("error parsing json: %s", err)
+		log.Infof("error parsing json keys %v: %s", keys, err)
 	}
 
 	return
@@ -82,7 +82,7 @@ func GetBytes(o interface{}, keys ...string) (r []byte) {
 
 	r, _, _, err := jsonparser.Get(b, keys...)
 	if err != nil {
-		log.Infof("error parsing json: %s", err)
+		log.Infof("error parsing json keys %v: %s", keys, err)
 	}
 
 	return

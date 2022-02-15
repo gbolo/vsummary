@@ -18,6 +18,7 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 	defer common.ExecutionTime(time.Now(), "pollVirtualMachine")
 
 	// Create view of VirtualMachine objects
+	moType := "VirtualMachine"
 	m := view.NewManager(p.VmwareClient.Client)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -35,7 +36,7 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 	var moList []mo.VirtualMachine
 	err = v.Retrieve(
 		ctx,
-		[]string{"VirtualMachine"},
+		[]string{moType},
 		[]string{"summary", "config", "guest", "runtime", "parent", "resourcePool", "parentVApp"},
 		&moList,
 	)
@@ -91,6 +92,11 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 			vm.ResourcePoolMoref = mo.ResourcePool.Value
 		}
 
+		// skip this VM if it's missing core components
+		if vm.VmxPath == "" || vm.Vcpu == 0 || vm.MemoryMb == 0 {
+			log.Warningf("skipping vm %s due to missing core attributes", vm.Name)
+			continue
+		}
 		VMs = append(VMs, vm)
 
 		// loop through devices ----------------------------------------------------------------------------------------
@@ -152,7 +158,7 @@ func (p *Poller) GetVirtualMachines() (VMs []common.VirtualMachine, vDisks []com
 		}
 	}
 
-	log.Infof("poller fetched summary of %d moList", len(VMs))
+	log.Infof("poller fetched %d summaries of %s", len(VMs), moType)
 	return
 
 }

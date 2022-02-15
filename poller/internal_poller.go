@@ -108,12 +108,12 @@ func (i *InternalPoller) Daemonize() {
 	t := time.Tick(time.Duration(viper.GetInt("poller.interval")) * time.Minute)
 	log.Infof("start interval polling (%dm) of %s", viper.GetInt("poller.interval"), i.Config.VcenterURL)
 
-	// this prevents all pollers to go off at the exact same time
+	// this prevents all pollers to go off at the exact same time at the start
 	// TODO: redesign or remove this
-	randomizedWait(1, 10)
+	randomizedWait(1, 30)
 	i.PollThenStore()
 
-	// start polling until we shouldn't anymore
+	// start polling until we shouldn't anymore (if we get stop signal or poller is not enabled)
 	for {
 		select {
 		case <-t:
